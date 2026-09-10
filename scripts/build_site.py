@@ -179,14 +179,6 @@ body {
   color: var(--accent);
 }
 
-.filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-block: 44px 8px;
-  padding-top: 22px;
-  border-top: 1px solid var(--rule);
-}
 .filters button {
   font-family: "IBM Plex Mono", ui-monospace, monospace;
   font-size: 11px;
@@ -428,6 +420,157 @@ body {
   color: var(--ink-faint);
 }
 
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin-block: 44px 8px;
+  padding-top: 22px;
+  border-top: 1px solid var(--rule);
+}
+.filters { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.views { display: flex; gap: 0; border: 1px solid var(--rule); border-radius: 999px; padding: 3px; }
+.views button {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: color .15s, background-color .15s;
+}
+.views button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+.views button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.concept {
+  background: var(--note-bg);
+  border-radius: 3px;
+  padding: 22px clamp(16px, 3vw, 24px);
+  display: grid;
+  gap: 20px;
+}
+.concept-head { display: grid; gap: 8px; }
+.concept-title {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.concept-title .dur { color: var(--accent); }
+.concept-hook {
+  margin: 0;
+  font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 600;
+  font-size: clamp(1.15rem, 3vw, 1.4rem);
+  line-height: 1.2;
+  letter-spacing: -.012em;
+  text-wrap: balance;
+}
+.concept-logline { margin: 0; font-size: .95rem; color: var(--ink-soft); max-width: 52ch; }
+
+.beats { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.beat {
+  display: grid;
+  grid-template-columns: 7.6rem 1fr;
+  gap: 14px;
+  padding: 11px 0;
+  border-top: 1px solid var(--rule-soft);
+}
+.beat-mark { display: grid; gap: 3px; align-content: start; }
+.beat-t {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+.beat-name {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.beat-body { display: grid; gap: 8px; }
+.beat-visual { margin: 0; font-size: .93rem; line-height: 1.5; color: var(--ink-soft); max-width: 56ch; }
+.beat-overlay {
+  margin: 0;
+  justify-self: start;
+  font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 600;
+  font-size: .95rem;
+  line-height: 1.25;
+  letter-spacing: -.008em;
+  color: var(--ink);
+  background: var(--surface);
+  border-left: 3px solid var(--accent);
+  border-radius: 2px;
+  padding: 7px 11px;
+  max-width: 30ch;
+}
+
+.beat-attrib {
+  margin: 0;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.caption {
+  margin: 0;
+  white-space: pre-line;
+  font-size: 1rem;
+  line-height: 1.62;
+  max-width: 54ch;
+  background: var(--surface);
+  border-radius: 3px;
+  padding: 16px 18px;
+}
+.hashtags {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.hashtags li {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--accent);
+}
+.audio-note {
+  margin: 0;
+  font-size: .9rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  padding-left: 14px;
+  border-left: 2px solid var(--rule);
+  max-width: 56ch;
+}
+
+.view-concepts .case > :not(.case-head):not(.concept) { display: none; }
+.view-concepts .case:not([data-concept="1"]) { display: none; }
+
+@media (max-width: 620px) {
+  .beat { grid-template-columns: 1fr; gap: 8px; }
+  .beat-mark { display: flex; gap: 10px; align-items: baseline; }
+  .controls { gap: 16px; }
+}
+
 @media (max-width: 620px) {
   .links a { grid-template-columns: 1fr; gap: 5px; }
   .vtype { justify-self: start; }
@@ -460,6 +603,18 @@ JS = """
 
   buttons.forEach(function (b) {
     b.addEventListener('click', function () { apply(b.dataset.sport); });
+  });
+
+  var viewButtons = Array.prototype.slice.call(document.querySelectorAll('.views button'));
+  var page = document.querySelector('.page');
+
+  viewButtons.forEach(function (b) {
+    b.addEventListener('click', function () {
+      page.classList.toggle('view-concepts', b.dataset.view === 'koncepty');
+      viewButtons.forEach(function (o) {
+        o.setAttribute('aria-pressed', String(o === b));
+      });
+    });
   });
 })();
 """
@@ -495,6 +650,45 @@ def render_quote(quote: dict) -> str:
         "</blockquote>",
     ]
     return "".join(parts)
+
+
+def render_concept(concept: dict) -> str:
+    payoff = concept["payoff"]
+    beats = "".join(
+        '<li class="beat">'
+        f'<div class="beat-mark"><span class="beat-t">{esc(b["t"])}</span>'
+        f'<span class="beat-name">{esc(b["beat"])}</span></div>'
+        '<div class="beat-body">'
+        f'<p class="beat-visual">{esc(b["visual"])}</p>'
+        f'<p class="beat-overlay">{esc(b["overlay"])}</p>'
+        + (
+            f'<p class="beat-attrib">{esc(payoff["speaker"])}</p>'
+            if b["beat"] == "Důkaz"
+            else ""
+        )
+        + "</div></li>"
+        for b in concept["beats"]
+    )
+    tags = "".join(f"<li>{esc(t)}</li>" for t in concept["hashtags"])
+    audio = (
+        f'<p class="audio-note"><b>Zvuk:</b> {esc(concept["audio"])}</p>'
+        if concept.get("audio")
+        else ""
+    )
+    return (
+        '<div class="concept">'
+        '<div class="concept-head">'
+        '<p class="concept-title"><span>Koncept pro Reel</span>'
+        f'<span class="dur">9:16 · {concept["duration_s"]} s · 6 beatů</span></p>'
+        f'<p class="concept-hook">{esc(concept["hook"])}</p>'
+        f'<p class="concept-logline">{esc(concept["logline"])}</p>'
+        "</div>"
+        f'<div><p class="section-label">Sestřih</p><ul class="beats">{beats}</ul></div>'
+        f'<div><p class="section-label">Caption</p><p class="caption">{esc(concept["caption"])}</p>'
+        f'<ul class="hashtags">{tags}</ul></div>'
+        + (f"<div>{audio}</div>" if audio else "")
+        + "</div>"
+    )
 
 
 def render_case(case: dict) -> str:
@@ -574,7 +768,15 @@ def render_case(case: dict) -> str:
     )
     blocks.append(f'<div><p class="section-label">Zdroje</p><ul class="sources">{sources}</ul></div>')
 
-    return f'<article class="case" data-sport="{esc(sport)}">' + "".join(blocks) + "</article>"
+    if case.get("concept"):
+        blocks.append(render_concept(case["concept"]))
+
+    has_concept = "1" if case.get("concept") else "0"
+    return (
+        f'<article class="case" data-sport="{esc(sport)}" data-concept="{has_concept}">'
+        + "".join(blocks)
+        + "</article>"
+    )
 
 
 def main() -> None:
@@ -585,6 +787,7 @@ def main() -> None:
     cases.sort(key=lambda c: c["date"], reverse=True)
 
     sports = sorted({c["sport"] for c in cases}, key=lambda s: SPORT_LABELS.get(s, s))
+    n_concepts = sum(1 for c in cases if c.get("concept"))
     filters = ['<button type="button" data-sport="vse" aria-pressed="true">Vše</button>']
     filters += [
         f'<button type="button" data-sport="{esc(s)}" aria-pressed="false">'
@@ -605,13 +808,19 @@ def main() -> None:
 <style>{CSS}</style>
 <div class="page">
   <header class="masthead">
-    <p class="eyebrow">Archiv · {len(cases)} případů · {len(sports)} sportů</p>
+    <p class="eyebrow">{len(cases)} případů · {len(sports)} sportů · {n_concepts} konceptů</p>
     <h1>Otočky v hlavě</h1>
     <p class="lede">Sportovní obraty, u kterých mentální zlom není domněnka novináře,
-      ale doložený vlastními slovy aktéra.</p>
+      ale doložený vlastními slovy aktéra. Z každého je hotový koncept na Reel.</p>
     <ol class="criteria">{criteria_html}</ol>
   </header>
-  <nav class="filters" aria-label="Filtr podle sportu">{"".join(filters)}</nav>
+  <div class="controls">
+    <nav class="filters" aria-label="Filtr podle sportu">{"".join(filters)}</nav>
+    <nav class="views" aria-label="Pohled">
+      <button type="button" data-view="archiv" aria-pressed="true">Archiv</button>
+      <button type="button" data-view="koncepty" aria-pressed="false">Koncepty</button>
+    </nav>
+  </div>
   <main class="cases">
     {"".join(render_case(c) for c in cases)}
     <p class="empty" id="empty" hidden>V tomto sportu zatím žádný případ není.</p>

@@ -9,7 +9,11 @@
   "deficit": "Federer podával na vítězství za stavu 8:7 v pátém setu a vedl 40:15 — dva mečboly. Celé Centre Court hlasitě fandilo Federerovi.",
   "result": "6:7(5), 6:1, 6:7(4), 6:4, 12:13(3) — Djoković vyhrál po 4 hodinách a 55 minutách, nejdelší finále v historii Wimbledonu",
   "turning_point": "Dva odvrácené mečboly za stavu 7:8 a 15:40 na Federerově podání. Djoković oba vrátil agresivním returnem a zápas dotlačil do zkráceného pátého setu.",
-  "mental_mechanism": ["prerámování publika", "zúžení pozornosti", "sebeinstruktáž"],
+  "mental_mechanism": [
+    "prerámování publika",
+    "zúžení pozornosti",
+    "sebeinstruktáž"
+  ],
   "story": "Djoković hrál celý zápas proti soupeři i proti publiku, které skandovalo Federerovo jméno. Ve chvíli, kdy čelil dvěma mečbolům, si podle vlastních slov skandování přeložil ve své hlavě na vlastní jméno — nepřátelské prostředí obrátil v palivo. Popsal to jako stav soustředění, do kterého se vědomě uzavřel. Oba mečboly odvrátil a vyhrál pátý set 13:12 ve zkrácené hře. Na tiskovce po zápase byl na tohle přímo tázán a odpověděl větou, která se stala jednou z nejcitovanějších v tenise.",
   "evidence": {
     "asked_about": true,
@@ -62,9 +66,78 @@
     }
   ],
   "sources": [
-    { "name": "ATP Tour — jak bylo finále vyhráno", "url": "https://www.atptour.com/en/news/djokovic-federer-wimbledon-2019-final-match-analysis" },
-    { "name": "Wikipedia — 2019 Wimbledon men's singles final", "url": "https://en.wikipedia.org/wiki/2019_Wimbledon_Championships_%E2%80%93_Men's_singles_final" },
-    { "name": "Tennis.com — Djokovic saves two match points", "url": "https://www.tennis.com/news/articles/djokovic-saves-two-match-points-to-top-federer-for-16th-major-title" }
+    {
+      "name": "ATP Tour — jak bylo finále vyhráno",
+      "url": "https://www.atptour.com/en/news/djokovic-federer-wimbledon-2019-final-match-analysis"
+    },
+    {
+      "name": "Wikipedia — 2019 Wimbledon men's singles final",
+      "url": "https://en.wikipedia.org/wiki/2019_Wimbledon_Championships_%E2%80%93_Men's_singles_final"
+    },
+    {
+      "name": "Tennis.com — Djokovic saves two match points",
+      "url": "https://www.tennis.com/news/articles/djokovic-saves-two-match-points-to-top-federer-for-16th-major-title"
+    }
   ],
-  "verified_at": "2026-09-10"
+  "verified_at": "2026-09-10",
+  "concept": {
+    "hook": "Celý stadion skanduje jméno tvého soupeře. A ty čelíš dvěma mečbolům.",
+    "logline": "Djoković nemohl umlčet publikum, tak si přepsal to, co slyší.",
+    "duration_s": 48,
+    "beats": [
+      {
+        "t": "0:00–0:03",
+        "beat": "Konec",
+        "visual": "Zvuk davu skandujícího „Roger“. Federer se chystá podávat na vítězství.",
+        "overlay": "8:7. Dva mečboly. Proti němu."
+      },
+      {
+        "t": "0:03–0:12",
+        "beat": "Kontext",
+        "visual": "Záběry na zaplněné Centre Court, Federerovy fanoušky, Djokovičův obličej.",
+        "overlay": "Celý stadion fandí tomu druhému."
+      },
+      {
+        "t": "0:12–0:20",
+        "beat": "Zlom",
+        "visual": "Zpomalený detail na Djokoviče mezi výměnami. Text „ROGER“ na obraze se přepíše na „NOVAK“.",
+        "overlay": "ROGER → NOVAK"
+      },
+      {
+        "t": "0:20–0:33",
+        "beat": "Obrat",
+        "visual": "Oba odvrácené mečboly, rychlý střih. Zkrácená hra pátého setu, pád na kolena.",
+        "overlay": "13:12. Nejdelší finále v historii."
+      },
+      {
+        "t": "0:33–0:45",
+        "beat": "Důkaz",
+        "visual": "Záznam z tiskovky — Djoković tu větu říká sám, s titulky.",
+        "overlay": "„Když dav skanduje Rogere, já slyším Novaku.“"
+      },
+      {
+        "t": "0:45–0:48",
+        "beat": "Pointa",
+        "visual": "Černá plocha, bílý text.",
+        "overlay": "Vstup si nevybereš. To, co si z něj uděláš, ano."
+      }
+    ],
+    "payoff": {
+      "speaker": "Novak Djoković",
+      "line": "Když dav skanduje Rogere, já slyším Novaku."
+    },
+    "caption": "Centre Court skanduje jméno tvého soupeře. Ty čelíš dvěma mečbolům ve finále Wimbledonu.\n\nDjoković ten zvuk nemohl vypnout. Tak s ním udělal něco jiného — přeložil si ho.\n\n„Když dav skanduje Rogere, já slyším Novaku.“\n\nSám na tiskovce dodal, že to zní jako pitomost. Ale že to tak opravdu je. Pak oba mečboly odvrátil a vyhrál 13:12 v pátém setu.\n\nVstup si nevybereš. To, co si z něj uděláš, ano.",
+    "hashtags": [
+      "#djokovic",
+      "#wimbledon",
+      "#tenis",
+      "#mentalnitrenink",
+      "#sportovnipsychologie",
+      "#mindset",
+      "#comeback",
+      "#hlavarozhoduje"
+    ],
+    "audio": "Použít originální zvuk — skandování davu je půlka příběhu. Hudbu jen tiše pod beat 5–6.",
+    "closing": "Vstup si nevybereš. To, co si z něj uděláš, ano."
+  }
 }

@@ -9,7 +9,11 @@
   "deficit": "Dvakrát složen v prvním kole. Chandler ho většinu zbytku kola mlátil u klece, rozhodčí Dan Miragliotta stál nad ním a byl na pokraji zastavení zápasu. K tomu léta pověsti bojovníka, který to vzdává.",
   "result": "TKO 19 sekund po začátku druhého kola — Oliveira se stal mistrem světa v lehké váze",
   "turning_point": "Minuta pauzy mezi koly. Do druhého kola vyšel úplně jiný bojovník, hned Chandlera složil levým hákem a dokončil to na zemi.",
-  "mental_mechanism": ["prerámování", "sebeinstruktáž", "hněv jako palivo"],
+  "mental_mechanism": [
+    "prerámování",
+    "sebeinstruktáž",
+    "hněv jako palivo"
+  ],
   "story": "Oliveira byl roky v MMA nositelem té nejhorší nálepky — po odstoupení z prvního hlavního zápasu proti Maxi Hollowayovi ho velká část fanoušků označila za člověka, který to vzdává. V zápase o titul proti Chandlerovi dostal přesně tu situaci, ve které se to mělo znovu potvrdit: dvakrát na zemi, rozhodčí připravený zasáhnout. Přežil kolo a po minutě pauzy nastoupil do druhého jako někdo jiný. Za 19 sekund bylo hotovo. V oktagonu plakal a mluvil o tom, že to celé bylo o dokazování.",
   "uncertainty": "Nepodařilo se dohledat výrok, ve kterém by Oliveira konkrétně popsal, co si během minuty mezi koly řekl nebo co mu řekl roh. Doložená je jeho obecná výpověď o mentalitě a o vyrovnávání se s nálepkou. Pokud takový výrok existuje v portugalštině nebo v podcastu, případ je vhodné doplnit.",
   "evidence": {
@@ -63,10 +67,83 @@
     }
   ],
   "sources": [
-    { "name": "South China Morning Post — comeback win", "url": "https://www.scmp.com/sport/martial-arts/mixed-martial-arts/article/3133661/ufc-262-charles-oliveira-knocks-out-michael" },
-    { "name": "Yahoo Sports — champion's mentality", "url": "https://sports.yahoo.com/a-champions-mentality-how-a-resilient-charles-oliveira-made-it-to-the-top-224406921.html" },
-    { "name": "Bloody Elbow — nálepka „quitter“ po zápase s Hollowayem", "url": "https://bloodyelbow.com/2025/05/27/charles-oliveira-was-booed-out-of-the-cage-and-labeled-a-quitter-after-forfeiting-his-first-ever-ufc-main-event/" },
-    { "name": "Tapology — záznam zápasu", "url": "https://www.tapology.com/fightcenter/bouts/560948-ufc-262-charles-do-bronx-oliveira-vs-iron-michael-chandler" }
+    {
+      "name": "South China Morning Post — comeback win",
+      "url": "https://www.scmp.com/sport/martial-arts/mixed-martial-arts/article/3133661/ufc-262-charles-oliveira-knocks-out-michael"
+    },
+    {
+      "name": "Yahoo Sports — champion's mentality",
+      "url": "https://sports.yahoo.com/a-champions-mentality-how-a-resilient-charles-oliveira-made-it-to-the-top-224406921.html"
+    },
+    {
+      "name": "Bloody Elbow — nálepka „quitter“ po zápase s Hollowayem",
+      "url": "https://bloodyelbow.com/2025/05/27/charles-oliveira-was-booed-out-of-the-cage-and-labeled-a-quitter-after-forfeiting-his-first-ever-ufc-main-event/"
+    },
+    {
+      "name": "Tapology — záznam zápasu",
+      "url": "https://www.tapology.com/fightcenter/bouts/560948-ufc-262-charles-do-bronx-oliveira-vs-iron-michael-chandler"
+    }
   ],
-  "verified_at": "2026-09-10"
+  "verified_at": "2026-09-10",
+  "concept": {
+    "hook": "Roky mu říkali, že to vždycky vzdá. Teď leží na zemi.",
+    "logline": "Dostal přesně tu situaci, ve které se měla jeho nálepka potvrdit.",
+    "duration_s": 44,
+    "beats": [
+      {
+        "t": "0:00–0:04",
+        "beat": "Konec",
+        "visual": "Oliveira na zemi v prvním kole, rozhodčí skloněný nad ním.",
+        "overlay": "Dvakrát na zemi. Rozhodčí připravený zasáhnout."
+      },
+      {
+        "t": "0:04–0:14",
+        "beat": "Kontext",
+        "visual": "Archiv — odstoupení proti Hollowayovi, pískot, komentáře o tom, že to vzdává.",
+        "overlay": "Roky mu říkali, že to vždycky vzdá."
+      },
+      {
+        "t": "0:14–0:20",
+        "beat": "Zlom",
+        "visual": "Konec prvního kola, minuta v rohu, nástup do druhého kola.",
+        "overlay": "Přežil kolo."
+      },
+      {
+        "t": "0:20–0:30",
+        "beat": "Obrat",
+        "visual": "Levý hák, Chandler jde k zemi, dokončení. Devatenáct sekund.",
+        "overlay": "19 sekund."
+      },
+      {
+        "t": "0:30–0:41",
+        "beat": "Důkaz",
+        "visual": "Rozhovor v oktagonu — Oliveira v slzách, s titulky.",
+        "overlay": "„Všem jsem dokázal, že jsem lev mezi lvy.“"
+      },
+      {
+        "t": "0:41–0:44",
+        "beat": "Pointa",
+        "visual": "Černá plocha, bílý text.",
+        "overlay": "Nálepka, kterou ti dají ostatní, není rozsudek."
+      }
+    ],
+    "payoff": {
+      "speaker": "Charles Oliveira",
+      "line": "Všem jsem dokázal, že jsem lev mezi lvy."
+    },
+    "caption": "Roky mu fanoušci říkali, že to vždycky vzdá. Po jednom odstoupení mu ta nálepka zůstala viset.\n\nV zápase o titul dostal přesně tu situaci, ve které se to mělo potvrdit. Dvakrát na zemi v prvním kole. Rozhodčí skloněný nad ním, připravený to ukončit.\n\nPřežil kolo. Do druhého nastoupil jako někdo jiný. Za 19 sekund bylo hotovo.\n\nV oktagonu pak plakal:\n\n„Všem jsem dokázal, že jsem lev mezi lvy.“\n\nNálepka, kterou ti dají ostatní, není rozsudek.",
+    "hashtags": [
+      "#charlesoliveira",
+      "#ufc",
+      "#mma",
+      "#dobronx",
+      "#mentalnitrenink",
+      "#sportovnipsychologie",
+      "#mindset",
+      "#comeback",
+      "#hlavarozhoduje"
+    ],
+    "audio": "Originální zvuk. Ticho haly v prvním kole vs. výbuch ve druhém.",
+    "closing": "Nálepka, kterou ti dají ostatní, není rozsudek."
+  }
 }

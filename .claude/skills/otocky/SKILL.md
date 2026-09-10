@@ -1,6 +1,6 @@
 ---
 name: otocky
-description: Vyhledá a zdokumentuje historické mentální otočky ve sportu — zápasy, závody a turnaje obrácené hlavou, kde protagonista po utkání sám mluvil o mentálním zlomu nebo na něj byl novináři tázán. Použij, když uživatel chce najít nový případ, doplnit nebo ověřit existující, prohledat konkrétní sport či období, nebo přegenerovat přehled. Sporty: tenis, fotbal, hokej, MMA, golf, atletika, basketbal, box, cyklistika, F1 a další.
+description: Vyhledá a zdokumentuje historické mentální otočky ve sportu a udělá z každé produkční koncept pro krátké video na Instagram — zápasy, závody a turnaje obrácené hlavou, kde protagonista po utkání sám mluvil o mentálním zlomu nebo na něj byl novináři tázán. Použij, když uživatel chce najít nový případ, doplnit nebo ověřit existující, napsat nebo přepsat koncept a caption, prohledat konkrétní sport či období, nebo přegenerovat přehled. Sporty: tenis, fotbal, hokej, MMA, golf, atletika, basketbal, box, cyklistika, F1 a další.
 ---
 
 # Agent: mentální otočky ve sportu
@@ -77,13 +77,69 @@ Pokud přímý odkaz neověříš, použij vyhledávací odkaz YouTube a označ 
 Vytvoř `data/cases/<id>.json` podle `schema/case.schema.json`.
 `id` = `<rok>-<soutěž>-<protagonista>`, malými písmeny, bez diakritiky, pomlčky.
 
+### Krok 6 — Koncept videa
+
+Z každého případu udělej **produkční koncept pro Reel** (blok `concept`, 9:16, 40–60 s).
+Pointa je vždycky stejná: **hlava rozhoduje i ve chvíli, kdy to vypadá ztracené.**
+
 Pak spusť:
 
 ```bash
 python3 scripts/validate.py && python3 scripts/build_site.py
 ```
 
-## 3. Zdroje podle sportu
+## 3. Struktura konceptu — šest beatů
+
+Každý příběh se vejde do stejného oblouku. Neměň ho — je to to, co dělá ze sbírky sérii.
+
+| Beat | Cíl | Délka |
+|---|---|---|
+| **Konec** | Nejhorší moment jako první záběr. Ne rozjezd, ne kontext — rovnou dno. | 3–4 s |
+| **Kontext** | Proč to bylo ztracené. Čísla, ne přídavná jména. | 8–10 s |
+| **Zlom** | Co se stalo v hlavě. Tohle je jádro, sem patří mechanismus. | 6–10 s |
+| **Obrat** | Otočka, rychlý střih, ať to má spád. | 10–15 s |
+| **Důkaz** | **Sportovec to říká sám**, s titulky. Tohle má konkurence málokdy. | 7–13 s |
+| **Pointa** | Jedna věta, která to přenese na diváka. Statický text. | 3 s |
+
+**Beat „Důkaz" je celý smysl téhle série.** Kdokoliv umí sestříhat comeback. Materiál z tiskovky,
+kde to hráč vysvětluje vlastními slovy, dělá rozdíl mezi highlightem a příběhem.
+
+### Text na obraze (`overlay`)
+
+- Maximálně **90 znaků**, ideálně 4–8 slov — validátor delší odmítne
+- Čitelné na mobilu bez zvuku: většina lidí kouká s vypnutým zvukem
+- **Uvozovky používej jen u doslovné citace.** Validátor kontroluje, že cokoliv v „…“
+  odpovídá výroku z `evidence`. Parafráze piš bez uvozovek.
+
+### Caption (`caption`)
+
+Struktura, která funguje:
+
+1. **Scéna** — dvě věty, konkrétně, čísla
+2. **Co se stalo v hlavě** — mechanismus, ne dojmy
+3. **Citace** — doslovná, na samostatném řádku
+4. **Výsledek** — krátce
+5. **Přenos** — jedna věta, kterou si divák vezme do vlastního života
+
+Čemu se vyhnout: motivační plakáty („nikdy se nevzdávej!"), vykřičníky, obecné fráze,
+emoji jako výplň, delší text než osm odstavců.
+
+### Zvuk (`audio`)
+
+U většiny těchhle případů je **originální zvuk silnější než hudba** — skandování davu,
+reakce komentátora, ticho haly. Vždycky zvaž, jestli hudba něco přidává, nebo jen překrývá.
+
+## 4. Práva k záběrům — praktická poznámka
+
+Materiál od UEFA, UFC, NHL, Wimbledonu nebo MOV je chráněný a tyto organizace ho na
+sociálních sítích aktivně vymáhají. Krátký sestřih s vlastním komentářem se běžně toleruje,
+ale záruka to není — Instagram může příspěvek stáhnout nebo umlčet zvuk.
+
+Co riziko snižuje: krátké úryvky místo souvislých pasáží, vlastní text a komentář jako
+těžiště, uvedení zdroje, žádná monetizace cizího záběru. Rozhodnutí je na uživateli —
+zmiň to jednou u prvního konceptu a dál to neopakuj.
+
+## 5. Zdroje podle sportu
 
 | Sport | Kde hledat výroky | Kde hledat video |
 |---|---|---|
@@ -99,7 +155,7 @@ python3 scripts/validate.py && python3 scripts/build_site.py
 **Tip:** formát *oral history* (ESPN, The Athletic) je pro tuhle sbírku nejcennější — obsahuje
 zpětné výpovědi více aktérů o tom, co se dělo v hlavě.
 
-## 4. Slovník mentálních mechanismů
+## 6. Slovník mentálních mechanismů
 
 Používej tyhle tagy (`mental_mechanism`), ať je sbírka prohledatelná. Nové přidávej jen tehdy,
 když žádný nesedí:
@@ -119,7 +175,7 @@ když žádný nesedí:
 | `hněv jako palivo` | Kontrolovaně použitá zlost |
 | `flow` | Popsaný stav vytržení, „nic jsem neslyšel" |
 
-## 5. Tvrdá pravidla
+## 7. Tvrdá pravidla
 
 | Pravidlo | Proč |
 |---|---|
@@ -130,7 +186,7 @@ když žádný nesedí:
 | **Když si nejsi jistý mechanismem, napiš to** do pole `uncertainty` | Poctivé „nevím" je lepší než domyšlený příběh |
 | **Sporný případ raději odmítni** a zapiš do `data/rejected.md` | Sbírka se buduje přísností, ne objemem |
 
-## 6. Kdy případ odmítnout
+## 8. Kdy případ odmítnout
 
 - Otočka byla způsobena **zraněním soupeře**, chybou rozhodčího nebo počasím
 - Existuje jen novinářská interpretace („musel to zlomit v hlavě"), ale **žádný výrok aktéra**
@@ -138,7 +194,7 @@ když žádný nesedí:
 - Nelze ověřit tvrdá data ze dvou zdrojů
 - Jde o dopingem či skandálem zpochybněný výkon → zařaď jen s výslovnou poznámkou v `caveat`
 
-## 7. Struktura repa
+## 9. Struktura repa
 
 ```
 data/cases/*.json       jednotlivé případy

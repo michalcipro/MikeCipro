@@ -9,7 +9,11 @@
   "deficit": "Prohra 0:3 z prvního zápasu na Camp Nou. Bez Mohameda Salaha a Roberta Firmina, tedy bez dvou ze tří útočníků.",
   "result": "4:0 (celkově 4:3) — dvě branky Divock Origi, dvě Georginio Wijnaldum; postup do finále, které Liverpool vyhrál",
   "turning_point": "Čtvrtý gól Origiho po bleskově zahraném rohu Trenta Alexandera-Arnolda, kdy Barcelona nebyla připravená. Mentální zlom ale nastal už před výkopem — v šatně.",
-  "mental_mechanism": ["kolektivní víra", "přijetí prohry", "prerámování"],
+  "mental_mechanism": [
+    "kolektivní víra",
+    "přijetí prohry",
+    "prerámování"
+  ],
   "story": "Klopp před zápasem nezvolil taktickou řeč, ale mentální. Podle Dejana Lovrena hráčům řekl, ať prostě věří a vloží si do hlavy, že to jde — a dodal to hrubší formulací o odvaze. Novinářům před zápasem řekl, že pokud vypadnou, chce vypadnout nejkrásnějším možným způsobem. Tím z beznadějné situace sňal tíhu očekávání: nešlo se ztrapnit, dalo se jen získat. Liverpool otočil 0:3 ve 4:0. Klopp po zápase mluvil o kombinaci srdce a fotbalových dovedností, nikoli o taktice.",
   "evidence": {
     "asked_about": true,
@@ -66,9 +70,79 @@
     }
   ],
   "sources": [
-    { "name": "LiverpoolFC.com — Lovren o Kloppově řeči", "url": "https://www.liverpoolfc.com/news/first-team/349667-jurgen-klopp-inspired-barcelona-comeback-dejan-lovren-reaction" },
-    { "name": "Goal.com — co Klopp řekl před výkopem", "url": "https://www.goal.com/en-us/news/show-fcking-balls---what-klopp-told-liverpool-players-before-kick-off-to-inspire-miracle-barcelona-comeback/m9hh3zmby7gv1c6j3kw44f29a" },
-    { "name": "This Is Anfield", "url": "https://www.thisisanfield.com/2024/05/what-jurgen-klopp-told-liverpool-players-the-morning-before-barcelona-comeback/" }
+    {
+      "name": "LiverpoolFC.com — Lovren o Kloppově řeči",
+      "url": "https://www.liverpoolfc.com/news/first-team/349667-jurgen-klopp-inspired-barcelona-comeback-dejan-lovren-reaction"
+    },
+    {
+      "name": "Goal.com — co Klopp řekl před výkopem",
+      "url": "https://www.goal.com/en-us/news/show-fcking-balls---what-klopp-told-liverpool-players-before-kick-off-to-inspire-miracle-barcelona-comeback/m9hh3zmby7gv1c6j3kw44f29a"
+    },
+    {
+      "name": "This Is Anfield",
+      "url": "https://www.thisisanfield.com/2024/05/what-jurgen-klopp-told-liverpool-players-the-morning-before-barcelona-comeback/"
+    }
   ],
-  "verified_at": "2026-09-10"
+  "verified_at": "2026-09-10",
+  "concept": {
+    "hook": "0:3. Bez dvou nejlepších útočníků. Proti Barceloně s Messim.",
+    "logline": "Klopp sundal z týmu strach z prohry — a tím jim uvolnil ruce.",
+    "duration_s": 50,
+    "beats": [
+      {
+        "t": "0:00–0:04",
+        "beat": "Konec",
+        "visual": "Gól Messiho z prvního zápasu, sklopené hlavy hráčů Liverpoolu.",
+        "overlay": "0:3. A bez Salaha a Firmina."
+      },
+      {
+        "t": "0:04–0:13",
+        "beat": "Kontext",
+        "visual": "Studiové titulky a novinové palcovky o tom, že je hotovo. Prázdné šatní boxy.",
+        "overlay": "Nikdo tomu nevěřil."
+      },
+      {
+        "t": "0:13–0:22",
+        "beat": "Zlom",
+        "visual": "Statický záběr na Kloppa na tiskovce před zápasem, titulky.",
+        "overlay": "„Selhat tím nejkrásnějším možným způsobem.“"
+      },
+      {
+        "t": "0:22–0:38",
+        "beat": "Obrat",
+        "visual": "Čtyři góly za sebou, rychlý střih. Vrchol: rychle zahraný roh a Origiho čtvrtá branka.",
+        "overlay": "4:0"
+      },
+      {
+        "t": "0:38–0:47",
+        "beat": "Důkaz",
+        "visual": "Materiál z Inside Anfield — reakce lavičky, Kloppovo pozápasové vyjádření s titulky.",
+        "overlay": "„Kluci, prostě věřte.“"
+      },
+      {
+        "t": "0:47–0:50",
+        "beat": "Pointa",
+        "visual": "Černá plocha, bílý text.",
+        "overlay": "Někdy je cesta ven přes to, že se přestaneš bát prohry."
+      }
+    ],
+    "payoff": {
+      "speaker": "Jürgen Klopp (cituje Dejan Lovren)",
+      "line": "Kluci, prostě věřte. Vložte si do hlavy, že to dokážeme."
+    },
+    "caption": "0:3 z prvního zápasu. Bez Salaha, bez Firmina. Proti Barceloně s Messim.\n\nKlopp v šatně neřešil taktiku. Řekl klukům, že když vypadnou, ať vypadnou tím nejkrásnějším možným způsobem.\n\nSundal z nich strach z prohry. Tím jim uvolnil ruce.\n\n„Kluci, prostě věřte. Vložte si do hlavy, že to dokážeme.“ — takhle si tu řeč pamatuje Dejan Lovren.\n\n4:0. Postup do finále, které pak vyhráli.\n\nNěkdy je cesta ven přes to, že se přestaneš bát prohry.",
+    "hashtags": [
+      "#liverpool",
+      "#anfield",
+      "#ligamistru",
+      "#fotbal",
+      "#klopp",
+      "#mentalnitrenink",
+      "#mindset",
+      "#comeback",
+      "#hlavarozhoduje"
+    ],
+    "audio": "Originální zvuk stadionu u gólů. Pod beat 3 ticho — Kloppova věta musí stát sama.",
+    "closing": "Někdy je cesta ven přes to, že se přestaneš bát prohry."
+  }
 }

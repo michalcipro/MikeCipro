@@ -9,7 +9,11 @@
   "deficit": "V desátém kole zavadil o nohu tréninkového partnera Galena Ruppa a upadl na dráhu uprostřed olympijského finále.",
   "result": "Zlatá medaile v čase 27:05,17 — obhajoba olympijského titulu",
   "turning_point": "Několik vteřin na zemi. Farah vstal, zařadil se zpět a v cílové rovince předběhl Tanuie.",
-  "mental_mechanism": ["vzpomínka na dřinu", "vnější motiv", "sebeinstruktáž"],
+  "mental_mechanism": [
+    "vzpomínka na dřinu",
+    "vnější motiv",
+    "sebeinstruktáž"
+  ],
   "story": "Uprostřed olympijského finále Farah upadl. Sám popsal, že v tu chvíli mu hlavou proletělo, že závod i sen skončil. Místo toho během několika vteřin na zemi přepnul: připomněl si odvedenou práci a rodinu a rozhodl se, že to nenechá zmizet. Vstal, dotáhl se zpět do čela a v závěru zrychlil. V rozhovorech bezprostředně po závodě mluvil skoro výhradně o tom, co se mu odehrálo v hlavě, ne o nohou.",
   "evidence": {
     "asked_about": true,
@@ -66,9 +70,79 @@
     }
   ],
   "sources": [
-    { "name": "CBC Sports — dramatic comeback", "url": "https://www.cbc.ca/sports/olympics/2.7171/track-field/mo-farah-s-dramatic-comeback-earns-him-olympic-10-000m-gold-1.3720173" },
-    { "name": "VICE Sports", "url": "https://www.vice.com/en/article/mo-farah-comes-back-to-win-10000m-after-falling-in-middle-of-race/" },
-    { "name": "ESPN — Farah stumbles, wins second straight gold", "url": "https://africa.espn.com/olympics/story/_/id/17296045/mo-farah-stumbles-mid-race-wins-second-straight-gold-men-10k" }
+    {
+      "name": "CBC Sports — dramatic comeback",
+      "url": "https://www.cbc.ca/sports/olympics/2.7171/track-field/mo-farah-s-dramatic-comeback-earns-him-olympic-10-000m-gold-1.3720173"
+    },
+    {
+      "name": "VICE Sports",
+      "url": "https://www.vice.com/en/article/mo-farah-comes-back-to-win-10000m-after-falling-in-middle-of-race/"
+    },
+    {
+      "name": "ESPN — Farah stumbles, wins second straight gold",
+      "url": "https://africa.espn.com/olympics/story/_/id/17296045/mo-farah-stumbles-mid-race-wins-second-straight-gold-men-10k"
+    }
   ],
-  "verified_at": "2026-09-10"
+  "verified_at": "2026-09-10",
+  "concept": {
+    "hook": "Uprostřed olympijského finále letí na zem.",
+    "logline": "Pád trval dvě vteřiny. Rozhodnutí míň.",
+    "duration_s": 42,
+    "beats": [
+      {
+        "t": "0:00–0:04",
+        "beat": "Konec",
+        "visual": "Pád ve zpomaleném záběru, Farah na tartanu.",
+        "overlay": "Olympijské finále. A on je na zemi."
+      },
+      {
+        "t": "0:04–0:11",
+        "beat": "Kontext",
+        "visual": "Pole běžců mu utíká, komentátorská reakce.",
+        "overlay": "Deset kol před cílem."
+      },
+      {
+        "t": "0:11–0:19",
+        "beat": "Zlom",
+        "visual": "Zpomalené vteřiny, kdy vstává. Text přes obraz.",
+        "overlay": "„Můj závod je pryč, můj sen je pryč.“"
+      },
+      {
+        "t": "0:19–0:32",
+        "beat": "Obrat",
+        "visual": "Dotahování se zpět, cílová rovinka, předběhnutí Tanuie.",
+        "overlay": "27:05,17 — obhájené zlato."
+      },
+      {
+        "t": "0:32–0:39",
+        "beat": "Důkaz",
+        "visual": "Pozávodní rozhovor s titulky.",
+        "overlay": "„Vzpomněl jsem si na všechnu tu dřinu.“"
+      },
+      {
+        "t": "0:39–0:42",
+        "beat": "Pointa",
+        "visual": "Černá plocha, bílý text.",
+        "overlay": "Pád trval dvě vteřiny. Rozhodnutí míň."
+      }
+    ],
+    "payoff": {
+      "speaker": "Mo Farah",
+      "line": "Na okamžik jsem si myslel: můj závod je pryč, můj sen je pryč. Ale pak se mi povedlo sáhnout hodně hluboko."
+    },
+    "caption": "Deset kol do olympijského finále na 10 000 metrů. Zavadí o nohu a letí na zem.\n\nPár vteřin na tartanu. V hlavě mu proletí, že je konec.\n\n„Na okamžik jsem si myslel: můj závod je pryč, můj sen je pryč. Ale pak se mi povedlo sáhnout hodně hluboko.“\n\nVstal. Dotáhl se zpátky. V cílové rovince předběhl Tanuie a obhájil zlato.\n\nPo závodě mluvil skoro výhradně o tom, co se mu odehrálo v hlavě, ne o nohou:\n\n„Vzpomněl jsem si na všechnu tu dřinu a na to, že to všechno může být během minuty pryč. Nehodlal jsem to nechat být.“\n\nPád trval dvě vteřiny. Rozhodnutí míň.",
+    "hashtags": [
+      "#mofarah",
+      "#rio2016",
+      "#atletika",
+      "#olympics",
+      "#mentalnitrenink",
+      "#sportovnipsychologie",
+      "#mindset",
+      "#comeback",
+      "#hlavarozhoduje"
+    ],
+    "audio": "Originální komentář u pádu — reakce komentátora nese emoci lépe než hudba.",
+    "closing": "Pád trval dvě vteřiny. Rozhodnutí míň."
+  }
 }

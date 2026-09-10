@@ -22,6 +22,13 @@ URL_RE = re.compile(r"^https?://")
 
 QUOTE_FIELDS = ["speaker", "quote_original", "quote_cs", "context", "source_name", "source_url"]
 
+QUOTE_MARKS = str.maketrans("", "", "\u201e\u201c\u201d\u2018\u2019\u201a\"'")
+
+
+def norm(text: str) -> str:
+    """Znění citace bez uvozovek, velikosti písmen a koncové interpunkce."""
+    return " ".join(text.translate(QUOTE_MARKS).split()).casefold().strip(".,!?:; ")
+
 
 def load_schema() -> dict:
     with SCHEMA_PATH.open(encoding="utf-8") as fh:
@@ -100,6 +107,50 @@ def check_case(path: Path, schema: dict, seen_ids: dict[str, Path]) -> list[str]
             errors.append(f"{path.name}: video[{i}].type '{video.get('type')}' není povolený")
         if not URL_RE.match(video.get("url", "")):
             errors.append(f"{path.name}: video[{i}].url není platná URL")
+
+    concept = case.get("concept")
+    if concept:
+        cprops = props["concept"]["properties"]
+        for field in props["concept"]["required"]:
+            if not concept.get(field):
+                errors.append(f"{path.name}: concept — chybí povinné pole '{field}'")
+
+        beat_names = cprops["beats"]["items"]["properties"]["beat"]["enum"]
+        for i, beat in enumerate(concept.get("beats") or []):
+            if beat.get("beat") not in beat_names:
+                errors.append(
+                    f"{path.name}: concept.beats[{i}].beat '{beat.get('beat')}' není ze struktury {beat_names}"
+                )
+            if len(beat.get("overlay", "")) > 90:
+                errors.append(f"{path.name}: concept.beats[{i}].overlay je delší než 90 znaků — na obraze se to nevejde")
+
+        for tag in concept.get("hashtags") or []:
+            if not tag.startswith("#"):
+                errors.append(f"{path.name}: hashtag '{tag}' nezačíná #")
+
+        # Cokoliv, co je v konceptu podáno jako citace, musí vycházet z evidence.
+        pool = norm(
+            " ".join(
+                q.get("quote_cs", "")
+                for q in (athlete_quotes + (evidence.get("expert_quotes") or []))
+            )
+        )
+
+        payoff = (concept.get("payoff") or {}).get("line", "")
+        if payoff and norm(payoff) not in pool:
+            errors.append(
+                f"{path.name}: concept.payoff.line neodpovídá žádné doložené citaci — "
+                f"titulek nesmí obsahovat výrok, který není v evidence"
+            )
+
+        for i, beat in enumerate(concept.get("beats") or []):
+            overlay = beat.get("overlay", "")
+            if overlay.startswith("\u201e") and overlay.rstrip().endswith("\u201c"):
+                if norm(overlay) not in pool:
+                    errors.append(
+                        f"{path.name}: concept.beats[{i}].overlay je podán jako citace, "
+                        f"ale neodpovídá žádnému doloženému výroku"
+                    )
 
     for i, source in enumerate(case.get("sources") or []):
         if not URL_RE.match(source.get("url", "")):

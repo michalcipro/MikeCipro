@@ -9,7 +9,12 @@
   "deficit": "73 odehraných majorů bez titulu a pověst hráče, který se mentálně složí, když je pod tlakem. V nedělním kole ztratil vedení po zaváhání na 10. a 11. jamce a propadl se za Rose.",
   "result": "Vítězství v náhlé smrti na 18. jamce birdie ránou — první major po 74 startech, ve věku 37 let",
   "turning_point": "Po ztrátě na 10. a 11. jamce se poprvé v kariéře nepropadl. Na 13. jamce zahrál z borovic parazachraňující ránu, srovnal a dotáhl to do rozstřelu.",
-  "mental_mechanism": ["prerámování", "oddělení od výsledku", "přijetí prohry", "vnější motiv"],
+  "mental_mechanism": [
+    "prerámování",
+    "oddělení od výsledku",
+    "přijetí prohry",
+    "vnější motiv"
+  ],
   "story": "García byl roky symbolem mentální křehkosti v golfu — hráč, který má hru na major, ale ne hlavu. Ve finálovém kole Masters 2017 ztratil vedení přesně tak, jak to dělal vždycky. Rozdíl byl v tom, co následovalo: místo kolapsu přišel klid. Sám popsal, že poprvé přijal dobré i špatné rány a šel dál, a že to byla ta nejklidnější nedělní hra majoru, jakou zažil. Na tiskovce po vítězství byl přímo tázán, na co je nejvíc hrdý — odpověděl, že na ukázku charakteru a mentality, ne na golf.",
   "evidence": {
     "asked_about": true,
@@ -75,9 +80,78 @@
     }
   ],
   "sources": [
-    { "name": "Washington Post — Garcia completes his transformation", "url": "https://www.washingtonpost.com/sports/sergio-garcia-completes-his-transformation-by-winning-the-masters/2017/04/09/8a3f3ae4-1d5c-11e7-be2a-3a1fb24d4671_story.html" },
-    { "name": "Golf Digest — What it took", "url": "https://www.golfdigest.com/story/masters-2017-what-it-took-for-sergio-garcia-to-finally-win-a-major" },
-    { "name": "Sky Sports — improved mental strength", "url": "https://www.skysports.com/golf/news/24512/10832395/sergio-garcias-improved-mental-strength-inspired-masters-victory" }
+    {
+      "name": "Washington Post — Garcia completes his transformation",
+      "url": "https://www.washingtonpost.com/sports/sergio-garcia-completes-his-transformation-by-winning-the-masters/2017/04/09/8a3f3ae4-1d5c-11e7-be2a-3a1fb24d4671_story.html"
+    },
+    {
+      "name": "Golf Digest — What it took",
+      "url": "https://www.golfdigest.com/story/masters-2017-what-it-took-for-sergio-garcia-to-finally-win-a-major"
+    },
+    {
+      "name": "Sky Sports — improved mental strength",
+      "url": "https://www.skysports.com/golf/news/24512/10832395/sergio-garcias-improved-mental-strength-inspired-masters-victory"
+    }
   ],
-  "verified_at": "2026-09-10"
+  "verified_at": "2026-09-10",
+  "concept": {
+    "hook": "74 majorů. Pokaždé, když byl blízko, se složil.",
+    "logline": "Nezměnil švih. Změnil to, co dělá po špatné ráně.",
+    "duration_s": 52,
+    "beats": [
+      {
+        "t": "0:00–0:04",
+        "beat": "Konec",
+        "visual": "Archivní záběry Garcíových dřívějších kolapsů, frustrovaná gesta.",
+        "overlay": "73 majorů. Pokaždé se složil."
+      },
+      {
+        "t": "0:04–0:14",
+        "beat": "Kontext",
+        "visual": "Nedělní kolo v Augustě, zaváhání na 10. a 11. jamce, ztráta vedení.",
+        "overlay": "A začíná to znovu."
+      },
+      {
+        "t": "0:14–0:24",
+        "beat": "Zlom",
+        "visual": "Detail na jeho obličej po špatné ráně — klid místo vzteku. Rána z borovic na 13. jamce.",
+        "overlay": "Tentokrát žádný propad."
+      },
+      {
+        "t": "0:24–0:36",
+        "beat": "Obrat",
+        "visual": "Rozstřel na 18. jamce, vítězný birdie putt, pád na kolena.",
+        "overlay": "První major v 37 letech."
+      },
+      {
+        "t": "0:36–0:49",
+        "beat": "Důkaz",
+        "visual": "Záznam z tiskovky — otázka „na co jsi nejvíc hrdý“ a jeho odpověď, s titulky.",
+        "overlay": "„Ukázka mého charakteru a mojí mentality.“"
+      },
+      {
+        "t": "0:49–0:52",
+        "beat": "Pointa",
+        "visual": "Černá plocha, bílý text.",
+        "overlay": "Nezměnil švih. Změnil to, co dělá po špatné ráně."
+      }
+    ],
+    "payoff": {
+      "speaker": "Sergio García",
+      "line": "Rozhodně ukázka mého charakteru a mojí mentality."
+    },
+    "caption": "74 startů na majorech. Pokaždé, když byl blízko, se složil. Sám o sobě říkal, že občas přemýšlel, jestli vůbec někdy nějaký vyhraje.\n\nV neděli v Augustě ztratil vedení přesně tak jako vždycky — po dvou špatných jamkách.\n\nRozdíl byl v tom, co přišlo potom. Nic. Žádný propad.\n\n„Celý týden jsem zvládal emoce, přijímal dobré i špatné věci, šel dál a pokračoval.“\n\nVyhrál v rozstřelu. A když se ho na tiskovce ptali, na co je nejvíc hrdý, nemluvil o golfu:\n\n„Rozhodně na ukázku mého charakteru a mojí mentality.“\n\nNezměnil švih. Změnil to, co dělá po špatné ráně.",
+    "hashtags": [
+      "#sergiogarcia",
+      "#masters",
+      "#golf",
+      "#augusta",
+      "#mentalnitrenink",
+      "#sportovnipsychologie",
+      "#mindset",
+      "#hlavarozhoduje"
+    ],
+    "audio": "Tlumená hudba. Golf má ticho jako součást atmosféry — nepřehlušit ho.",
+    "closing": "Nezměnil švih. Změnil to, co dělá po špatné ráně."
+  }
 }

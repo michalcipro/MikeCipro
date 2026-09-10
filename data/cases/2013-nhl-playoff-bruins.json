@@ -9,7 +9,11 @@
   "deficit": "Stav 1:4 ve třetí třetině sedmého zápasu, zbývalo něco přes 10 minut. Část diváků odcházela z haly.",
   "result": "5:4 v prodloužení — Patrice Bergeron srovnal 51 sekund před koncem a v prodloužení rozhodl",
   "turning_point": "Rozhovor na střídačce za stavu 1:4: Zdeno Chára a Milan Lucic si řekli, že cílem není otočit zápas, ale dát jeden gól do desáté minuty. Po prvním gólu se nálada na lavičce zlomila.",
-  "mental_mechanism": ["zúžení pozornosti", "přijetí prohry", "kolektivní víra"],
+  "mental_mechanism": [
+    "zúžení pozornosti",
+    "přijetí prohry",
+    "kolektivní víra"
+  ],
   "story": "Za stavu 1:4 deset minut před koncem sedmého zápasu série byl Boston prakticky vyřazený. Podle vlastních výpovědí hráčů byl zlom v tom, že si na lavičce přestali klást nemožný cíl a nahradili ho splnitelným: jeden gól do desáté minuty. Trenér Claude Julien popsal, že v tu chvíli neměli co ztratit, a soustředil se na to zůstat klidný. Po prvním vstřeleném gólu se atmosféra na střídačce podle Lucice viditelně změnila. Bruins srovnali 51 sekund před koncem a v prodloužení vyhráli.",
   "uncertainty": "Citace pocházejí ze zpětné oral history ESPN (2018), ne z bezprostředních pozápasových rozhovorů. Jde tedy o rekonstrukci s odstupem let.",
   "evidence": {
@@ -62,9 +66,79 @@
     }
   ],
   "sources": [
-    { "name": "ESPN — oral history sedmého zápasu", "url": "https://www.espn.com/nhl/story/_/id/23199161/a-mini-oral-history-bruins-2013-game-7-miracle-vs-maple-leafs" },
-    { "name": "NHL.com — Game of the Decade", "url": "https://www.nhl.com/news/game-of-the-decade-boston-stuns-toronto-game-7-2013-playoffs-313998466" },
-    { "name": "ESPN — výsledek zápasu", "url": "https://www.espn.com/nhl/game/_/gameId/400462047/maple-leafs-bruins" }
+    {
+      "name": "ESPN — oral history sedmého zápasu",
+      "url": "https://www.espn.com/nhl/story/_/id/23199161/a-mini-oral-history-bruins-2013-game-7-miracle-vs-maple-leafs"
+    },
+    {
+      "name": "NHL.com — Game of the Decade",
+      "url": "https://www.nhl.com/news/game-of-the-decade-boston-stuns-toronto-game-7-2013-playoffs-313998466"
+    },
+    {
+      "name": "ESPN — výsledek zápasu",
+      "url": "https://www.espn.com/nhl/game/_/gameId/400462047/maple-leafs-bruins"
+    }
   ],
-  "verified_at": "2026-09-10"
+  "verified_at": "2026-09-10",
+  "concept": {
+    "hook": "1:4. Deset minut do konce sezony. Lidi odcházejí z haly.",
+    "logline": "Nemožný cíl vyměnili za splnitelný — a tím se to zlomilo.",
+    "duration_s": 46,
+    "beats": [
+      {
+        "t": "0:00–0:04",
+        "beat": "Konec",
+        "visual": "Ukazatel skóre 1:4, třetí třetina, prázdnící se sektory.",
+        "overlay": "1:4. Deset minut do konce."
+      },
+      {
+        "t": "0:04–0:12",
+        "beat": "Kontext",
+        "visual": "Sklopené hlavy na střídačce, odcházející diváci, sedmý zápas série.",
+        "overlay": "Diváci začali odcházet."
+      },
+      {
+        "t": "0:12–0:22",
+        "beat": "Zlom",
+        "visual": "Záběr na střídačku, Chára a Lucic vedle sebe. Text se objeví přes obraz.",
+        "overlay": "„Dáme prostě jeden a od toho se odrazíme.“"
+      },
+      {
+        "t": "0:22–0:36",
+        "beat": "Obrat",
+        "visual": "Tři góly za sebou, vyrovnání 51 sekund před koncem, gól v prodloužení.",
+        "overlay": "5:4 v prodloužení."
+      },
+      {
+        "t": "0:36–0:43",
+        "beat": "Důkaz",
+        "visual": "Titulky s výroky Lucice a trenéra Juliena přes záběry oslav.",
+        "overlay": "„Přimět kluky, aby tomu uvěřili, bylo důležité.“"
+      },
+      {
+        "t": "0:43–0:46",
+        "beat": "Pointa",
+        "visual": "Černá plocha, bílý text.",
+        "overlay": "1:4 otočit nedokážeš. Jeden gól dát dokážeš."
+      }
+    ],
+    "payoff": {
+      "speaker": "Zdeno Chára",
+      "line": "Dáme prostě jeden a od toho se odrazíme."
+    },
+    "caption": "1:4. Deset minut do konce sedmého zápasu série. Diváci začínají odcházet z haly.\n\nNa střídačce se Chára otočí na Lucice. Neřekne „musíme to otočit“. Řekne:\n\n„Dáme prostě jeden a od toho se odrazíme.“\n\nNemožný cíl vyměnili za splnitelný. Po prvním gólu se podle Lucice lavička viditelně změnila — a už to bylo jiné utkání.\n\nSrovnali 51 sekund před koncem. V prodloužení vyhráli.\n\n1:4 otočit nedokážeš. Jeden gól dát dokážeš. V tom je celý trik.",
+    "hashtags": [
+      "#bruins",
+      "#nhl",
+      "#hokej",
+      "#game7",
+      "#mentalnitrenink",
+      "#sportovnipsychologie",
+      "#mindset",
+      "#comeback",
+      "#hlavarozhoduje"
+    ],
+    "audio": "Originální zvuk haly. Kontrast mezi tichem za stavu 1:4 a výbuchem u vyrovnání je celý příběh.",
+    "closing": "1:4 otočit nedokážeš. Jeden gól dát dokážeš."
+  }
 }
