@@ -1,0 +1,74 @@
+{
+  "id": "2016-rio-farah",
+  "sport": "atletika",
+  "date": "2016-08-13",
+  "event": "Olympijské hry Rio de Janeiro 2016",
+  "stage": "finále mužů na 10 000 m",
+  "protagonist": "Mo Farah",
+  "opponent": "startovní pole, zejména Paul Tanui (Keňa)",
+  "deficit": "V desátém kole zavadil o nohu tréninkového partnera Galena Ruppa a upadl na dráhu uprostřed olympijského finále.",
+  "result": "Zlatá medaile v čase 27:05,17 — obhajoba olympijského titulu",
+  "turning_point": "Několik vteřin na zemi. Farah vstal, zařadil se zpět a v cílové rovince předběhl Tanuie.",
+  "mental_mechanism": ["vzpomínka na dřinu", "vnější motiv", "sebeinstruktáž"],
+  "story": "Uprostřed olympijského finále Farah upadl. Sám popsal, že v tu chvíli mu hlavou proletělo, že závod i sen skončil. Místo toho během několika vteřin na zemi přepnul: připomněl si odvedenou práci a rodinu a rozhodl se, že to nenechá zmizet. Vstal, dotáhl se zpět do čela a v závěru zrychlil. V rozhovorech bezprostředně po závodě mluvil skoro výhradně o tom, co se mu odehrálo v hlavě, ne o nohou.",
+  "evidence": {
+    "asked_about": true,
+    "athlete_quotes": [
+      {
+        "speaker": "Mo Farah",
+        "quote_original": "When I fell down for one moment I was thinking, 'oh my race is over, my dream is over'. But then I managed to dig deep.",
+        "quote_cs": "Když jsem upadl, na okamžik jsem si myslel: „můj závod je pryč, můj sen je pryč“. Ale pak se mi povedlo sáhnout hodně hluboko.",
+        "context": "Rozhovor bezprostředně po závodě, v odpovědi na dotaz na pád.",
+        "source_name": "CBC Sports",
+        "source_url": "https://www.cbc.ca/sports/olympics/2.7171/track-field/mo-farah-s-dramatic-comeback-earns-him-olympic-10-000m-gold-1.3720173",
+        "date": "2016-08-13"
+      },
+      {
+        "speaker": "Mo Farah",
+        "quote_original": "I thought about all my hard work and that it could all be gone in a minute. I wasn't going to let it go. I thought about my family. It made me emotional.",
+        "quote_cs": "Vzpomněl jsem si na všechnu tu dřinu a na to, že to všechno může být během minuty pryč. Nehodlal jsem to nechat být. Myslel jsem na rodinu. Dojalo mě to.",
+        "context": "Rozhovor po závodě.",
+        "source_name": "VICE Sports",
+        "source_url": "https://www.vice.com/en/article/mo-farah-comes-back-to-win-10000m-after-falling-in-middle-of-race/",
+        "date": "2016-08-13"
+      },
+      {
+        "speaker": "Mo Farah",
+        "quote_original": "It's hard mentally when you go down.",
+        "quote_cs": "Když jdete k zemi, je to mentálně těžké.",
+        "context": "Rozhovor po závodě, o dopadu pádu.",
+        "source_name": "Gulf News",
+        "source_url": "https://gulfnews.com/amp/story/sport%2Ffarah-defies-fall-to-win-olympic-10-000m-gold-1.1878603",
+        "date": "2016-08-13"
+      }
+    ]
+  },
+  "video": [
+    {
+      "label": "Zlato na 10 000 m — oficiální olympijské video",
+      "url": "https://www.youtube.com/watch?v=UKsEV7vGAvA",
+      "type": "key_moment"
+    },
+    {
+      "label": "Celý závod včetně pádu",
+      "url": "https://www.youtube.com/watch?v=t_iaGKYwJow",
+      "type": "full_match"
+    },
+    {
+      "label": "Záběr na pád a návrat",
+      "url": "https://www.youtube.com/watch?v=JWy7fhu92Do",
+      "type": "key_moment"
+    },
+    {
+      "label": "Mo Farah: My Rio Highlights",
+      "url": "https://www.youtube.com/watch?v=hI2eM2YYwS0",
+      "type": "interview"
+    }
+  ],
+  "sources": [
+    { "name": "CBC Sports — dramatic comeback", "url": "https://www.cbc.ca/sports/olympics/2.7171/track-field/mo-farah-s-dramatic-comeback-earns-him-olympic-10-000m-gold-1.3720173" },
+    { "name": "VICE Sports", "url": "https://www.vice.com/en/article/mo-farah-comes-back-to-win-10000m-after-falling-in-middle-of-race/" },
+    { "name": "ESPN — Farah stumbles, wins second straight gold", "url": "https://africa.espn.com/olympics/story/_/id/17296045/mo-farah-stumbles-mid-race-wins-second-straight-gold-men-10k" }
+  ],
+  "verified_at": "2026-09-10"
+}

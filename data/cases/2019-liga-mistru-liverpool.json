@@ -1,0 +1,74 @@
+{
+  "id": "2019-liga-mistru-liverpool",
+  "sport": "fotbal",
+  "date": "2019-05-07",
+  "event": "Liga mistrů UEFA 2018/19",
+  "stage": "semifinále, odveta — Anfield",
+  "protagonist": "Liverpool FC (Jürgen Klopp)",
+  "opponent": "FC Barcelona",
+  "deficit": "Prohra 0:3 z prvního zápasu na Camp Nou. Bez Mohameda Salaha a Roberta Firmina, tedy bez dvou ze tří útočníků.",
+  "result": "4:0 (celkově 4:3) — dvě branky Divock Origi, dvě Georginio Wijnaldum; postup do finále, které Liverpool vyhrál",
+  "turning_point": "Čtvrtý gól Origiho po bleskově zahraném rohu Trenta Alexandera-Arnolda, kdy Barcelona nebyla připravená. Mentální zlom ale nastal už před výkopem — v šatně.",
+  "mental_mechanism": ["kolektivní víra", "přijetí prohry", "prerámování"],
+  "story": "Klopp před zápasem nezvolil taktickou řeč, ale mentální. Podle Dejana Lovrena hráčům řekl, ať prostě věří a vloží si do hlavy, že to jde — a dodal to hrubší formulací o odvaze. Novinářům před zápasem řekl, že pokud vypadnou, chce vypadnout nejkrásnějším možným způsobem. Tím z beznadějné situace sňal tíhu očekávání: nešlo se ztrapnit, dalo se jen získat. Liverpool otočil 0:3 ve 4:0. Klopp po zápase mluvil o kombinaci srdce a fotbalových dovedností, nikoli o taktice.",
+  "evidence": {
+    "asked_about": true,
+    "athlete_quotes": [
+      {
+        "speaker": "Dejan Lovren",
+        "role": "obránce Liverpoolu, cituje Kloppovu předzápasovou řeč",
+        "quote_original": "Boys, just believe. Put in your mind that we can do it. It's something that we never heard before.",
+        "quote_cs": "Kluci, prostě věřte. Vložte si do hlavy, že to dokážeme. Něco takového jsme předtím nikdy neslyšeli.",
+        "context": "Lovren popsal Kloppovu řeč ze šatny před výkopem v rozhovoru pro oficiální kanály Liverpoolu.",
+        "source_name": "LiverpoolFC.com",
+        "source_url": "https://www.liverpoolfc.com/news/first-team/349667-jurgen-klopp-inspired-barcelona-comeback-dejan-lovren-reaction",
+        "date": "2019-05-08"
+      }
+    ],
+    "expert_quotes": [
+      {
+        "speaker": "Jürgen Klopp",
+        "role": "trenér Liverpoolu",
+        "quote_original": "What the boys did – this mix, again, of big heart and football skills – is unbelievable.",
+        "quote_cs": "Co kluci předvedli — tahle směs velkého srdce a fotbalových dovedností — je neuvěřitelné.",
+        "context": "Pozápasový rozhovor po odvetě na Anfieldu.",
+        "source_name": "This Is Anfield",
+        "source_url": "https://www.thisisanfield.com/2024/05/what-jurgen-klopp-told-liverpool-players-the-morning-before-barcelona-comeback/",
+        "date": "2019-05-07"
+      },
+      {
+        "speaker": "Jürgen Klopp",
+        "role": "trenér Liverpoolu",
+        "quote_original": "fail in the most beautiful way",
+        "quote_cs": "selhat tím nejkrásnějším možným způsobem",
+        "context": "Předzápasová tisková konference — Klopp tím vědomě sňal z týmu tíhu očekávání.",
+        "source_name": "Goal.com",
+        "source_url": "https://www.goal.com/en-us/news/show-fcking-balls---what-klopp-told-liverpool-players-before-kick-off-to-inspire-miracle-barcelona-comeback/m9hh3zmby7gv1c6j3kw44f29a",
+        "date": "2019-05-06"
+      }
+    ]
+  },
+  "video": [
+    {
+      "label": "Inside Anfield — pohled z hřiště a ze šatny",
+      "url": "https://www.youtube.com/watch?v=Ik-DhHJM8eo",
+      "type": "documentary"
+    },
+    {
+      "label": "Sestřih zápasu (UEFA)",
+      "url": "https://www.youtube.com/watch?v=7HldRlTZj_g",
+      "type": "highlights"
+    },
+    {
+      "label": "Ikonické zápasy Ligy mistrů — Liverpool 4:0 Barcelona",
+      "url": "https://www.youtube.com/watch?v=jMLcAl62F3Q",
+      "type": "highlights"
+    }
+  ],
+  "sources": [
+    { "name": "LiverpoolFC.com — Lovren o Kloppově řeči", "url": "https://www.liverpoolfc.com/news/first-team/349667-jurgen-klopp-inspired-barcelona-comeback-dejan-lovren-reaction" },
+    { "name": "Goal.com — co Klopp řekl před výkopem", "url": "https://www.goal.com/en-us/news/show-fcking-balls---what-klopp-told-liverpool-players-before-kick-off-to-inspire-miracle-barcelona-comeback/m9hh3zmby7gv1c6j3kw44f29a" },
+    { "name": "This Is Anfield", "url": "https://www.thisisanfield.com/2024/05/what-jurgen-klopp-told-liverpool-players-the-morning-before-barcelona-comeback/" }
+  ],
+  "verified_at": "2026-09-10"
+}

@@ -1,0 +1,72 @@
+{
+  "id": "2021-ufc-262-oliveira",
+  "sport": "mma",
+  "date": "2021-05-15",
+  "event": "UFC 262, Toyota Center, Houston",
+  "stage": "hlavní zápas — souboj o uvolněný titul v lehké váze",
+  "protagonist": "Charles Oliveira",
+  "opponent": "Michael Chandler",
+  "deficit": "Dvakrát složen v prvním kole. Chandler ho většinu zbytku kola mlátil u klece, rozhodčí Dan Miragliotta stál nad ním a byl na pokraji zastavení zápasu. K tomu léta pověsti bojovníka, který to vzdává.",
+  "result": "TKO 19 sekund po začátku druhého kola — Oliveira se stal mistrem světa v lehké váze",
+  "turning_point": "Minuta pauzy mezi koly. Do druhého kola vyšel úplně jiný bojovník, hned Chandlera složil levým hákem a dokončil to na zemi.",
+  "mental_mechanism": ["prerámování", "sebeinstruktáž", "hněv jako palivo"],
+  "story": "Oliveira byl roky v MMA nositelem té nejhorší nálepky — po odstoupení z prvního hlavního zápasu proti Maxi Hollowayovi ho velká část fanoušků označila za člověka, který to vzdává. V zápase o titul proti Chandlerovi dostal přesně tu situaci, ve které se to mělo znovu potvrdit: dvakrát na zemi, rozhodčí připravený zasáhnout. Přežil kolo a po minutě pauzy nastoupil do druhého jako někdo jiný. Za 19 sekund bylo hotovo. V oktagonu plakal a mluvil o tom, že to celé bylo o dokazování.",
+  "uncertainty": "Nepodařilo se dohledat výrok, ve kterém by Oliveira konkrétně popsal, co si během minuty mezi koly řekl nebo co mu řekl roh. Doložená je jeho obecná výpověď o mentalitě a o vyrovnávání se s nálepkou. Pokud takový výrok existuje v portugalštině nebo v podcastu, případ je vhodné doplnit.",
+  "evidence": {
+    "asked_about": true,
+    "athlete_quotes": [
+      {
+        "speaker": "Charles Oliveira",
+        "quote_original": "I deserve it, I wanted to come here and show I'm the best. I proved to everybody I'm the lion of lions.",
+        "quote_cs": "Zasloužím si to, chtěl jsem sem přijít a ukázat, že jsem nejlepší. Všem jsem dokázal, že jsem lev mezi lvy.",
+        "context": "Rozhovor s Joem Roganem v oktagonu bezprostředně po zápase, v slzách.",
+        "source_name": "South China Morning Post",
+        "source_url": "https://www.scmp.com/sport/martial-arts/mixed-martial-arts/article/3133661/ufc-262-charles-oliveira-knocks-out-michael",
+        "date": "2021-05-15"
+      },
+      {
+        "speaker": "Charles Oliveira",
+        "quote_original": "There is a champion's mentality, and I have had that for a long time. I knew the wins would come. I knew I would get to [the top].",
+        "quote_cs": "Existuje něco jako mentalita šampiona a já ji mám už dlouho. Věděl jsem, že vítězství přijdou. Věděl jsem, že se nahoru dostanu.",
+        "context": "O své mentální proměně a cestě z pověsti bojovníka, který to vzdává.",
+        "source_name": "Yahoo Sports — Oliveira's career an ode to resiliency",
+        "source_url": "https://sports.yahoo.com/a-champions-mentality-how-a-resilient-charles-oliveira-made-it-to-the-top-224406921.html",
+        "date": "2021-12"
+      }
+    ]
+  },
+  "video": [
+    {
+      "label": "Rozhovor v oktagonu bezprostředně po zápase",
+      "url": "https://www.youtube.com/watch?v=yTNsvQb13iU",
+      "type": "interview"
+    },
+    {
+      "label": "Oliveirova pozápasová tiskovka (celá)",
+      "url": "https://www.youtube.com/watch?v=afcACDD2ltM",
+      "type": "press_conference"
+    },
+    {
+      "label": "Oficiální pozápasová tiskovka UFC 262",
+      "url": "https://www.youtube.com/watch?v=YrlZ9gYv4vc",
+      "type": "press_conference"
+    },
+    {
+      "label": "Knockout — oficiální záznam UFC",
+      "url": "https://www.facebook.com/ufceurope/videos/charles-oliveira-knocks-out-michael-chandler-ufc-262/931827820987773/",
+      "type": "key_moment"
+    },
+    {
+      "label": "Vyhledat sestřih zápasu na YouTube",
+      "url": "https://www.youtube.com/results?search_query=UFC+262+Oliveira+vs+Chandler+highlights",
+      "type": "search"
+    }
+  ],
+  "sources": [
+    { "name": "South China Morning Post — comeback win", "url": "https://www.scmp.com/sport/martial-arts/mixed-martial-arts/article/3133661/ufc-262-charles-oliveira-knocks-out-michael" },
+    { "name": "Yahoo Sports — champion's mentality", "url": "https://sports.yahoo.com/a-champions-mentality-how-a-resilient-charles-oliveira-made-it-to-the-top-224406921.html" },
+    { "name": "Bloody Elbow — nálepka „quitter“ po zápase s Hollowayem", "url": "https://bloodyelbow.com/2025/05/27/charles-oliveira-was-booed-out-of-the-cage-and-labeled-a-quitter-after-forfeiting-his-first-ever-ufc-main-event/" },
+    { "name": "Tapology — záznam zápasu", "url": "https://www.tapology.com/fightcenter/bouts/560948-ufc-262-charles-do-bronx-oliveira-vs-iron-michael-chandler" }
+  ],
+  "verified_at": "2026-09-10"
+}

@@ -1,0 +1,83 @@
+{
+  "id": "2017-masters-garcia",
+  "sport": "golf",
+  "date": "2017-04-09",
+  "event": "Masters Tournament 2017, Augusta National",
+  "stage": "finálové kolo a rozstřel",
+  "protagonist": "Sergio García",
+  "opponent": "Justin Rose",
+  "deficit": "73 odehraných majorů bez titulu a pověst hráče, který se mentálně složí, když je pod tlakem. V nedělním kole ztratil vedení po zaváhání na 10. a 11. jamce a propadl se za Rose.",
+  "result": "Vítězství v náhlé smrti na 18. jamce birdie ránou — první major po 74 startech, ve věku 37 let",
+  "turning_point": "Po ztrátě na 10. a 11. jamce se poprvé v kariéře nepropadl. Na 13. jamce zahrál z borovic parazachraňující ránu, srovnal a dotáhl to do rozstřelu.",
+  "mental_mechanism": ["prerámování", "oddělení od výsledku", "přijetí prohry", "vnější motiv"],
+  "story": "García byl roky symbolem mentální křehkosti v golfu — hráč, který má hru na major, ale ne hlavu. Ve finálovém kole Masters 2017 ztratil vedení přesně tak, jak to dělal vždycky. Rozdíl byl v tom, co následovalo: místo kolapsu přišel klid. Sám popsal, že poprvé přijal dobré i špatné rány a šel dál, a že to byla ta nejklidnější nedělní hra majoru, jakou zažil. Na tiskovce po vítězství byl přímo tázán, na co je nejvíc hrdý — odpověděl, že na ukázku charakteru a mentality, ne na golf.",
+  "evidence": {
+    "asked_about": true,
+    "athlete_quotes": [
+      {
+        "speaker": "Sergio García",
+        "quote_original": "definitely demonstration of my character, and my mentality",
+        "quote_cs": "rozhodně ukázka mého charakteru a mojí mentality",
+        "context": "Vítězná tiskovka po skončení turnaje, v přímé odpovědi na otázku, na co je nejvíc hrdý.",
+        "source_name": "Golf Digest — What it took for Sergio Garcia to finally win a major",
+        "source_url": "https://www.golfdigest.com/story/masters-2017-what-it-took-for-sergio-garcia-to-finally-win-a-major",
+        "date": "2017-04-09"
+      },
+      {
+        "speaker": "Sergio García",
+        "quote_original": "I was able to deal with the emotions the whole week, and accept the good things and the bad things and move on and keep going.",
+        "quote_cs": "Celý týden jsem zvládal emoce, přijímal dobré i špatné věci, šel dál a pokračoval.",
+        "context": "Vítězná tiskovka po turnaji.",
+        "source_name": "Golf Digest",
+        "source_url": "https://www.golfdigest.com/story/masters-2017-what-it-took-for-sergio-garcia-to-finally-win-a-major",
+        "date": "2017-04-09"
+      },
+      {
+        "speaker": "Sergio García",
+        "quote_original": "I think the problem was, because where my head was at sometimes, I did think about if I was ever going to win one.",
+        "quote_cs": "Myslím, že problém byl v tom, kde jsem to měl v hlavě — občas jsem opravdu přemýšlel, jestli vůbec někdy nějaký vyhraju.",
+        "context": "Vítězná tiskovka, o svém dřívějším rozpoložení.",
+        "source_name": "Washington Post",
+        "source_url": "https://www.washingtonpost.com/sports/sergio-garcia-completes-his-transformation-by-winning-the-masters/2017/04/09/8a3f3ae4-1d5c-11e7-be2a-3a1fb24d4671_story.html",
+        "date": "2017-04-09"
+      },
+      {
+        "speaker": "Sergio García",
+        "quote_original": "Probably it's because my mentality has changed a little bit, the way I'm thinking things.",
+        "quote_cs": "Nejspíš je to tím, že se moje mentalita trochu změnila — způsob, jakým věci vnímám.",
+        "context": "O tom, proč se výsledky změnily.",
+        "source_name": "Sky Sports Golf",
+        "source_url": "https://www.skysports.com/golf/news/24512/10832395/sergio-garcias-improved-mental-strength-inspired-masters-victory",
+        "date": "2017-04-10"
+      }
+    ]
+  },
+  "video": [
+    {
+      "label": "Rozhovor s vítězem o dramatickém závěru",
+      "url": "https://www.youtube.com/watch?v=edHh2X8NciY",
+      "type": "interview"
+    },
+    {
+      "label": "Kompletní finálové kolo a rozstřel (celý přenos)",
+      "url": "https://www.youtube.com/watch?v=kfMSpgr1L3Q",
+      "type": "full_match"
+    },
+    {
+      "label": "Garcíovo finálové kolo ve třech minutách",
+      "url": "https://www.youtube.com/watch?v=tX6qpK07894",
+      "type": "highlights"
+    },
+    {
+      "label": "Vítězný rozstřel na 18. jamce",
+      "url": "https://www.youtube.com/watch?v=MVX4XWAg7bU",
+      "type": "key_moment"
+    }
+  ],
+  "sources": [
+    { "name": "Washington Post — Garcia completes his transformation", "url": "https://www.washingtonpost.com/sports/sergio-garcia-completes-his-transformation-by-winning-the-masters/2017/04/09/8a3f3ae4-1d5c-11e7-be2a-3a1fb24d4671_story.html" },
+    { "name": "Golf Digest — What it took", "url": "https://www.golfdigest.com/story/masters-2017-what-it-took-for-sergio-garcia-to-finally-win-a-major" },
+    { "name": "Sky Sports — improved mental strength", "url": "https://www.skysports.com/golf/news/24512/10832395/sergio-garcias-improved-mental-strength-inspired-masters-victory" }
+  ],
+  "verified_at": "2026-09-10"
+}

@@ -1,0 +1,70 @@
+{
+  "id": "2013-nhl-playoff-bruins",
+  "sport": "hokej",
+  "date": "2013-05-13",
+  "event": "Stanley Cup Playoffs 2013, 1. kolo",
+  "stage": "sedmý zápas série, TD Garden Boston",
+  "protagonist": "Boston Bruins",
+  "opponent": "Toronto Maple Leafs",
+  "deficit": "Stav 1:4 ve třetí třetině sedmého zápasu, zbývalo něco přes 10 minut. Část diváků odcházela z haly.",
+  "result": "5:4 v prodloužení — Patrice Bergeron srovnal 51 sekund před koncem a v prodloužení rozhodl",
+  "turning_point": "Rozhovor na střídačce za stavu 1:4: Zdeno Chára a Milan Lucic si řekli, že cílem není otočit zápas, ale dát jeden gól do desáté minuty. Po prvním gólu se nálada na lavičce zlomila.",
+  "mental_mechanism": ["zúžení pozornosti", "přijetí prohry", "kolektivní víra"],
+  "story": "Za stavu 1:4 deset minut před koncem sedmého zápasu série byl Boston prakticky vyřazený. Podle vlastních výpovědí hráčů byl zlom v tom, že si na lavičce přestali klást nemožný cíl a nahradili ho splnitelným: jeden gól do desáté minuty. Trenér Claude Julien popsal, že v tu chvíli neměli co ztratit, a soustředil se na to zůstat klidný. Po prvním vstřeleném gólu se atmosféra na střídačce podle Lucice viditelně změnila. Bruins srovnali 51 sekund před koncem a v prodloužení vyhráli.",
+  "uncertainty": "Citace pocházejí ze zpětné oral history ESPN (2018), ne z bezprostředních pozápasových rozhovorů. Jde tedy o rekonstrukci s odstupem let.",
+  "evidence": {
+    "asked_about": true,
+    "athlete_quotes": [
+      {
+        "speaker": "Zdeno Chára",
+        "role": "kapitán Boston Bruins",
+        "quote_original": "Let's just get one and start from there.",
+        "quote_cs": "Dáme prostě jeden a od toho se odrazíme.",
+        "context": "Na střídačce za stavu 1:4, v rozhovoru s Milanem Lucicem. Citováno v oral history ESPN.",
+        "source_name": "ESPN — A mini oral history of the Bruins' 2013 Game 7 miracle",
+        "source_url": "https://www.espn.com/nhl/story/_/id/23199161/a-mini-oral-history-bruins-2013-game-7-miracle-vs-maple-leafs",
+        "date": "2018"
+      },
+      {
+        "speaker": "Milan Lucic",
+        "role": "útočník Boston Bruins",
+        "quote_original": "Just saying that and getting guys to believe in it was important.",
+        "quote_cs": "Už jen to vyslovit a přimět kluky, aby tomu uvěřili, bylo důležité.",
+        "context": "O momentu na střídačce, kdy si řekli, že potřebují jeden gól do desáté minuty. Oral history ESPN.",
+        "source_name": "ESPN — oral history",
+        "source_url": "https://www.espn.com/nhl/story/_/id/23199161/a-mini-oral-history-bruins-2013-game-7-miracle-vs-maple-leafs",
+        "date": "2018"
+      }
+    ],
+    "expert_quotes": [
+      {
+        "speaker": "Claude Julien",
+        "role": "trenér Boston Bruins",
+        "quote_original": "You say you have nothing to lose. You either come back or you're done. So, I did everything I could to stay calm and show poise behind the bench.",
+        "quote_cs": "Řeknete si, že nemáte co ztratit. Buď to otočíte, nebo je konec. Takže jsem dělal všechno pro to, abych zůstal klidný a za lavičkou působil vyrovnaně.",
+        "context": "O situaci ve 14. minutě třetí třetiny za stavu 1:4, kdy část diváků odcházela z haly.",
+        "source_name": "ESPN — oral history",
+        "source_url": "https://www.espn.com/nhl/story/_/id/23199161/a-mini-oral-history-bruins-2013-game-7-miracle-vs-maple-leafs",
+        "date": "2018"
+      }
+    ]
+  },
+  "video": [
+    {
+      "label": "Celý zápas — kompletní záznam (NHL)",
+      "url": "https://www.youtube.com/watch?v=RrlgFXcS6pk",
+      "type": "full_match"
+    },
+    {
+      "label": "Sestřih otočky",
+      "url": "https://www.youtube.com/shorts/zW4xicfDOU4",
+      "type": "highlights"
+    }
+  ],
+  "sources": [
+    { "name": "ESPN — oral history sedmého zápasu", "url": "https://www.espn.com/nhl/story/_/id/23199161/a-mini-oral-history-bruins-2013-game-7-miracle-vs-maple-leafs" },
+    { "name": "NHL.com — Game of the Decade", "url": "https://www.nhl.com/news/game-of-the-decade-boston-stuns-toronto-game-7-2013-playoffs-313998466" },
+    { "name": "ESPN — výsledek zápasu", "url": "https://www.espn.com/nhl/game/_/gameId/400462047/maple-leafs-bruins" }
+  ],
+  "verified_at": "2026-09-10"
+}

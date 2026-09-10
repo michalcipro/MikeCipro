@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Mentální otočka ve sportu",
+  "type": "object",
+  "required": [
+    "id", "sport", "date", "event", "protagonist", "deficit", "result",
+    "turning_point", "mental_mechanism", "story", "evidence", "video", "sources", "verified_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "rok-soutez-protagonista, bez diakritiky"
+    },
+    "sport": {
+      "type": "string",
+      "enum": ["tenis", "fotbal", "hokej", "mma", "golf", "atletika", "basketbal", "box", "cyklistika", "f1", "ostatni"]
+    },
+    "date": { "type": "string", "format": "date" },
+    "event": { "type": "string", "description": "Soutěž a ročník" },
+    "stage": { "type": "string", "description": "Fáze — finále, semifinále, 1. kolo…" },
+    "protagonist": { "type": "string" },
+    "opponent": { "type": "string" },
+    "deficit": { "type": "string", "description": "Z jakého stavu se otáčelo — konkrétně" },
+    "result": { "type": "string", "description": "Konečný výsledek" },
+    "turning_point": { "type": "string", "description": "Konkrétní okamžik zlomu" },
+    "mental_mechanism": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" },
+      "description": "Tagy ze slovníku v SKILL.md"
+    },
+    "story": { "type": "string", "description": "3–6 vět česky: co se stalo a co se změnilo v hlavě" },
+    "uncertainty": { "type": "string", "description": "Co není jisté nebo doložené" },
+    "caveat": { "type": "string", "description": "Kontroverze, doping, pozdější zpochybnění" },
+    "evidence": {
+      "type": "object",
+      "required": ["asked_about", "athlete_quotes"],
+      "additionalProperties": false,
+      "properties": {
+        "asked_about": {
+          "type": "boolean",
+          "description": "Byl na mentální stránku přímo tázán? (podmínka 3)"
+        },
+        "athlete_quotes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/quote" }
+        },
+        "expert_quotes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/quote" }
+        }
+      }
+    },
+    "video": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["label", "url", "type"],
+        "additionalProperties": false,
+        "properties": {
+          "label": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "type": {
+            "type": "string",
+            "enum": ["key_moment", "highlights", "full_match", "press_conference", "interview", "documentary", "search"]
+          }
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "url"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string" },
+          "url": { "type": "string", "format": "uri" }
+        }
+      }
+    },
+    "verified_at": { "type": "string", "format": "date" }
+  },
+  "$defs": {
+    "quote": {
+      "type": "object",
+      "required": ["speaker", "quote_original", "quote_cs", "context", "source_name", "source_url"],
+      "additionalProperties": false,
+      "properties": {
+        "speaker": { "type": "string" },
+        "role": { "type": "string", "description": "trenér, spoluhráč, komentátor, psycholog…" },
+        "quote_original": { "type": "string", "description": "Doslovné znění v původním jazyce" },
+        "quote_cs": { "type": "string", "description": "Český překlad" },
+        "context": { "type": "string", "description": "Kdy a kde to řekl" },
+        "source_name": { "type": "string" },
+        "source_url": { "type": "string", "format": "uri" },
+        "date": { "type": "string", "description": "Datum výroku, pokud známé" }
+      }
+    }
+  }
+}
