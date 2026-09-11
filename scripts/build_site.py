@@ -42,6 +42,18 @@ VIDEO_LABELS = {
     "search": "Vyhledat",
 }
 
+LICENCE_LABELS = {
+    "all_rights_reserved": "práva vyhrazena",
+    "cc_by": "CC BY",
+    "cc_by_sa": "CC BY-SA",
+    "public_domain": "volné dílo",
+    "licensed_stock": "licencovaná knihovna",
+    "own_material": "vlastní / nechráněné",
+    "unknown": "neověřeno",
+}
+
+RISK_LABELS = {"low": "nízké", "medium": "střední", "high": "vysoké"}
+
 MONTHS = [
     "ledna", "února", "března", "dubna", "května", "června",
     "července", "srpna", "září", "října", "listopadu", "prosince",
@@ -562,11 +574,77 @@ body {
   max-width: 56ch;
 }
 
+.risk {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  padding: 3px 7px;
+}
+.risk-high { color: var(--turn-from); }
+.risk-medium { color: var(--ink-soft); }
+.risk-low { color: var(--turn-to); }
+
+.clips { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.clips li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 14px;
+  align-items: baseline;
+  padding: 9px 0;
+  border-top: 1px solid var(--rule-soft);
+  font-size: .92rem;
+}
+.clip-use { color: var(--ink-soft); }
+.clip-holder { display: block; color: var(--ink); margin-top: 2px; }
+.clip-holder a { color: inherit; text-underline-offset: 2px; }
+.lic {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+.lic-all_rights_reserved { color: var(--turn-from); }
+
+.credit-line {
+  margin: 12px 0 0;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--ink-faint);
+}
+.credit-line b { color: var(--ink-soft); font-weight: 500; }
+
+.variant {
+  border: 1px dashed var(--turn-to);
+  border-radius: 3px;
+  padding: 18px clamp(14px, 3vw, 20px);
+  display: grid;
+  gap: 16px;
+}
+.variant-premise { margin: 0; font-size: .95rem; line-height: 1.55; color: var(--ink-soft); max-width: 58ch; }
+.assets { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.assets li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 5px 14px;
+  align-items: baseline;
+  padding: 9px 0;
+  border-top: 1px solid var(--rule-soft);
+  font-size: .92rem;
+}
+.asset-attrib { grid-column: 1 / -1; font-size: .85rem; color: var(--ink-faint); line-height: 1.5; margin: 0; }
+
 .view-concepts .case > :not(.case-head):not(.concept) { display: none; }
 .view-concepts .case:not([data-concept="1"]) { display: none; }
 
 @media (max-width: 620px) {
   .beat { grid-template-columns: 1fr; gap: 8px; }
+  .clips li, .assets li { grid-template-columns: 1fr; }
   .beat-mark { display: flex; gap: 10px; align-items: baseline; }
   .controls { gap: 16px; }
 }
@@ -652,9 +730,8 @@ def render_quote(quote: dict) -> str:
     return "".join(parts)
 
 
-def render_concept(concept: dict) -> str:
-    payoff = concept["payoff"]
-    beats = "".join(
+def render_beats(beats: list[dict], payoff_speaker: str = "") -> str:
+    return "".join(
         '<li class="beat">'
         f'<div class="beat-mark"><span class="beat-t">{esc(b["t"])}</span>'
         f'<span class="beat-name">{esc(b["beat"])}</span></div>'
@@ -662,13 +739,75 @@ def render_concept(concept: dict) -> str:
         f'<p class="beat-visual">{esc(b["visual"])}</p>'
         f'<p class="beat-overlay">{esc(b["overlay"])}</p>'
         + (
-            f'<p class="beat-attrib">{esc(payoff["speaker"])}</p>'
-            if b["beat"] == "Důkaz"
+            f'<p class="beat-attrib">{esc(payoff_speaker)}</p>'
+            if b["beat"] == "Důkaz" and payoff_speaker
             else ""
         )
         + "</div></li>"
-        for b in concept["beats"]
+        for b in beats
     )
+
+
+def render_credits(credits: dict) -> str:
+    clips = "".join(
+        "<li><span>"
+        f'<span class="clip-use">{esc(c["use"])}</span>'
+        f'<span class="clip-holder">'
+        + (
+            f'<a href="{esc(c["url"])}" target="_blank" rel="noopener">{esc(c["rights_holder"])}</a>'
+            if c.get("url")
+            else esc(c["rights_holder"])
+        )
+        + "</span></span>"
+        f'<span class="lic lic-{esc(c["licence"])}">{esc(LICENCE_LABELS.get(c["licence"], c["licence"]))}</span>'
+        "</li>"
+        for c in credits["clips"]
+    )
+    risk = credits["risk"]
+    note = (
+        f'<p class="credit-line">{esc(credits["risk_note"])}</p>'
+        if credits.get("risk_note")
+        else ""
+    )
+    return (
+        '<div><p class="section-label">Práva a kredity '
+        f'<span class="risk risk-{esc(risk)}">Riziko: {esc(RISK_LABELS.get(risk, risk))}</span></p>'
+        f'<ul class="clips">{clips}</ul>'
+        + note
+        + f'<p class="credit-line"><b>Kredit do videa:</b> {esc(credits["on_screen"])}</p></div>'
+    )
+
+
+def render_variant(variant: dict, payoff_speaker: str) -> str:
+    assets = "".join(
+        "<li><span>"
+        f'<span class="clip-use">{esc(a["what"])}</span>'
+        f'<span class="clip-holder">'
+        + (
+            f'<a href="{esc(a["url"])}" target="_blank" rel="noopener">{esc(a["source"])}</a>'
+            if a.get("url")
+            else esc(a["source"])
+        )
+        + "</span></span>"
+        f'<span class="lic lic-{esc(a["licence"])}">{esc(LICENCE_LABELS.get(a["licence"], a["licence"]))}</span>'
+        + (f'<p class="asset-attrib">{esc(a["attribution"])}</p>' if a.get("attribution") else "")
+        + "</li>"
+        for a in variant["assets"]
+    )
+    return (
+        '<div class="variant">'
+        '<p class="section-label">Bezpečná varianta — bez archivních záběrů '
+        '<span class="risk risk-low">Riziko: nízké</span></p>'
+        f'<p class="variant-premise">{esc(variant["premise"])}</p>'
+        f'<ul class="beats">{render_beats(variant["beats"], payoff_speaker)}</ul>'
+        f'<div><p class="section-label">Co k tomu potřebuješ</p><ul class="assets">{assets}</ul></div>'
+        "</div>"
+    )
+
+
+def render_concept(concept: dict) -> str:
+    payoff = concept["payoff"]
+    beats = render_beats(concept["beats"], payoff["speaker"])
     tags = "".join(f"<li>{esc(t)}</li>" for t in concept["hashtags"])
     audio = (
         f'<p class="audio-note"><b>Zvuk:</b> {esc(concept["audio"])}</p>'
@@ -683,10 +822,19 @@ def render_concept(concept: dict) -> str:
         f'<p class="concept-hook">{esc(concept["hook"])}</p>'
         f'<p class="concept-logline">{esc(concept["logline"])}</p>'
         "</div>"
-        f'<div><p class="section-label">Sestřih</p><ul class="beats">{beats}</ul></div>'
+        f'<div><p class="section-label">Sestřih — archivní varianta '
+        f'<span class="risk risk-{esc(concept["credits"]["risk"])}">Riziko: '
+        f'{esc(RISK_LABELS.get(concept["credits"]["risk"], concept["credits"]["risk"]))}</span></p>'
+        f'<ul class="beats">{beats}</ul></div>'
         f'<div><p class="section-label">Caption</p><p class="caption">{esc(concept["caption"])}</p>'
         f'<ul class="hashtags">{tags}</ul></div>'
         + (f"<div>{audio}</div>" if audio else "")
+        + render_credits(concept["credits"])
+        + (
+            render_variant(concept["variant_safe"], payoff["speaker"])
+            if concept.get("variant_safe")
+            else ""
+        )
         + "</div>"
     )
 

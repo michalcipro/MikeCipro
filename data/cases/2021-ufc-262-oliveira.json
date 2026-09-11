@@ -131,7 +131,7 @@
       "speaker": "Charles Oliveira",
       "line": "Všem jsem dokázal, že jsem lev mezi lvy."
     },
-    "caption": "Roky mu fanoušci říkali, že to vždycky vzdá. Po jednom odstoupení mu ta nálepka zůstala viset.\n\nV zápase o titul dostal přesně tu situaci, ve které se to mělo potvrdit. Dvakrát na zemi v prvním kole. Rozhodčí skloněný nad ním, připravený to ukončit.\n\nPřežil kolo. Do druhého nastoupil jako někdo jiný. Za 19 sekund bylo hotovo.\n\nV oktagonu pak plakal:\n\n„Všem jsem dokázal, že jsem lev mezi lvy.“\n\nNálepka, kterou ti dají ostatní, není rozsudek.",
+    "caption": "Roky mu fanoušci říkali, že to vždycky vzdá. Po jednom odstoupení mu ta nálepka zůstala viset.\n\nV zápase o titul dostal přesně tu situaci, ve které se to mělo potvrdit. Dvakrát na zemi v prvním kole. Rozhodčí skloněný nad ním, připravený to ukončit.\n\nPřežil kolo. Do druhého nastoupil jako někdo jiný. Za 19 sekund bylo hotovo.\n\nV oktagonu pak plakal:\n\n„Všem jsem dokázal, že jsem lev mezi lvy.“\n\nNálepka, kterou ti dají ostatní, není rozsudek.\n\nZdroje\n— Záznam zápasu a rozhovor v oktagonu: UFC (Zuffa, LLC)\n— Pozápasová tisková konference: UFC\n— Kontext k pověsti bojovníka: Bloody Elbow, Yahoo Sports",
     "hashtags": [
       "#charlesoliveira",
       "#ufc",
@@ -144,6 +144,26 @@
       "#hlavarozhoduje"
     ],
     "audio": "Originální zvuk. Ticho haly v prvním kole vs. výbuch ve druhém.",
-    "closing": "Nálepka, kterou ti dají ostatní, není rozsudek."
+    "closing": "Nálepka, kterou ti dají ostatní, není rozsudek.",
+    "credits": {
+      "on_screen": "Záběry: UFC",
+      "caption_block": "Zdroje\n— Záznam zápasu a rozhovor v oktagonu: UFC (Zuffa, LLC)\n— Pozápasová tisková konference: UFC\n— Kontext k pověsti bojovníka: Bloody Elbow, Yahoo Sports",
+      "clips": [
+        {
+          "use": "Beat 1–4 — knockdowny v prvním kole, dokončení ve druhém",
+          "rights_holder": "Zuffa, LLC / UFC",
+          "licence": "all_rights_reserved",
+          "url": "https://www.facebook.com/ufceurope/videos/charles-oliveira-knocks-out-michael-chandler-ufc-262/931827820987773/"
+        },
+        {
+          "use": "Beat 5 — rozhovor v oktagonu",
+          "rights_holder": "Zuffa, LLC / UFC",
+          "licence": "all_rights_reserved",
+          "url": "https://www.youtube.com/watch?v=yTNsvQb13iU"
+        }
+      ],
+      "risk": "high",
+      "risk_note": "UFC patří k nejagresivnějším držitelům práv vůbec a nároky uplatňuje i na několikasekundové úryvky."
+    }
   }
 }

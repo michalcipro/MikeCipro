@@ -188,7 +188,8 @@
         "payoff",
         "caption",
         "hashtags",
-        "closing"
+        "closing",
+        "credits"
       ],
       "additionalProperties": false,
       "properties": {
@@ -280,6 +281,176 @@
         "closing": {
           "type": "string",
           "description": "Poslední věta na obraze"
+        },
+        "credits": {
+          "type": "object",
+          "description": "Kdo drží práva ke každému použitému materiálu a jak se to uvede",
+          "required": [
+            "on_screen",
+            "caption_block",
+            "clips",
+            "risk"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "on_screen": {
+              "type": "string",
+              "description": "Kredit vysázený do videa — krátký"
+            },
+            "caption_block": {
+              "type": "string",
+              "description": "Blok zdrojů, který se připojí pod caption"
+            },
+            "clips": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "use",
+                  "rights_holder",
+                  "licence"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "use": {
+                    "type": "string",
+                    "description": "Ve kterém beatu a k čemu"
+                  },
+                  "rights_holder": {
+                    "type": "string"
+                  },
+                  "licence": {
+                    "type": "string",
+                    "enum": [
+                      "all_rights_reserved",
+                      "cc_by",
+                      "cc_by_sa",
+                      "public_domain",
+                      "licensed_stock",
+                      "own_material",
+                      "unknown"
+                    ]
+                  },
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "attribution": {
+                    "type": "string",
+                    "description": "Přesné znění, které licence vyžaduje"
+                  }
+                }
+              }
+            },
+            "risk": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high"
+              ],
+              "description": "Riziko stažení příspěvku nebo nároku"
+            },
+            "risk_note": {
+              "type": "string"
+            }
+          }
+        },
+        "variant_safe": {
+          "type": "object",
+          "description": "Alternativní střih bez cizích archivních záběrů — nulové riziko nároku",
+          "required": [
+            "premise",
+            "beats",
+            "assets"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "premise": {
+              "type": "string",
+              "description": "Na čem varianta stojí místo archivu"
+            },
+            "beats": {
+              "type": "array",
+              "minItems": 4,
+              "items": {
+                "type": "object",
+                "required": [
+                  "t",
+                  "beat",
+                  "visual",
+                  "overlay"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "t": {
+                    "type": "string",
+                    "description": "Časové okno, např. 0:12–0:20"
+                  },
+                  "beat": {
+                    "type": "string",
+                    "enum": [
+                      "Konec",
+                      "Kontext",
+                      "Zlom",
+                      "Obrat",
+                      "Důkaz",
+                      "Pointa"
+                    ]
+                  },
+                  "visual": {
+                    "type": "string",
+                    "description": "Co je na obraze a odkud se to bere"
+                  },
+                  "overlay": {
+                    "type": "string",
+                    "description": "Text na obrazovce — krátký"
+                  }
+                }
+              }
+            },
+            "assets": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "what",
+                  "source",
+                  "licence"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "what": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "type": "string"
+                  },
+                  "licence": {
+                    "type": "string",
+                    "enum": [
+                      "all_rights_reserved",
+                      "cc_by",
+                      "cc_by_sa",
+                      "public_domain",
+                      "licensed_stock",
+                      "own_material",
+                      "unknown"
+                    ]
+                  },
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "attribution": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }

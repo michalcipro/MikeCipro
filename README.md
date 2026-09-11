@@ -87,5 +87,23 @@ hráč vysvětluje vlastními slovy, dělá rozdíl mezi highlightem a příběh
 - Co není doložené, se zapíše do pole `uncertainty`, ne domyslí
 - **Cokoliv v konceptu podané jako citace — titulek na obraze i pointa — musí odpovídat
   výroku z `evidence`.** Validátor to kontroluje a bez shody neprojde
-- K záběrům velkých soutěží (UEFA, UFC, NHL, Wimbledon, MOV) se vážou autorská práva —
-  viz poznámka v SKILL.md
+- **Ke každému použitému materiálu je uvedený držitel práv a licence.** Bez bloku `credits`
+  koncept neprojde
+- **Agent nikdy netvrdí, že uvedení zdroje stačí k legálnosti.** Nestačí — kredit není licence
+
+### Zdroje a práva
+
+U každého konceptu je blok `credits`: kdo drží práva ke každému záběru, jaká je licence,
+kredit do videa, blok zdrojů pod caption a odhad rizika. Validátor neprojde, pokud je
+u materiálu s vyhrazenými právy nastaveno riziko `low`.
+
+Všech šest současných případů stojí na záběrech velkých soutěží (AELTC, UEFA, Augusta National,
+NHL, UFC, MOV) — tedy **riziko vysoké**. Proto má každý případ s vysokým rizikem dostat
+i **bezpečnou variantu** (`variant_safe`): střih bez cizích archivních záběrů, postavený
+na tom, co použít lze — fakta (skóre, časy), krátká citace s uvedením zdroje, fotografie
+pod CC BY-SA, licencovaný zvuk a vlastní grafika.
+
+Hotovou bezpečnou variantu má zatím Djoković. Není to ústupek: u téhle série nese příběh
+citace, ne záběr, a typografické zpracování ji navíc odliší od repostů sestřihů.
+
+> Tohle není právní poradenství. U reálného rizika se zeptej právníka.

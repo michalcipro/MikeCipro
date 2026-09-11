@@ -143,14 +143,52 @@ def check_case(path: Path, schema: dict, seen_ids: dict[str, Path]) -> list[str]
                 f"titulek nesmí obsahovat výrok, který není v evidence"
             )
 
-        for i, beat in enumerate(concept.get("beats") or []):
-            overlay = beat.get("overlay", "")
-            if overlay.startswith("\u201e") and overlay.rstrip().endswith("\u201c"):
-                if norm(overlay) not in pool:
+        variant_beats = (concept.get("variant_safe") or {}).get("beats") or []
+        for where, beat_list in (("beats", concept.get("beats") or []),
+                                 ("variant_safe.beats", variant_beats)):
+            for i, beat in enumerate(beat_list):
+                overlay = beat.get("overlay", "")
+                if overlay.startswith("\u201e") and overlay.rstrip().endswith("\u201c"):
+                    if norm(overlay) not in pool:
+                        errors.append(
+                            f"{path.name}: concept.{where}[{i}].overlay je podán jako citace, "
+                            f"ale neodpovídá žádnému doloženému výroku"
+                        )
+
+        credits = concept.get("credits") or {}
+        clips = credits.get("clips") or []
+        if not clips:
+            errors.append(f"{path.name}: concept.credits.clips — každý použitý materiál musí mít uvedeného držitele práv")
+
+        licences = {c.get("licence") for c in clips}
+        for i, clip in enumerate(clips):
+            if not clip.get("rights_holder"):
+                errors.append(f"{path.name}: credits.clips[{i}] — chybí rights_holder")
+            if clip.get("licence") in ("cc_by", "cc_by_sa") and not clip.get("attribution"):
+                errors.append(
+                    f"{path.name}: credits.clips[{i}] — licence {clip['licence']} vyžaduje "
+                    f"konkrétní znění atribuce"
+                )
+
+        # Kredit nenahrazuje licenci. Materiál s vyhrazenými právy nesmí být veden jako nízké riziko.
+        if "all_rights_reserved" in licences and credits.get("risk") == "low":
+            errors.append(
+                f"{path.name}: credits.risk je 'low', ale použitý materiál má vyhrazená práva — "
+                f"uvedení zdroje riziko nároku neodstraňuje"
+            )
+        if credits.get("risk") in ("medium", "high") and not credits.get("risk_note"):
+            errors.append(f"{path.name}: credits.risk_note musí vysvětlit, v čem riziko spočívá")
+
+        variant = concept.get("variant_safe")
+        if variant:
+            for i, asset in enumerate(variant.get("assets") or []):
+                if asset.get("licence") == "all_rights_reserved":
                     errors.append(
-                        f"{path.name}: concept.beats[{i}].overlay je podán jako citace, "
-                        f"ale neodpovídá žádnému doloženému výroku"
+                        f"{path.name}: variant_safe.assets[{i}] má vyhrazená práva — "
+                        f"bezpečná varianta nesmí stát na cizím chráněném materiálu"
                     )
+                if asset.get("licence") in ("cc_by", "cc_by_sa") and not asset.get("attribution"):
+                    errors.append(f"{path.name}: variant_safe.assets[{i}] — chybí znění atribuce")
 
     for i, source in enumerate(case.get("sources") or []):
         if not URL_RE.match(source.get("url", "")):

@@ -126,7 +126,7 @@
       "speaker": "Zdeno Chára",
       "line": "Dáme prostě jeden a od toho se odrazíme."
     },
-    "caption": "1:4. Deset minut do konce sedmého zápasu série. Diváci začínají odcházet z haly.\n\nNa střídačce se Chára otočí na Lucice. Neřekne „musíme to otočit“. Řekne:\n\n„Dáme prostě jeden a od toho se odrazíme.“\n\nNemožný cíl vyměnili za splnitelný. Po prvním gólu se podle Lucice lavička viditelně změnila — a už to bylo jiné utkání.\n\nSrovnali 51 sekund před koncem. V prodloužení vyhráli.\n\n1:4 otočit nedokážeš. Jeden gól dát dokážeš. V tom je celý trik.",
+    "caption": "1:4. Deset minut do konce sedmého zápasu série. Diváci začínají odcházet z haly.\n\nNa střídačce se Chára otočí na Lucice. Neřekne „musíme to otočit“. Řekne:\n\n„Dáme prostě jeden a od toho se odrazíme.“\n\nNemožný cíl vyměnili za splnitelný. Po prvním gólu se podle Lucice lavička viditelně změnila — a už to bylo jiné utkání.\n\nSrovnali 51 sekund před koncem. V prodloužení vyhráli.\n\n1:4 otočit nedokážeš. Jeden gól dát dokážeš. V tom je celý trik.\n\nZdroje\n— Záznam sedmého zápasu: NHL, oficiální kanál\n— Výroky Cháry, Lucice a Juliena: ESPN, oral history zápasu (2018)",
     "hashtags": [
       "#bruins",
       "#nhl",
@@ -139,6 +139,20 @@
       "#hlavarozhoduje"
     ],
     "audio": "Originální zvuk haly. Kontrast mezi tichem za stavu 1:4 a výbuchem u vyrovnání je celý příběh.",
-    "closing": "1:4 otočit nedokážeš. Jeden gól dát dokážeš."
+    "closing": "1:4 otočit nedokážeš. Jeden gól dát dokážeš.",
+    "credits": {
+      "on_screen": "Záběry: NHL",
+      "caption_block": "Zdroje\n— Záznam sedmého zápasu: NHL, oficiální kanál\n— Výroky Cháry, Lucice a Juliena: ESPN, oral history zápasu (2018)",
+      "clips": [
+        {
+          "use": "Beat 1–4 — stav 1:4, střídačka, obrat a prodloužení",
+          "rights_holder": "National Hockey League (NHL)",
+          "licence": "all_rights_reserved",
+          "url": "https://www.youtube.com/watch?v=RrlgFXcS6pk"
+        }
+      ],
+      "risk": "high",
+      "risk_note": "NHL uplatňuje nároky na záběry ze zápasů systematicky. Beat 5 je u tohoto případu jen text — výroky pocházejí z psané oral history, ne z videa."
+    }
   }
 }

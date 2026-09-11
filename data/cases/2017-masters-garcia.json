@@ -140,7 +140,7 @@
       "speaker": "Sergio García",
       "line": "Rozhodně ukázka mého charakteru a mojí mentality."
     },
-    "caption": "74 startů na majorech. Pokaždé, když byl blízko, se složil. Sám o sobě říkal, že občas přemýšlel, jestli vůbec někdy nějaký vyhraje.\n\nV neděli v Augustě ztratil vedení přesně tak jako vždycky — po dvou špatných jamkách.\n\nRozdíl byl v tom, co přišlo potom. Nic. Žádný propad.\n\n„Celý týden jsem zvládal emoce, přijímal dobré i špatné věci, šel dál a pokračoval.“\n\nVyhrál v rozstřelu. A když se ho na tiskovce ptali, na co je nejvíc hrdý, nemluvil o golfu:\n\n„Rozhodně na ukázku mého charakteru a mojí mentality.“\n\nNezměnil švih. Změnil to, co dělá po špatné ráně.",
+    "caption": "74 startů na majorech. Pokaždé, když byl blízko, se složil. Sám o sobě říkal, že občas přemýšlel, jestli vůbec někdy nějaký vyhraje.\n\nV neděli v Augustě ztratil vedení přesně tak jako vždycky — po dvou špatných jamkách.\n\nRozdíl byl v tom, co přišlo potom. Nic. Žádný propad.\n\n„Celý týden jsem zvládal emoce, přijímal dobré i špatné věci, šel dál a pokračoval.“\n\nVyhrál v rozstřelu. A když se ho na tiskovce ptali, na co je nejvíc hrdý, nemluvil o golfu:\n\n„Rozhodně na ukázku mého charakteru a mojí mentality.“\n\nNezměnil švih. Změnil to, co dělá po špatné ráně.\n\nZdroje\n— Finálové kolo a rozstřel: Masters Tournament (Augusta National Golf Club)\n— Rozhovor s vítězem: Masters Tournament\n— Citace: vítězná tisková konference, 9. 4. 2017 (Golf Digest, Washington Post, Sky Sports)",
     "hashtags": [
       "#sergiogarcia",
       "#masters",
@@ -152,6 +152,26 @@
       "#hlavarozhoduje"
     ],
     "audio": "Tlumená hudba. Golf má ticho jako součást atmosféry — nepřehlušit ho.",
-    "closing": "Nezměnil švih. Změnil to, co dělá po špatné ráně."
+    "closing": "Nezměnil švih. Změnil to, co dělá po špatné ráně.",
+    "credits": {
+      "on_screen": "Záběry: Masters Tournament / Augusta National",
+      "caption_block": "Zdroje\n— Finálové kolo a rozstřel: Masters Tournament (Augusta National Golf Club)\n— Rozhovor s vítězem: Masters Tournament\n— Citace: vítězná tisková konference, 9. 4. 2017 (Golf Digest, Washington Post, Sky Sports)",
+      "clips": [
+        {
+          "use": "Beat 1–4 — dřívější kolapsy, nedělní kolo, rozstřel",
+          "rights_holder": "Augusta National Golf Club / Masters Tournament",
+          "licence": "all_rights_reserved",
+          "url": "https://www.youtube.com/watch?v=kfMSpgr1L3Q"
+        },
+        {
+          "use": "Beat 5 — tisková konference",
+          "rights_holder": "Augusta National Golf Club / Masters Tournament",
+          "licence": "all_rights_reserved",
+          "url": "https://www.youtube.com/watch?v=edHh2X8NciY"
+        }
+      ],
+      "risk": "high",
+      "risk_note": "Augusta National hlídá svou značku i záběry mimořádně přísně a nároky uplatňuje i na krátké úryvky."
+    }
   }
 }

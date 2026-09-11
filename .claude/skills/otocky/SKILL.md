@@ -129,15 +129,64 @@ emoji jako výplň, delší text než osm odstavců.
 U většiny těchhle případů je **originální zvuk silnější než hudba** — skandování davu,
 reakce komentátora, ticho haly. Vždycky zvaž, jestli hudba něco přidává, nebo jen překrývá.
 
-## 4. Práva k záběrům — praktická poznámka
+## 4. Zdroje a práva — povinná součást každého konceptu
 
-Materiál od UEFA, UFC, NHL, Wimbledonu nebo MOV je chráněný a tyto organizace ho na
-sociálních sítích aktivně vymáhají. Krátký sestřih s vlastním komentářem se běžně toleruje,
-ale záruka to není — Instagram může příspěvek stáhnout nebo umlčet zvuk.
+### Pravidlo, které se nesmí zamlčet
 
-Co riziko snižuje: krátké úryvky místo souvislých pasáží, vlastní text a komentář jako
-těžiště, uvedení zdroje, žádná monetizace cizího záběru. Rozhodnutí je na uživateli —
-zmiň to jednou u prvního konceptu a dál to neopakuj.
+**Uvedení zdroje nedělá použití legálním.** Kredit je nutný, ale autorská práva neruší —
+platformy vyhodnocují nárok bez ohledu na to, jestli je zdroj uvedený. Kdykoliv o tom
+padne řeč, řekni to rovnou. Nikdy netvrď, že „s uvedeným zdrojem je to v pořádku".
+
+Tohle není právní poradenství. U reálného rizika odkaž uživatele na právníka.
+
+### Blok `credits` — povinný u každého konceptu
+
+| Pole | Obsah |
+|---|---|
+| `clips` | Každý použitý materiál: ve kterém beatu, **kdo drží práva**, licence, odkaz |
+| `on_screen` | Krátký kredit vysázený do videa |
+| `caption_block` | Blok zdrojů, který se připojí pod caption |
+| `risk` | `low` / `medium` / `high` — odhad rizika nároku nebo stažení |
+| `risk_note` | V čem riziko konkrétně spočívá |
+
+Validátor neprojde, pokud je u materiálu s vyhrazenými právy nastaveno riziko `low`.
+Tuhle kontrolu neobcházej.
+
+### Jak přísní jsou jednotliví držitelé práv
+
+| Držitel | Přísnost |
+|---|---|
+| **MOV / Olympic Broadcasting Services** | Nejvyšší — nároky plošně, i na krátké sestřihy |
+| **UFC (Zuffa)** | Velmi vysoká — i několikasekundové úryvky |
+| **AELTC / Wimbledon** | Velmi vysoká — nepovoluje sdílení ani hráčům |
+| **Augusta National / Masters** | Velmi vysoká — hlídá značku i záběry |
+| **UEFA, NHL, NBA, Premier League** | Vysoká — automatické rozpoznávání obsahu |
+
+U všech těchto nastav `risk: "high"`.
+
+### Bezpečná varianta (`variant_safe`)
+
+**U každého případu s vysokým rizikem navrhni i střih bez cizích archivních záběrů.**
+Není to ústupek — u téhle série to často vyjde líp, protože nosič příběhu je citace,
+ne záběr. Typografie navíc odliší sérii od tisíce repostů sestřihů.
+
+Co se dá použít bez rizika:
+
+| Materiál | Proč je to v pořádku |
+|---|---|
+| **Skóre, časy, průběh zápasu** | Fakta autorskoprávní ochraně nepodléhají — nakresli si je sám |
+| **Krátká citace s uvedením zdroje** | Chráněný je záznam, ne fakt, že to bylo řečeno |
+| **Fotografie pod CC BY / CC BY-SA** | Wikimedia Commons — atribuci opiš přesně ze stránky souboru |
+| **Volné dílo** | Bez omezení |
+| **Licencovaná zvuková knihovna** | Epidemic Sound, Artlist, Pixabay |
+| **Vlastní záběry, hlas, grafika** | Tvoje |
+
+Do `variant_safe.assets` nesmí přijít nic s `all_rights_reserved` — validátor to odmítne.
+
+### Když se archivní varianta přesto použije
+
+Riziko snižuje, ne odstraňuje: úryvky pod ~7 sekund, vlastní komentář jako těžiště
+(ne jen přestříhaný highlight), uvedený zdroj, žádná monetizace cizího záběru.
 
 ## 5. Zdroje podle sportu
 

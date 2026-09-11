@@ -130,7 +130,7 @@
       "speaker": "Mo Farah",
       "line": "Na okamžik jsem si myslel: můj závod je pryč, můj sen je pryč. Ale pak se mi povedlo sáhnout hodně hluboko."
     },
-    "caption": "Deset kol do olympijského finále na 10 000 metrů. Zavadí o nohu a letí na zem.\n\nPár vteřin na tartanu. V hlavě mu proletí, že je konec.\n\n„Na okamžik jsem si myslel: můj závod je pryč, můj sen je pryč. Ale pak se mi povedlo sáhnout hodně hluboko.“\n\nVstal. Dotáhl se zpátky. V cílové rovince předběhl Tanuie a obhájil zlato.\n\nPo závodě mluvil skoro výhradně o tom, co se mu odehrálo v hlavě, ne o nohou:\n\n„Vzpomněl jsem si na všechnu tu dřinu a na to, že to všechno může být během minuty pryč. Nehodlal jsem to nechat být.“\n\nPád trval dvě vteřiny. Rozhodnutí míň.",
+    "caption": "Deset kol do olympijského finále na 10 000 metrů. Zavadí o nohu a letí na zem.\n\nPár vteřin na tartanu. V hlavě mu proletí, že je konec.\n\n„Na okamžik jsem si myslel: můj závod je pryč, můj sen je pryč. Ale pak se mi povedlo sáhnout hodně hluboko.“\n\nVstal. Dotáhl se zpátky. V cílové rovince předběhl Tanuie a obhájil zlato.\n\nPo závodě mluvil skoro výhradně o tom, co se mu odehrálo v hlavě, ne o nohou:\n\n„Vzpomněl jsem si na všechnu tu dřinu a na to, že to všechno může být během minuty pryč. Nehodlal jsem to nechat být.“\n\nPád trval dvě vteřiny. Rozhodnutí míň.\n\nZdroje\n— Záznam finále na 10 000 m: Mezinárodní olympijský výbor (IOC) / Olympic Broadcasting Services\n— Pozávodní výroky: CBC Sports, VICE Sports, Gulf News, 13. 8. 2016",
     "hashtags": [
       "#mofarah",
       "#rio2016",
@@ -143,6 +143,26 @@
       "#hlavarozhoduje"
     ],
     "audio": "Originální komentář u pádu — reakce komentátora nese emoci lépe než hudba.",
-    "closing": "Pád trval dvě vteřiny. Rozhodnutí míň."
+    "closing": "Pád trval dvě vteřiny. Rozhodnutí míň.",
+    "credits": {
+      "on_screen": "Záběry: IOC / Olympic Broadcasting Services",
+      "caption_block": "Zdroje\n— Záznam finále na 10 000 m: Mezinárodní olympijský výbor (IOC) / Olympic Broadcasting Services\n— Pozávodní výroky: CBC Sports, VICE Sports, Gulf News, 13. 8. 2016",
+      "clips": [
+        {
+          "use": "Beat 1–4 — pád, dotahování, cílová rovinka",
+          "rights_holder": "International Olympic Committee (IOC)",
+          "licence": "all_rights_reserved",
+          "url": "https://www.youtube.com/watch?v=UKsEV7vGAvA"
+        },
+        {
+          "use": "Beat 5 — pozávodní rozhovor",
+          "rights_holder": "International Olympic Committee (IOC)",
+          "licence": "all_rights_reserved",
+          "url": "https://www.youtube.com/watch?v=hI2eM2YYwS0"
+        }
+      ],
+      "risk": "high",
+      "risk_note": "MOV chrání olympijské záběry nejpřísněji ze všech a nároky uplatňuje plošně, včetně krátkých sestřihů."
+    }
   }
 }

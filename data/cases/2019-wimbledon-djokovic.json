@@ -126,7 +126,7 @@
       "speaker": "Novak Djoković",
       "line": "Když dav skanduje Rogere, já slyším Novaku."
     },
-    "caption": "Centre Court skanduje jméno tvého soupeře. Ty čelíš dvěma mečbolům ve finále Wimbledonu.\n\nDjoković ten zvuk nemohl vypnout. Tak s ním udělal něco jiného — přeložil si ho.\n\n„Když dav skanduje Rogere, já slyším Novaku.“\n\nSám na tiskovce dodal, že to zní jako pitomost. Ale že to tak opravdu je. Pak oba mečboly odvrátil a vyhrál 13:12 v pátém setu.\n\nVstup si nevybereš. To, co si z něj uděláš, ano.",
+    "caption": "Centre Court skanduje jméno tvého soupeře. Ty čelíš dvěma mečbolům ve finále Wimbledonu.\n\nDjoković ten zvuk nemohl vypnout. Tak s ním udělal něco jiného — přeložil si ho.\n\n„Když dav skanduje Rogere, já slyším Novaku.“\n\nSám na tiskovce dodal, že to zní jako pitomost. Ale že to tak opravdu je. Pak oba mečboly odvrátil a vyhrál 13:12 v pátém setu.\n\nVstup si nevybereš. To, co si z něj uděláš, ano.\n\nZdroje\n— Záběry finále a tiskové konference: The All England Lawn Tennis Club (Wimbledon), oficiální YouTube kanál\n— Průběh zápasu a statistika: ATP Tour\n— Citace: tisková konference po finále, Wimbledon, 14. 7. 2019",
     "hashtags": [
       "#djokovic",
       "#wimbledon",
@@ -138,6 +138,94 @@
       "#hlavarozhoduje"
     ],
     "audio": "Použít originální zvuk — skandování davu je půlka příběhu. Hudbu jen tiše pod beat 5–6.",
-    "closing": "Vstup si nevybereš. To, co si z něj uděláš, ano."
+    "closing": "Vstup si nevybereš. To, co si z něj uděláš, ano.",
+    "credits": {
+      "on_screen": "Záběry: Wimbledon / AELTC",
+      "caption_block": "Zdroje\n— Záběry finále a tiskové konference: The All England Lawn Tennis Club (Wimbledon), oficiální YouTube kanál\n— Průběh zápasu a statistika: ATP Tour\n— Citace: tisková konference po finále, Wimbledon, 14. 7. 2019",
+      "clips": [
+        {
+          "use": "Beat 1, 2, 4 — stav zápasu, publikum, odvrácené mečboly, závěr",
+          "rights_holder": "The All England Lawn Tennis Club (AELTC) / Wimbledon",
+          "licence": "all_rights_reserved",
+          "url": "https://www.youtube.com/watch?v=mnLdAeSXZv0"
+        },
+        {
+          "use": "Beat 5 — Djoković na tiskovce",
+          "rights_holder": "The All England Lawn Tennis Club (AELTC) / Wimbledon",
+          "licence": "all_rights_reserved",
+          "url": "https://www.youtube.com/watch?v=8jf3Z6XfqFM"
+        }
+      ],
+      "risk": "high",
+      "risk_note": "AELTC je jeden z nejpřísnějších držitelů práv ve sportu — nepovoluje sdílení záběrů ze zápasů ani samotným hráčům. Nárok nebo stažení příspěvku je pravděpodobné. Uvedení zdroje na tom nic nemění. Pro tenhle případ doporučuji bezpečnou variantu."
+    },
+    "variant_safe": {
+      "premise": "Celý příběh stojí na jedné větě, ne na záběru. Djokovičova věta o tom, že slyší vlastní jméno, jde vyprávět čistou typografií — a je to výraznější než další repost sestřihu. Skóre a průběh zápasu jsou fakta, ta chráněná nejsou: nakreslíš si je sám.",
+      "beats": [
+        {
+          "t": "0:00–0:04",
+          "beat": "Konec",
+          "visual": "Černá plocha. Slovo ROGER naskakuje v rytmu skandování, přibývá přes celou plochu, až ji zaplní. Zvuk: licencovaná ruchová stopa davu, ne originální přenos.",
+          "overlay": "ROGER. ROGER. ROGER."
+        },
+        {
+          "t": "0:04–0:13",
+          "beat": "Kontext",
+          "visual": "Vysázený ukazatel skóre — vlastní grafika. Pátý set, 7:8, stav 15:40. Čísla naskakují jedno po druhém.",
+          "overlay": "Dva mečboly. A celý stadion proti němu."
+        },
+        {
+          "t": "0:13–0:22",
+          "beat": "Zlom",
+          "visual": "Písmena ROGER se přeskládají na NOVAK. Pomalu, čitelně — tohle je celý trik toho příběhu a musí se stihnout přečíst.",
+          "overlay": "ROGER → NOVAK"
+        },
+        {
+          "t": "0:22–0:32",
+          "beat": "Obrat",
+          "visual": "Skóre pátého setu odpočítává nahoru vlastní grafikou až na 13:12. Pod tím naskakuje délka zápasu.",
+          "overlay": "13:12. Čtyři hodiny a 55 minut."
+        },
+        {
+          "t": "0:32–0:41",
+          "beat": "Důkaz",
+          "visual": "Volně licencovaná fotografie Djokoviče, ztmavená, přes ni vysázená celá citace. Pod ní zdroj: tisková konference, Wimbledon, 14. 7. 2019.",
+          "overlay": "„Když dav skanduje Rogere, já slyším Novaku.“"
+        },
+        {
+          "t": "0:41–0:45",
+          "beat": "Pointa",
+          "visual": "Černá plocha, bílý text.",
+          "overlay": "Vstup si nevybereš. To, co si z něj uděláš, ano."
+        }
+      ],
+      "assets": [
+        {
+          "what": "Fotografie Djokoviče pro beat 5",
+          "source": "Wikimedia Commons",
+          "licence": "cc_by_sa",
+          "url": "https://commons.wikimedia.org/wiki/File:Novak_Djokovic_(19720174971).jpg",
+          "attribution": "Přesné znění atribuce i verzi licence opiš ze stránky souboru — u různých fotek se liší (CC BY-SA 2.0 vs. 4.0). Atribuce musí být vysázená ve videu nebo v captionu, jinak licenci porušuješ."
+        },
+        {
+          "what": "Ruchová stopa davu na stadionu",
+          "source": "Licencovaná zvuková knihovna (Epidemic Sound, Artlist) nebo Pixabay",
+          "licence": "licensed_stock",
+          "attribution": "Podle podmínek konkrétní knihovny."
+        },
+        {
+          "what": "Typografie, ukazatel skóre a přechod ROGER → NOVAK",
+          "source": "Vlastní grafika",
+          "licence": "own_material",
+          "attribution": "Skóre a průběh zápasu jsou fakta — autorskoprávní ochraně nepodléhají."
+        },
+        {
+          "what": "Citace z tiskové konference",
+          "source": "Tisková konference Wimbledon, 14. 7. 2019",
+          "licence": "own_material",
+          "attribution": "Krátký citát s uvedením zdroje a data. Chráněný je záznam, ne samotný fakt, že to řekl."
+        }
+      ]
+    }
   }
 }

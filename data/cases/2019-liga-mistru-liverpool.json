@@ -130,7 +130,7 @@
       "speaker": "Jürgen Klopp (cituje Dejan Lovren)",
       "line": "Kluci, prostě věřte. Vložte si do hlavy, že to dokážeme."
     },
-    "caption": "0:3 z prvního zápasu. Bez Salaha, bez Firmina. Proti Barceloně s Messim.\n\nKlopp v šatně neřešil taktiku. Řekl klukům, že když vypadnou, ať vypadnou tím nejkrásnějším možným způsobem.\n\nSundal z nich strach z prohry. Tím jim uvolnil ruce.\n\n„Kluci, prostě věřte. Vložte si do hlavy, že to dokážeme.“ — takhle si tu řeč pamatuje Dejan Lovren.\n\n4:0. Postup do finále, které pak vyhráli.\n\nNěkdy je cesta ven přes to, že se přestaneš bát prohry.",
+    "caption": "0:3 z prvního zápasu. Bez Salaha, bez Firmina. Proti Barceloně s Messim.\n\nKlopp v šatně neřešil taktiku. Řekl klukům, že když vypadnou, ať vypadnou tím nejkrásnějším možným způsobem.\n\nSundal z nich strach z prohry. Tím jim uvolnil ruce.\n\n„Kluci, prostě věřte. Vložte si do hlavy, že to dokážeme.“ — takhle si tu řeč pamatuje Dejan Lovren.\n\n4:0. Postup do finále, které pak vyhráli.\n\nNěkdy je cesta ven přes to, že se přestaneš bát prohry.\n\nZdroje\n— Sestřih zápasu: UEFA Champions League, oficiální kanál\n— Záběry ze zákulisí: Liverpool FC, pořad Inside Anfield\n— Kloppova předzápasová řeč podle Dejana Lovrena: LiverpoolFC.com, 8. 5. 2019",
     "hashtags": [
       "#liverpool",
       "#anfield",
@@ -143,6 +143,26 @@
       "#hlavarozhoduje"
     ],
     "audio": "Originální zvuk stadionu u gólů. Pod beat 3 ticho — Kloppova věta musí stát sama.",
-    "closing": "Někdy je cesta ven přes to, že se přestaneš bát prohry."
+    "closing": "Někdy je cesta ven přes to, že se přestaneš bát prohry.",
+    "credits": {
+      "on_screen": "Záběry: UEFA · Liverpool FC",
+      "caption_block": "Zdroje\n— Sestřih zápasu: UEFA Champions League, oficiální kanál\n— Záběry ze zákulisí: Liverpool FC, pořad Inside Anfield\n— Kloppova předzápasová řeč podle Dejana Lovrena: LiverpoolFC.com, 8. 5. 2019",
+      "clips": [
+        {
+          "use": "Beat 1, 4 — první zápas a čtyři góly na Anfieldu",
+          "rights_holder": "UEFA",
+          "licence": "all_rights_reserved",
+          "url": "https://www.youtube.com/watch?v=7HldRlTZj_g"
+        },
+        {
+          "use": "Beat 5 — zákulisí a reakce lavičky",
+          "rights_holder": "Liverpool FC",
+          "licence": "all_rights_reserved",
+          "url": "https://www.youtube.com/watch?v=Ik-DhHJM8eo"
+        }
+      ],
+      "risk": "high",
+      "risk_note": "UEFA má na záběry z Ligy mistrů automatické rozpoznávání obsahu. Nárok přijde prakticky vždy."
+    }
   }
 }
