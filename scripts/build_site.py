@@ -83,6 +83,10 @@ CSS = """
   --accent: #0f6e4f;
   --note-bg: #f1f0e8;
   --shadow: 0 1px 2px rgba(21, 24, 21, .05);
+  --frame-bg: #101210;
+  --frame-ink: #f5f6f2;
+  --frame-dim: #98a29a;
+  --frame-guide: #3a4740;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -639,12 +643,109 @@ body {
 }
 .asset-attrib { grid-column: 1 / -1; font-size: .85rem; color: var(--ink-faint); line-height: 1.5; margin: 0; }
 
+.first-frame {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+.frame {
+  position: relative;
+  aspect-ratio: 9 / 16;
+  max-width: 100%;
+  background: var(--frame-bg);
+  border-radius: 6px;
+  overflow: hidden;
+  display: grid;
+  align-content: center;
+  gap: 10px;
+  padding: 0 20px;
+}
+.frame::before,
+.frame::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  border-top: 1px dashed var(--frame-guide);
+}
+.frame::before { top: 15%; }
+.frame::after { bottom: 25%; }
+.frame-eyebrow {
+  margin: 0;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: .16em;
+  color: var(--frame-dim);
+}
+.frame-headline {
+  margin: 0;
+  font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 1.32rem;
+  line-height: 1.08;
+  letter-spacing: -.02em;
+  color: var(--frame-ink);
+  text-wrap: balance;
+}
+.frame-subline {
+  margin: 0;
+  font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 500;
+  font-size: .95rem;
+  line-height: 1.25;
+  color: var(--frame-dim);
+  text-wrap: balance;
+}
+.frame-caption {
+  margin: 8px 0 0;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 9.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  text-align: center;
+}
+.frame-side { display: grid; gap: 12px; align-content: start; }
+.frame-side .concept-hook {
+  font-family: Newsreader, Georgia, serif;
+  font-weight: 400;
+  font-size: 1.02rem;
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: var(--ink);
+  max-width: 46ch;
+}
+.frame-side .concept-logline { font-size: .92rem; }
+.basis {
+  margin: 0;
+  font-size: .88rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  padding-left: 14px;
+  border-left: 2px solid var(--turn-to);
+  max-width: 46ch;
+}
+.basis b {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 9.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--turn-to);
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
 .view-concepts .case > :not(.case-head):not(.concept) { display: none; }
 .view-concepts .case:not([data-concept="1"]) { display: none; }
 
 @media (max-width: 620px) {
   .beat { grid-template-columns: 1fr; gap: 8px; }
   .clips li, .assets li { grid-template-columns: 1fr; }
+  .first-frame { grid-template-columns: 1fr; }
+  .frame { max-width: 260px; }
   .beat-mark { display: flex; gap: 10px; align-items: baseline; }
   .controls { gap: 16px; }
 }
@@ -748,6 +849,21 @@ def render_beats(beats: list[dict], payoff_speaker: str = "") -> str:
     )
 
 
+def render_frame(card: dict) -> str:
+    """Maketa prvního záběru — 9:16 s naznačenou bezpečnou zónou Reels."""
+    sub = f'<p class="frame-subline">{esc(card["subline"])}</p>' if card.get("subline") else ""
+    return (
+        "<div>"
+        '<div class="frame">'
+        f'<p class="frame-eyebrow">{esc(card["eyebrow"])}</p>'
+        f'<p class="frame-headline">{esc(card["headline"])}</p>'
+        + sub
+        + "</div>"
+        '<p class="frame-caption">První záběr · 0:00–0:03</p>'
+        "</div>"
+    )
+
+
 def render_credits(credits: dict) -> str:
     clips = "".join(
         "<li><span>"
@@ -819,8 +935,16 @@ def render_concept(concept: dict) -> str:
         '<div class="concept-head">'
         '<p class="concept-title"><span>Koncept pro Reel</span>'
         f'<span class="dur">9:16 · {concept["duration_s"]} s · 6 beatů</span></p>'
+        f'<div class="first-frame">{render_frame(concept["title_card"])}'
+        '<div class="frame-side">'
         f'<p class="concept-hook">{esc(concept["hook"])}</p>'
         f'<p class="concept-logline">{esc(concept["logline"])}</p>'
+        + (
+            f'<p class="basis"><b>Nápis se opírá o</b>{esc(concept["title_card"]["basis_note"])}</p>'
+            if concept["title_card"].get("basis_note")
+            else ""
+        )
+        + "</div></div>"
         "</div>"
         f'<div><p class="section-label">Sestřih — archivní varianta '
         f'<span class="risk risk-{esc(concept["credits"]["risk"])}">Riziko: '

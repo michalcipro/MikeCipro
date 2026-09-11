@@ -88,7 +88,47 @@ Pak spusť:
 python3 scripts/validate.py && python3 scripts/build_site.py
 ```
 
-## 3. Struktura konceptu — šest beatů
+## 3. Nápis v prvním záběru (`title_card`)
+
+O tom, jestli divák zůstane, se rozhodne v první vteřině. Nápis je proto součástí konceptu,
+ne dodatek.
+
+| Pole | Obsah |
+|---|---|
+| `eyebrow` | Soutěž a fáze, malým písmem — kontext bez zdržování |
+| `headline` | Hlavní nápis, **max. 45 znaků** (validátor delší odmítne) |
+| `subline` | Druhý řádek, drží napětí |
+| `basis` | `fakt` nebo `tvrzeni` |
+| `basis_note` | Čím je nápis podložený — u `tvrzeni` povinné |
+
+### Piš fakt, ne superlativ
+
+„Jeden z největších obratů v historii tenisu" je to, co má na prvním záběru každý sportovní
+účet. Nedá se doložit a v záplavě stejných nápisů zanikne.
+
+**Konkrétní fakt je poutavější než superlativ** — a navíc obstojí:
+
+| Slabé | Silné | Proč |
+|---|---|---|
+| Neuvěřitelný obrat! | 1:4. Deset minut do konce sezony. | Čísla si divák umí přeložit do napětí |
+| Legendární zápas | Nejdelší finále v historii Wimbledonu. | Superlativ, který je zároveň rekord |
+| Nikdy to nevzdal | Dvakrát na zemi v prvním kole. | Obraz místo hodnocení |
+| Dokázal nemožné | 74 startů na majoru. Ani jeden titul. | Konkrétní tíha |
+
+Nejlepší nápis je **superlativ, který je současně ověřitelný rekord**. Když takový existuje,
+použij ho — máš údernost i doložitelnost.
+
+Když se superlativu nevyhneš, nastav `basis: "tvrzeni"` a do `basis_note` napiš, o co se opírá.
+Bez toho koncept neprojde.
+
+### Sazba do záběru
+
+- Text patří do **bezpečné zóny** — nad spodních 25 % a pod horních 15 % obrazu,
+  jinak ho překryje rozhraní Instagramu
+- Nápis musí být čitelný bez zvuku a na malém displeji
+- Nápis drží celé první tři vteřiny, nepřebliká
+
+## 4. Struktura konceptu — šest beatů
 
 Každý příběh se vejde do stejného oblouku. Neměň ho — je to to, co dělá ze sbírky sérii.
 
@@ -129,7 +169,7 @@ emoji jako výplň, delší text než osm odstavců.
 U většiny těchhle případů je **originální zvuk silnější než hudba** — skandování davu,
 reakce komentátora, ticho haly. Vždycky zvaž, jestli hudba něco přidává, nebo jen překrývá.
 
-## 4. Zdroje a práva — povinná součást každého konceptu
+## 5. Zdroje a práva — povinná součást každého konceptu
 
 ### Pravidlo, které se nesmí zamlčet
 
@@ -188,7 +228,7 @@ Do `variant_safe.assets` nesmí přijít nic s `all_rights_reserved` — validá
 Riziko snižuje, ne odstraňuje: úryvky pod ~7 sekund, vlastní komentář jako těžiště
 (ne jen přestříhaný highlight), uvedený zdroj, žádná monetizace cizího záběru.
 
-## 5. Zdroje podle sportu
+## 6. Zdroje podle sportu
 
 | Sport | Kde hledat výroky | Kde hledat video |
 |---|---|---|
@@ -204,7 +244,7 @@ Riziko snižuje, ne odstraňuje: úryvky pod ~7 sekund, vlastní komentář jako
 **Tip:** formát *oral history* (ESPN, The Athletic) je pro tuhle sbírku nejcennější — obsahuje
 zpětné výpovědi více aktérů o tom, co se dělo v hlavě.
 
-## 6. Slovník mentálních mechanismů
+## 7. Slovník mentálních mechanismů
 
 Používej tyhle tagy (`mental_mechanism`), ať je sbírka prohledatelná. Nové přidávej jen tehdy,
 když žádný nesedí:
@@ -224,7 +264,7 @@ když žádný nesedí:
 | `hněv jako palivo` | Kontrolovaně použitá zlost |
 | `flow` | Popsaný stav vytržení, „nic jsem neslyšel" |
 
-## 7. Tvrdá pravidla
+## 8. Tvrdá pravidla
 
 | Pravidlo | Proč |
 |---|---|
@@ -235,7 +275,7 @@ když žádný nesedí:
 | **Když si nejsi jistý mechanismem, napiš to** do pole `uncertainty` | Poctivé „nevím" je lepší než domyšlený příběh |
 | **Sporný případ raději odmítni** a zapiš do `data/rejected.md` | Sbírka se buduje přísností, ne objemem |
 
-## 8. Kdy případ odmítnout
+## 9. Kdy případ odmítnout
 
 - Otočka byla způsobena **zraněním soupeře**, chybou rozhodčího nebo počasím
 - Existuje jen novinářská interpretace („musel to zlomit v hlavě"), ale **žádný výrok aktéra**
@@ -243,7 +283,7 @@ když žádný nesedí:
 - Nelze ověřit tvrdá data ze dvou zdrojů
 - Jde o dopingem či skandálem zpochybněný výkon → zařaď jen s výslovnou poznámkou v `caveat`
 
-## 9. Struktura repa
+## 10. Struktura repa
 
 ```
 data/cases/*.json       jednotlivé případy

@@ -163,6 +163,13 @@
       ],
       "risk": "high",
       "risk_note": "MOV chrání olympijské záběry nejpřísněji ze všech a nároky uplatňuje plošně, včetně krátkých sestřihů."
+    },
+    "title_card": {
+      "eyebrow": "RIO 2016 · FINÁLE NA 10 000 M",
+      "headline": "Uprostřed olympijského finále spadl.",
+      "subline": "Deset kol před cílem.",
+      "basis": "fakt",
+      "basis_note": "Pád v desátém kole je v záznamu závodu."
     }
   }
 }

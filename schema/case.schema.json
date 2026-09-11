@@ -189,7 +189,8 @@
         "caption",
         "hashtags",
         "closing",
-        "credits"
+        "credits",
+        "title_card"
       ],
       "additionalProperties": false,
       "properties": {
@@ -449,6 +450,42 @@
                   }
                 }
               }
+            }
+          }
+        },
+        "title_card": {
+          "type": "object",
+          "description": "Nápis vysázený do prvního záběru — rozhoduje o tom, jestli divák zůstane",
+          "required": [
+            "eyebrow",
+            "headline",
+            "basis"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "eyebrow": {
+              "type": "string",
+              "description": "Soutěž a fáze, malým písmem nad nadpisem"
+            },
+            "headline": {
+              "type": "string",
+              "description": "Hlavní nápis — musí se přečíst do 1,5 s"
+            },
+            "subline": {
+              "type": "string",
+              "description": "Druhý řádek, drží napětí"
+            },
+            "basis": {
+              "type": "string",
+              "enum": [
+                "fakt",
+                "tvrzeni"
+              ],
+              "description": "Je nápis ověřitelný fakt, nebo hodnotící tvrzení?"
+            },
+            "basis_note": {
+              "type": "string",
+              "description": "Čím je nápis podložený"
             }
           }
         }

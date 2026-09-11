@@ -153,6 +153,13 @@
       ],
       "risk": "high",
       "risk_note": "NHL uplatňuje nároky na záběry ze zápasů systematicky. Beat 5 je u tohoto případu jen text — výroky pocházejí z psané oral history, ne z videa."
+    },
+    "title_card": {
+      "eyebrow": "STANLEY CUP 2013 · SEDMÝ ZÁPAS",
+      "headline": "1:4. Deset minut do konce sezony.",
+      "subline": "Diváci začali odcházet z haly.",
+      "basis": "fakt",
+      "basis_note": "Stav i čas jsou v zápise utkání. Odchod diváků popisují trenér Julien i Lucic."
     }
   }
 }

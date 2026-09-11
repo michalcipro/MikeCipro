@@ -155,6 +155,21 @@ def check_case(path: Path, schema: dict, seen_ids: dict[str, Path]) -> list[str]
                             f"ale neodpovídá žádnému doloženému výroku"
                         )
 
+        card = concept.get("title_card") or {}
+        if len(card.get("headline", "")) > 45:
+            errors.append(
+                f"{path.name}: title_card.headline má {len(card['headline'])} znaků — "
+                f"nad 45 se to v prvním záběru nestihne přečíst"
+            )
+        if len(card.get("subline", "")) > 60:
+            errors.append(f"{path.name}: title_card.subline je delší než 60 znaků")
+        # Superlativ v prvním záběru je nejsnazší místo, kde sbírka ztratí důvěryhodnost.
+        if card.get("basis") == "tvrzeni" and not card.get("basis_note"):
+            errors.append(
+                f"{path.name}: title_card je hodnotící tvrzení, ale chybí basis_note — "
+                f"napiš, o co se opírá, nebo to přepiš na doložitelný fakt"
+            )
+
         credits = concept.get("credits") or {}
         clips = credits.get("clips") or []
         if not clips:

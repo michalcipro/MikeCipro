@@ -164,6 +164,13 @@
       ],
       "risk": "high",
       "risk_note": "UFC patří k nejagresivnějším držitelům práv vůbec a nároky uplatňuje i na několikasekundové úryvky."
+    },
+    "title_card": {
+      "eyebrow": "UFC 262 · ZÁPAS O TITUL",
+      "headline": "Dvakrát na zemi v prvním kole.",
+      "subline": "Rozhodčí připravený zápas ukončit.",
+      "basis": "fakt",
+      "basis_note": "Dva knockdowny jsou v záznamu. Postoj rozhodčího Miragliotty popisuje dobové zpravodajství."
     }
   }
 }

@@ -226,6 +226,13 @@
           "attribution": "Krátký citát s uvedením zdroje a data. Chráněný je záznam, ne samotný fakt, že to řekl."
         }
       ]
+    },
+    "title_card": {
+      "eyebrow": "WIMBLEDON 2019 · FINÁLE",
+      "headline": "Nejdelší finále v historii Wimbledonu.",
+      "subline": "A byl v něm dva míčky od prohry.",
+      "basis": "fakt",
+      "basis_note": "4 hodiny 55 minut je doložený rekord Wimbledonu. Federer měl dva mečboly za stavu 8:7 a 40:15 na vlastním podání."
     }
   }
 }

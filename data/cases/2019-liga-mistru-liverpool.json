@@ -163,6 +163,13 @@
       ],
       "risk": "high",
       "risk_note": "UEFA má na záběry z Ligy mistrů automatické rozpoznávání obsahu. Nárok přijde prakticky vždy."
+    },
+    "title_card": {
+      "eyebrow": "LIGA MISTRŮ 2019 · SEMIFINÁLE",
+      "headline": "0:3 z prvního zápasu.",
+      "subline": "Bez Salaha, bez Firmina. Proti Messimu.",
+      "basis": "fakt",
+      "basis_note": "Výsledek prvního zápasu na Camp Nou a absence obou hráčů v odvetě."
     }
   }
 }

@@ -172,6 +172,13 @@
       ],
       "risk": "high",
       "risk_note": "Augusta National hlídá svou značku i záběry mimořádně přísně a nároky uplatňuje i na krátké úryvky."
+    },
+    "title_card": {
+      "eyebrow": "MASTERS 2017 · FINÁLOVÉ KOLO",
+      "headline": "74 startů na majoru. Ani jeden titul.",
+      "subline": "A pověst hráče, co se pod tlakem složí.",
+      "basis": "fakt",
+      "basis_note": "Počet startů je doložený. Pověst mentálně křehkého hráče popisuje dobový tisk i sám García na tiskovce."
     }
   }
 }

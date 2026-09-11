@@ -55,6 +55,17 @@ python3 scripts/build_site.py   # přegeneruje site/index.html
 | `scripts/build_site.py` | Generátor přehledu |
 | `site/index.html` | Prohlížitelný přehled (generovaný) |
 
+### Nápis v prvním záběru
+
+O tom, jestli divák zůstane, rozhoduje první vteřina, takže je nápis součástí konceptu.
+Pravidlo: **piš fakt, ne superlativ.** „Jeden z největších obratů v historii" má na prvním
+záběru každý účet — nedá se doložit a zanikne. Konkrétní číslo je poutavější i obhajitelné.
+
+Nejlepší varianta je superlativ, který je zároveň ověřitelný rekord: *„Nejdelší finále
+v historii Wimbledonu. A byl v něm dva míčky od prohry."*
+
+Validátor hlídá délku (max 45 znaků) a u hodnotícího tvrzení vyžaduje doložení.
+
 ### Struktura konceptu — šest beatů
 
 Každý příběh jede stejný oblouk. To je to, co z jednotlivých videí dělá sérii.
