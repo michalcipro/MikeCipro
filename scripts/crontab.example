@@ -1,0 +1,11 @@
+# Nainstaluj: crontab -e  a vlož (uprav cestu)
+#
+# Jeden cyklus každou hodinu: sběr dat → učení → plán → výroba → publikace.
+# Agent si sám hlídá, že nepublikuje víc, než smí.
+0 * * * * /cesta/k/MikeCipro/scripts/run-cycle.sh >> /cesta/k/MikeCipro/data/cron.log 2>&1
+
+# Nedělní písemná analýza profilu za posledních 28 dní
+0 20 * * 0 cd /cesta/k/MikeCipro && .venv/bin/igagent analyze --days 28 >> data/cron.log 2>&1
+
+# Připomínka: token k Instagramu platí ~60 dní. První v měsíci zkontroluj platnost.
+0 9 1 * * cd /cesta/k/MikeCipro && .venv/bin/igagent token info >> data/cron.log 2>&1

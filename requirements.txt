@@ -1,0 +1,12 @@
+# --- jádro ---
+anthropic>=1.6.0
+Pillow>=10.3.0
+requests>=2.31.0
+PyYAML>=6.0.1
+python-dotenv>=1.0.1
+
+# --- video (ffmpeg binárka jako fallback, když není v systému) ---
+imageio-ffmpeg>=0.5.1
+
+# --- volitelné: hosting médií na S3/R2 (pip install -r requirements.txt boto3) ---
+# boto3>=1.34.0

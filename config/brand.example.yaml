@@ -1,0 +1,83 @@
+# Brand kit — tohle je jediné místo, kde agentovi říkáš, kdo jsi.
+# Zkopíruj na config/brand.yaml a uprav.
+
+name: MikeCipro
+handle: mikecipro
+language: cs
+
+tone: >
+  Přímý, lidský, konkrétní. Mluvím v první osobě, píšu jako kamarádovi.
+  Žádná korporátní vata, žádné „pojďme se podívat". Radši kratší věty.
+
+audience: >
+  Lidi 25–40, co chtějí praktické věci, které fungují v reálném týdnu,
+  ne teorii z knížek.
+
+# Obsahové pilíře — kolem čeho se točí celý profil
+pillars:
+  - "Za oponou: jak to dělám doopravdy, včetně toho, co nevyšlo"
+  - "Použitelné návody: jedna věc, kterou jde použít dneska"
+  - "Názory: co si o tom myslím a proč"
+
+topics:
+  - produktivita
+  - návyky
+  - práce na dálku
+  - nástroje
+  - osobní finance
+
+cta:
+  - "Ulož si to, ať to máš po ruce"
+  - "Napiš do komentářů, jak to máš ty"
+  - "Pošli to někomu, kdo to řeší"
+
+colors:
+  bg: "#0E1116"
+  bg_alt: "#1A1F27"
+  fg: "#F5F7FA"
+  muted: "#9BA6B2"
+  accent: "#FF5A36"
+  accent_alt: "#FFC53D"
+
+# Vlastní fonty (TTF). Když necháš prázdné, použije se systémový DejaVu.
+# Vlož soubory do assets/fonts/ a napiš jen název.
+fonts:
+  bold: ""
+  regular: ""
+
+logo_path: ""
+watermark_text: "@mikecipro"
+
+# Hashtagy, které patří na každý příspěvek
+hashtags_core:
+  - "#produktivita"
+  - "#navyky"
+
+# Z téhle zásoby si Claude vybírá podle tématu
+hashtags_pool:
+  - "#pracenadalku"
+  - "#osobnirozvoj"
+  - "#cesky"
+  - "#tipy"
+  - "#rutina"
+
+banned_words:
+  - "v dnešní uspěchané době"
+  - "pojďme se podívat"
+  - "klíčem k úspěchu"
+  - "game changer"
+
+# Hodiny, ve kterých agent smí publikovat (místní čas).
+# Agent si z nich sám vybere ty, které vycházejí nejlíp.
+posting_windows: [8, 12, 17, 19, 21]
+
+weekly_post_target: 5
+
+# Výchozí poměr formátů; agent ho průběžně přepočítává podle výsledků
+format_mix:
+  REEL: 0.5
+  CAROUSEL: 0.3
+  IMAGE: 0.2
+
+notes: >
+  Nepoužívat fotky dětí. Nikdy neslibovat konkrétní výdělky.

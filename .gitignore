@@ -1,0 +1,22 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+
+# pracovní data agenta — do repozitáře nepatří
+data/*
+!data/inbox/
+data/inbox/*
+!data/music/
+data/music/*
+!data/**/.gitkeep
+work/
+out/
+reports/
+*.sqlite3
+*.db
+
+# tvůj brand kit může obsahovat osobní poznámky
+config/brand.yaml
+
+.DS_Store
