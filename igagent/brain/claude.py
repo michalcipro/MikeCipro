@@ -94,10 +94,25 @@ class Brain:
 
     # ------------------------------------------------------------ plánování
     def plan_content(self, count, strategy=None, recent_posts=None, calendar_notes=None,
-                     available_media=None):
-        """Navrhne `count` konkrétních příspěvků."""
+                     available_media=None, slots=None, moments=None):
+        """Navrhne náměty. Se `slots` plánuje na konkrétní termíny sérií.
+
+        `slots` je [(ISO čas, Series)], `moments` jsou aktuální momenty,
+        které majitel zadal pro sérii reagující na dění.
+        """
         system = prompts.PLANNER + "\n\n" + self._context_block(strategy)
-        lines = [f"Navrhni {count} příspěvků na nejbližší dny."]
+        if slots:
+            lines = [f"Naplň {len(slots)} termínů. Ke každému vrať právě jeden námět, "
+                     "ve stejném pořadí:"]
+            for index, (when, series) in enumerate(slots, start=1):
+                lines.append(f"{index}. {_cz_datetime(when)} — série „{series.name}\" "
+                             f"(series: {series.key}, formát {series.format})")
+        else:
+            lines = [f"Navrhni {count} příspěvků na nejbližší dny."]
+
+        if moments:
+            lines.append("\nAktuální momenty, které majitel zadal k rozboru:")
+            lines.extend(f"- {m}" for m in moments)
         if recent_posts:
             lines.append("\nCo už vyšlo nedávno (ať se neopakuješ):")
             for post in recent_posts[:15]:
@@ -114,6 +129,27 @@ class Brain:
         if calendar_notes:
             lines.append(f"\nPoznámky k období: {calendar_notes}")
         return self._structured(system, "\n".join(lines), schemas.CONTENT_PLAN)
+
+    def repurpose(self, winners, count=2, strategy=None, english=False, recent_posts=None):
+        """Z vítězných námětů udělá nové verze — jinak, ne znovu totéž."""
+        system = prompts.REPURPOSER + "\n\n" + self._context_block(strategy)
+        lines = [f"Vyber {count} z těchto námětů a navrhni jejich novou verzi.",
+                 "Náměty jsou seřazené podle výsledku (nahoře nejlepší):", ""]
+        for post in winners:
+            lines.append(
+                f"- media_id: {post.get('media_id')} | série: {post.get('series') or '?'} "
+                f"| skóre: {_fmt(post.get('score'))} "
+                f"| nová sledování: {post.get('follows') or 0} "
+                f"| sdílení: {post.get('shares') or 0} "
+                f"| uložení: {post.get('saves') or 0}")
+            lines.append(f"  text: {(post.get('caption') or '')[:220]}")
+        if english:
+            lines.append("\nJeden z návrhů udělej jako `variant: anglicky` "
+                         "s `language: en` — stejný námět, samostatné anglické video.")
+        if recent_posts:
+            lines.append("\nTohle vyšlo nedávno, neopakuj to:")
+            lines.extend(f"- {(p.get('caption') or '')[:90]}" for p in recent_posts[:10])
+        return self._structured(system, "\n".join(lines), schemas.REPURPOSE)
 
     # ------------------------------------------------------------ psaní
     def write_post(self, item, strategy=None, reference_image=None):
@@ -219,3 +255,15 @@ def _image_block(path):
 
 def _fmt(value):
     return "—" if value is None else f"{float(value):.0f}"
+
+
+_CZ_DAYS = ["pondělí", "úterý", "středa", "čtvrtek", "pátek", "sobota", "neděle"]
+
+
+def _cz_datetime(iso_value):
+    from ..util import parse_iso
+
+    when = parse_iso(iso_value)
+    if not when:
+        return str(iso_value)
+    return f"{_CZ_DAYS[when.weekday()]} {when.day}.{when.month}. {when:%H:%M}"

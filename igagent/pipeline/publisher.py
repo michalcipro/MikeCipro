@@ -111,6 +111,11 @@ class QueuePublisher:
             "hashtags": item.hashtags,
             "children_count": len((item.assets or {}).get("files") or []),
             "created_by": "agent",
+            "series": item.series,
+            "language": item.language or "cs",
+            "duration_seconds": (item.assets or {}).get("duration_seconds"),
+            "repurposed_from": item.repurposed_from,
+            "variant": item.variant,
             "meta": {"queue_id": item.id, "assets": (item.assets or {}).get("files")},
         })
         self.store.log_event("published", item.id,

@@ -10,13 +10,12 @@ data/inbox/*
 !data/music/
 data/music/*
 !data/**/.gitkeep
+# momenty jsou pracovní poznámky, ne obsah repozitáře
+data/moments.txt
 work/
 out/
 reports/
 *.sqlite3
 *.db
-
-# tvůj brand kit může obsahovat osobní poznámky
-config/brand.yaml
 
 .DS_Store

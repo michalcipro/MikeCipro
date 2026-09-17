@@ -16,14 +16,16 @@ publikuje, změří výsledky — a podle nich upraví, co bude dělat příšt�
 
 | Oblast | Konkrétně |
 |---|---|
+| **Série** | Čtyři opakovatelné série s pevným dnem v týdnu — agent nevymýšlí novou identitu každý den, jen plní daný formát |
 | **Texty** | Popisky, hooky, hashtagy, alt texty, první komentář, scénáře Reelů — česky, v tónu tvojí značky (Claude) |
 | **Grafika** | Citátové karty, číslované tipy, statistiky, obálky, celé karusely (cover → slidy → outro) v barvách a fontech značky |
 | **Fotky** | Chytrý ořez podle obsahu (ne slepě na střed), jemné doladění, vodoznak, karusel z fotek, poměry 4:5 / 1:1 / 9:16 |
 | **Reels** | Automatický výběr nejzajímavějších úseků z delšího videa, jump cut (vyhození ticha), překlopení do 9:16, vypálený hook a titulky, hudba s uhnutím pod hlasem, srovnání hlasitosti, obálka |
 | **Reel z fotek** | Slideshow s pomalým nájezdem (Ken Burns) a prolínačkami |
 | **Publikace** | Fotka, karusel, Reel i story přes oficiální Instagram Graph API, včetně prvního komentáře |
-| **Analýza** | Denní snímky profilu, metriky každého příspěvku, skóre relativní k tvému vlastnímu průměru, týdenní písemná analýza |
-| **Učení** | Bandita nad vlastnostmi příspěvků — formát, téma, typ hooku, CTA, šablona, hodina, den. Sám zjistí, co funguje, a posune k tomu plán |
+| **Analýza** | Skóre podle konverze dosahu (nová sledování, sdílení, uložení, dokoukání), **ne podle views**; týdenní písemná analýza |
+| **Učení** | Bandita nad vlastnostmi příspěvků — série, formát, téma, typ hooku, CTA, hodina, den, jazyk. Sám zjistí, co funguje, a posune k tomu plán |
+| **Recyklace** | Po každých 10 videích vezme dva nejlepší náměty a naplánuje jejich novou verzi; každý 5. anglicky |
 | **Komentáře** | Sběr, návrhy odpovědí, eskalace toho, co má řešit člověk |
 
 ---
@@ -177,7 +179,8 @@ AUTOPILOT=review     # agent vyrobí a naplánuje, ty schválíš
 ```
 
 ```bash
-igagent run                    # jeden cyklus: změř → nauč se → naplánuj → vyrob
+igagent run                    # cyklus: změř → nauč se → naplánuj → recykluj → vyrob
+igagent kalendar               # co kdy natočit
 igagent queue list             # co čeká
 igagent queue show 4           # detail včetně popisku a cest k souborům
 igagent queue approve 4        # schválím
@@ -244,26 +247,131 @@ igagent graphic stat "47 %" --value "47 %" --context "Z vlastního dotazníku, n
 igagent collect       # stáhne data z Instagramu
 igagent learn         # přepočítá strategii
 igagent strategy      # co se agent naučil
+igagent kpi           # tabulka KPI po videích
 igagent analyze       # písemná analýza do reports/
 ```
 
 ---
 
+## Čtyři série a týdenní režim
+
+Páteř profilu jsou **čtyři opakovatelné série**, každá má svůj den. Agent
+nevymýšlí každý den novou identitu — ptá se „jak dneska udělat tuhle sérii
+co nejlíp". Nastavené jsou v `config/brand.yaml`, sekce `series:`.
+
+| Den | Série | Co slibuje divákovi |
+|---|---|---|
+| **pondělí 18:00** | Tvrdá pravda o výkonu | Vyvrátím jednu věc, které o mentální přípravě většina lidí věří |
+| **středa 18:00** | Udělej to při příštím zápase | Jeden nástroj použitelný hned v dalším zápase |
+| **pátek 19:00** | Co se právě stalo | Rozbor konkrétního momentu elitního sportovce |
+| **neděle 19:00** | Z terénu | Co jsem viděl v reálné práci a v diagnostice |
+
+Čtyři Reels týdně. Stories agent nepublikuje sám — náměty na ně má v brand
+kitu jako připomínku (`stories:`).
+
+```bash
+igagent kalendar              # co kdy natočit, včetně volných termínů
+igagent plan                  # naplní termíny konkrétními náměty
+```
+
+### Série „Co se právě stalo" potřebuje moment od tebe
+
+Reakce na konkrétní situaci se nedá naplánovat dopředu a agent si ji
+**nesmí vymýšlet** — od toho je pravidlo v promptu. Když něco uvidíš:
+
+```bash
+igagent moment add "Sinner po nevynucené chybě ve 4. gamu — reakce do 10 s"
+igagent moment list
+```
+
+Agent to použije při nejbližším plánování pátečního termínu. Dokud žádný
+moment nezadáš, páteční sloty zůstanou v kalendáři prázdné.
+
+> **K právům:** komentovat cizí moment je v pořádku, ale nepoužívej záběry
+> z přenosu ani cizí hudbu. Brand kit to má napsané jako pravidlo, takže
+> s tím Claude počítá už při psaní scénáře.
+
+### Prvních osm videí
+
+Startovní dávka je připravená v `config/seed-first-8.yaml`:
+
+```bash
+igagent seed
+```
+
+Každý námět dostane nejbližší volný termín své série, takže se osm videí
+samo rozloží do tří týdnů. Pak už jen natáčíš:
+
+```bash
+igagent queue attach 1 ~/Videa/sebevedomi.mp4
+igagent produce --id 1        # jump cut, 9:16, hook, titulky, obálka, popisek
+igagent queue approve 1
+```
+
+---
+
+## Jak se vyhodnocuje výkon
+
+**Views nejsou cíl a do skóre nevstupují.** Video pro 30 000 lidí, které
+nikoho nepřivede, je horší než video pro 800 lidí s osmi novými sledujícími.
+Proto se všechno dělí počtem zasažených lidí — skóre měří **konverzi dosahu**:
+
+| KPI | Váha | Co to je |
+|---|---|---|
+| nová sledování / 1 000 zasažených | 35 % | hlavní ukazatel růstu |
+| sdílení / 1 000 zasažených | 20 % | obsah, který lidé posílají dál |
+| uložení / 1 000 zasažených | 20 % | obsah, ke kterému se vracejí |
+| zhlédnutí / dosah | 15 % | udržení na začátku videa |
+| podíl zhlédnuté délky | 10 % | průměrná doba sledování |
+
+```bash
+igagent kpi                   # tabulka po videích
+```
+
+Každá složka se porovnává s **mediánem tvého vlastního účtu**, takže
+100 = tvůj průměrný příspěvek. Skóre nezestárne, když účet poroste.
+Váhy se dají přenastavit v `igagent/analytics/metrics.py` (`KPI_WEIGHTS`).
+
+**Poctivě k „udržení prvních tří sekund":** tenhle údaj Instagram Graph API
+nedává. Nejbližší dostupná náhrada je poměr zhlédnutí k dosahu — trend
+sleduje dobře, ale není to totéž číslo, jaké vidíš v aplikaci u retence.
+Agent to tak i označuje a nepředstírá přesnost, kterou nemá.
+
+**Malý dosah = velký šum.** Jedno sledování od 40 lidí by jinak vypadalo
+jako zázrak, proto se každá míra stahuje k mediánu podle velikosti dosahu
+(empirický Bayes). A doporučení typu „tvoje nejlepší hodina je…" se nikdy
+nedělá z jediného příspěvku.
+
+---
+
+## Recyklace vítězných námětů
+
+Dobrá myšlenka se neopouští po jednom videu. Po každých **10 publikovaných
+videích** vezme agent dva nejlepší náměty a naplánuje jejich novou verzi:
+
+- `jiny_uhel` — stejná myšlenka z pohledu trenéra místo hráče
+- `jiny_format` — co bylo video, může být karusel s kroky
+- `hlubsi` — původní video řeklo CO, nová verze řekne PROČ
+- `prakticky` — z názoru se udělá nástroj do zápasu
+- `anglicky` — **každý 5. recyklovaný námět** se natočí samostatně anglicky
+
+```bash
+igagent repurpose --status    # kolik videí od minule, kdo jsou vítězové
+igagent repurpose             # naplánuje nové verze
+```
+
+Recykluje se jen to, co překonalo průměr účtu (skóre ≥ 115), a každý námět
+jen jednou. Nikdy se nemíchají dva jazyky v jednom videu — anglická verze je
+samostatné video, ne titulky pod českým.
+
+
+---
+
 ## Jak se agent učí
 
-Každý publikovaný příspěvek si nese sadu vlastností: **formát, téma, pilíř,
-typ hooku, typ CTA, šablona, hodina, den v týdnu.** Po 24 hodinách se změří
-a dostane skóre:
-
-```
-skóre = 100 × (0,55 × dosah/medián  +  0,45 × vážené_interakce/medián)
-vážené interakce = lajky + 2×komentáře + 3×uložení + 4×sdílení
-```
-
-**100 = průměrný příspěvek tvého účtu.** Skóre je relativní k tobě, takže
-nezestárne, když účet poroste, a nedá se nafouknout počtem sledujících.
-Váhy odrážejí, co algoritmus odměňuje: uložení a sdílení víc než lajk.
-Porovnává se vždy jen s příspěvky podobného stáří.
+Každý publikovaný příspěvek si nese sadu vlastností: **série, formát, téma,
+typ hooku, typ CTA, šablona, hodina, den v týdnu, jazyk.** Po 24 hodinách se
+změří a dostane skóre podle KPI z předchozí sekce (100 = tvůj průměr).
 
 Nad každou vlastností si agent drží odhad:
 
@@ -315,10 +423,12 @@ igagent/
   brain/             Claude: prompty, JSON schémata, plánování/psaní/analýza
   analytics/         sběr dat, skórování, učící smyčka
   store/             SQLite (schéma v schema.sql)
-  pipeline/          plánovač, výroba, publikace, autonomní cyklus
+  pipeline/          plánovač sérií, výroba, publikace, recyklace, cyklus
   cli.py             příkazová řádka
-tests/               62 testů včetně celého cyklu proti napodobeninám
-config/brand.yaml    ← tvůj brand kit
+tests/               100 testů včetně celého cyklu proti napodobeninám
+config/brand.yaml         ← brand kit + definice čtyř sérií
+config/seed-first-8.yaml  ← startovní dávka námětů
+data/moments.txt          ← momenty pro páteční sérii
 data/inbox/          ← sem dávej fotky a videa
 data/music/          ← hudba, ke které máš práva
 out/                 hotová média (tahle složka se publikuje na web)

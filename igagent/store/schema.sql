@@ -37,6 +37,11 @@ CREATE TABLE IF NOT EXISTS posts (
     hashtags        TEXT,           -- JSON pole
     children_count  INTEGER,
     created_by      TEXT DEFAULT 'agent',   -- agent | human
+    series          TEXT,           -- klíč série z brand.yaml
+    language        TEXT DEFAULT 'cs',
+    duration_seconds REAL,          -- délka videa (pro podíl dokoukání)
+    repurposed_from TEXT,           -- media_id původního námětu
+    variant         TEXT,           -- jak byl námět zpracován znovu
     meta            TEXT,           -- JSON
     UNIQUE (media_id)
 );
@@ -94,6 +99,10 @@ CREATE TABLE IF NOT EXISTS queue (
     hashtags        TEXT,       -- JSON pole
     source_media    TEXT,       -- JSON: vstupní fotky/video od uživatele
     media_id        TEXT,       -- vyplní se po publikaci
+    series          TEXT,       -- klíč série z brand.yaml
+    language        TEXT NOT NULL DEFAULT 'cs',
+    repurposed_from TEXT,       -- media_id námětu, který se zpracovává znovu
+    variant         TEXT,       -- např. 'jiny_format', 'anglicky'
     error           TEXT,
     attempts        INTEGER NOT NULL DEFAULT 0,
     created_at      TEXT NOT NULL,

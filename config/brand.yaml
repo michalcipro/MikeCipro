@@ -1,0 +1,219 @@
+# Brand kit @mikecipro — mentální výkon ve sportu, neurovizuální diagnostika.
+#
+# Páteř profilu jsou čtyři opakovatelné série (níž). Agent nevymýšlí každý den
+# novou identitu — ptá se „jak dneska udělat tuhle sérii co nejlíp“.
+
+name: MikeCipro
+handle: mikecipro
+language: cs
+
+tone: >
+  Přímý, věcný, bez motivačního patosu. Mluvím z praxe, ne z knížek.
+  Krátké věty. Konkrétní situace ze zápasu místo obecných pouček.
+  Nesnažím se nadchnout — snažím se, aby to sportovec použil příští zápas.
+  Když něco nevím nebo to data neukazují, řeknu to.
+
+audience: >
+  Výkonnostní a elitní sportovci (hlavně tenis a individuální sporty),
+  jejich trenéři a rodiče. Lidé, kteří už trénují tvrdě a hledají,
+  proč se jim trénink nepřenáší do zápasu.
+
+# ─────────────────────────────────────────────────────────────────────
+#  ČTYŘI SÉRIE — jeden den v týdnu, jedna série
+# ─────────────────────────────────────────────────────────────────────
+series:
+
+  tvrda_pravda:
+    name: "Tvrdá pravda o výkonu"
+    promise: "Vyvrátím jednu věc, které o mentální přípravě většina lidí věří."
+    weekday: po
+    hour: 18
+    format: REEL
+    template: video
+    hook_style: kontrarian
+    cta_type: komentar
+    jumpcut: true
+    needs_user_media: true
+    target_seconds: 35
+    guidance: >
+      Krátké talking-head video s výrazným názorem. Struktura: tvrzení, které
+      jde proti běžnému přesvědčení → proč to lidi věří → co je ve skutečnosti
+      → co s tím sportovec udělá. Názor musí být obhajitelný z praxe nebo
+      z diagnostiky, ne provokace pro provokaci. Žádné „a proto je mindset
+      základ" na konci.
+    examples:
+      - "Klid před zápasem je přeceňovaný."
+      - "Sebevědomí nevzniká pozitivním myšlením."
+      - "Dobrý trénink tě nemusí připravit na zápas."
+      - "Mentální síla často vypadá jako obyčejná disciplína."
+      - "Když potřebuješ cítit motivaci, nejsi připravený."
+
+  udelej_to:
+    name: "Udělej to při příštím zápase"
+    promise: "Jeden konkrétní nástroj, který jde použít hned v dalším zápase."
+    weekday: st
+    hour: 18
+    format: REEL
+    template: video
+    hook_style: navod
+    cta_type: uloz
+    jumpcut: true
+    needs_user_media: true
+    target_seconds: 40
+    guidance: >
+      Praktický nástroj, který si divák uloží do záložek. Musí být tak
+      konkrétní, aby to šlo udělat bez přemýšlení: kdy přesně, co přesně,
+      jak dlouho. Když to má kroky, očísluj je. Radši jeden nástroj pořádně
+      než tři povrchně. Tohle je série, která sbírá uložení — text musí
+      dávat smysl i bez zvuku.
+    examples:
+      - "10sekundový reset po chybě."
+      - "Tři otázky před zápasem."
+      - "Co si říct při vedení 5:4."
+      - "Jak pracovat s pozorností mezi body."
+      - "Co má rodič říct po prohraném zápase."
+
+  co_se_stalo:
+    name: "Co se právě stalo"
+    promise: "Rozeberu konkrétní moment elitního sportovce — co se tam opravdu dělo."
+    weekday: pa
+    hour: 19
+    format: REEL
+    template: video
+    hook_style: pribeh
+    cta_type: sdilej
+    jumpcut: true
+    needs_user_media: true
+    needs_timely_input: true
+    target_seconds: 40
+    guidance: >
+      Reakce na jeden konkrétní moment, ne obecné povídání o hráči.
+      Popiš, co bylo vidět → co to znamená → co si z toho vzít.
+      Moment musí zadat majitel (odkaz nebo popis), agent si ho nevymýšlí.
+      POZOR NA PRÁVA: komentovat moment je v pořádku, ale nepoužívej záběry
+      z přenosu ani cizí hudbu — natoč se sám, popiš to slovy, použij
+      vlastní grafiku.
+    examples:
+      - "Co přesně udělal Djoković po chybě."
+      - "Proč Sabalenka nepotlačuje emoce."
+      - "Co trenér pokazil větou během přestávky."
+      - "Proč hráč neprohrál nervozitou, ale následnou reakcí."
+      - "Co říká Sinner o chybách a povolení selhat."
+
+  z_terenu:
+    name: "Z terénu"
+    promise: "Co jsem viděl v reálné práci se sportovci a v diagnostice."
+    weekday: ne
+    hour: 19
+    format: REEL
+    template: video
+    hook_style: pribeh
+    cta_type: sleduj
+    jumpcut: true
+    needs_user_media: true
+    target_seconds: 45
+    guidance: >
+      Tohle je největší výhoda profilu proti běžným „mindset účtům“ —
+      nikdo jiný tahle data nemá. Mluv o tom, co se opakuje napříč hráči,
+      co ukázala diagnostika, co trenér z lavičky nevidí.
+      Konkrétní čísla a pozorování, ale nikdy identifikovatelné údaje
+      o konkrétním sportovci bez jeho svolení. Anonymizuj.
+    examples:
+      - "Co jsem zjistil při diagnostice NCAA hráček."
+      - "Co se opakuje u profesionálů i juniorů."
+      - "Jak vypadá mentální práce před důležitým zápasem."
+      - "Co skutečně měříme v neurovizuální diagnostice."
+      - "Co trenér nevidí, ale diagnostika ano."
+
+# Náměty na stories (agent je nepublikuje sám, jen připomíná)
+stories:
+  - "Zákulisí práce — příprava diagnostiky, cesta na turnaj"
+  - "Anketa: co je pro tebe nejtěžší moment zápasu?"
+  - "Krátký názor na jednu větu, co jsem dneska slyšel"
+  - "Odpověď na otázku z komentářů"
+
+# ─────────────────────────────────────────────────────────────────────
+
+pillars:
+  - "Tvrdá pravda o výkonu — vyvracení mýtů o mentální přípravě"
+  - "Udělej to při příštím zápase — použitelné nástroje"
+  - "Co se právě stalo — rozbor momentů elitních sportovců"
+  - "Z terénu — zkušenost z diagnostiky a práce se sportovci"
+
+topics:
+  - mentální příprava
+  - výkon pod tlakem
+  - reakce na chybu
+  - pozornost a soustředění
+  - neurovizuální diagnostika
+  - práce s trenérem
+  - role rodiče ve sportu
+  - tenis
+
+cta:
+  - "Ulož si to před dalším zápasem"
+  - "Napiš do komentářů, jak to řešíš ty"
+  - "Pošli to trenérovi, kterého se to týká"
+  - "Sleduj, jestli pracuješ se sportovci"
+
+colors:
+  bg: "#0B0F14"
+  bg_alt: "#151C24"
+  fg: "#F2F5F8"
+  muted: "#8D9AA8"
+  accent: "#E8452C"
+  accent_alt: "#F2B705"
+
+fonts:
+  bold: ""
+  regular: ""
+
+logo_path: ""
+watermark_text: "@mikecipro"
+
+hashtags_core:
+  - "#mentalnipriprava"
+  - "#sportovnipsychologie"
+
+hashtags_pool:
+  - "#tenis"
+  - "#vykonpodtlakem"
+  - "#trenink"
+  - "#sportovnitrener"
+  - "#juniorskytenis"
+  - "#mentalnisila"
+  - "#neurovize"
+  - "#tenisovytrener"
+
+banned_words:
+  - "v dnešní uspěchané době"
+  - "pojďme se podívat"
+  - "klíčem k úspěchu"
+  - "game changer"
+  - "mindset je základ"
+  - "nastav si mysl na úspěch"
+  - "jdi si za svým snem"
+  - "vše je v hlavě"
+  - "100 % nasazení"
+
+# Série si své časy řídí samy; tohle je záloha pro příspěvky mimo série.
+posting_windows: [12, 18, 19]
+
+weekly_post_target: 4
+
+format_mix:
+  REEL: 0.85
+  CAROUSEL: 0.1
+  IMAGE: 0.05
+
+# Dobrý námět se neopouští po jednom videu. Po každých 10 videích
+# vezmi 2 nejlepší a zpracuj je znovu jinak; každý 5. znovu anglicky.
+repurpose_every: 10
+english_every: 5
+
+notes: >
+  Obsah primárně česky. Nikdy nemíchat dva jazyky v jednom videu —
+  anglická verze se natáčí samostatně jako vlastní video.
+  Nikdy neslibovat konkrétní sportovní výsledky ani neposkytovat
+  zdravotní či psychoterapeutické rady — tohle je výkonnostní práce,
+  ne léčba. O klientech mluvit vždy anonymizovaně.

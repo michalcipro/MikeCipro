@@ -20,6 +20,78 @@ ROOT = Path(__file__).resolve().parent.parent
 AUTOPILOT_MODES = ("off", "review", "full")
 
 
+WEEKDAYS_CS = ["pondělí", "úterý", "středa", "čtvrtek", "pátek", "sobota", "neděle"]
+WEEKDAY_KEYS = {"po": 0, "ut": 1, "st": 2, "ct": 3, "pa": 4, "so": 5, "ne": 6,
+                "pondeli": 0, "utery": 1, "streda": 2, "ctvrtek": 3, "patek": 4,
+                "sobota": 5, "nedele": 6}
+
+
+@dataclass
+class Series:
+    """Opakovatelná série — páteř profilu.
+
+    Místo vymýšlení nové identity každý den má každý den v týdnu svou sérii
+    s pevným formátem, typem hooku a výchozí šablonou. Agent pak neřeší
+    „co dnes", ale „jak dneska udělat tuhle sérii co nejlíp".
+    """
+
+    key: str = ""
+    name: str = ""
+    promise: str = ""              # co divák dostane, jednou větou
+    weekday: int = 0               # 0 = pondělí
+    hour: int = 18
+    format: str = "REEL"
+    template: str = "video"
+    hook_style: str = "kontrarian"
+    cta_type: str = "uloz"
+    jumpcut: bool = True           # talking head → vyhodit ticho
+    needs_user_media: bool = True  # série stojí na tvém natočeném videu
+    needs_timely_input: bool = False   # reaguje na aktuální moment
+    target_seconds: int = 35
+    examples: list = field(default_factory=list)
+    guidance: str = ""
+
+    @classmethod
+    def from_raw(cls, key, raw):
+        data = dict(raw or {})
+        data["key"] = key
+        weekday = data.get("weekday", 0)
+        if isinstance(weekday, str):
+            normalized = weekday.strip().lower()
+            if normalized not in WEEKDAY_KEYS:
+                raise ConfigError(
+                    f"Série '{key}': neznámý den '{weekday}'. "
+                    f"Použij číslo 0–6 nebo jeden z {sorted(set(WEEKDAY_KEYS))}.")
+            data["weekday"] = WEEKDAY_KEYS[normalized]
+        known = {f for f in cls.__dataclass_fields__}
+        unknown = set(data) - known
+        if unknown:
+            raise ConfigError(f"Série '{key}': neznámé klíče {sorted(unknown)}")
+        series = cls(**data)
+        if not 0 <= series.weekday <= 6:
+            raise ConfigError(f"Série '{key}': weekday musí být 0–6.")
+        return series
+
+    @property
+    def weekday_name(self):
+        return WEEKDAYS_CS[self.weekday]
+
+    def prompt_block(self):
+        lines = [f"### {self.name}  (klíč: {self.key}, {self.weekday_name} {self.hour}:00)",
+                 f"Slib divákovi: {self.promise}",
+                 f"Formát: {self.format} · hook: {self.hook_style} · CTA: {self.cta_type}"]
+        if self.guidance:
+            lines.append(f"Jak ji dělat: {self.guidance}")
+        if self.examples:
+            lines.append("Příklady námětů, které do série patří:")
+            lines.extend(f"  - {e}" for e in self.examples)
+        if self.needs_timely_input:
+            lines.append("POZOR: tahle série reaguje na konkrétní aktuální moment. "
+                         "Bez zadaného momentu od majitele námět nevymýšlej — "
+                         "místo toho popiš, jaký typ momentu hledat.")
+        return "\n".join(lines)
+
+
 @dataclass
 class Brand:
     """Brand kit — vše, co agent potřebuje, aby zněl a vypadal jako ty."""
@@ -44,6 +116,10 @@ class Brand:
     banned_words: list = field(default_factory=list)
     posting_windows: list = field(default_factory=lambda: [8, 12, 18, 20])
     weekly_post_target: int = 5
+    series: dict = field(default_factory=dict)
+    stories: list = field(default_factory=list)
+    repurpose_every: int = 10       # po kolika videích sáhnout po vítězích
+    english_every: int = 5          # každý N-tý recyklovaný námět anglicky
     format_mix: dict = field(default_factory=lambda: {"REEL": 0.5, "CAROUSEL": 0.3, "IMAGE": 0.2})
     notes: str = ""
 
@@ -59,10 +135,39 @@ class Brand:
         unknown = set(raw) - known
         if unknown:
             raise ConfigError(f"Neznámé klíče v brand kitu {p}: {sorted(unknown)}")
-        return cls(**raw)
+        raw["series"] = {key: Series.from_raw(key, value)
+                         for key, value in (raw.get("series") or {}).items()}
+        brand = cls(**raw)
+        brand._check_series()
+        return brand
+
+    def _check_series(self):
+        """Dvě série na stejný den by si přebíraly termín."""
+        seen = {}
+        for series in self.series.values():
+            clash = seen.get(series.weekday)
+            if clash:
+                raise ConfigError(
+                    f"Série '{series.key}' i '{clash}' mají {series.weekday_name} — "
+                    "každý den může mít jen jednu sérii.")
+            seen[series.weekday] = series.key
 
     def to_dict(self):
-        return asdict(self)
+        data = asdict(self)
+        data["series"] = {k: asdict(v) if hasattr(v, "key") else v
+                          for k, v in (self.series or {}).items()}
+        return data
+
+    def series_for_weekday(self, weekday):
+        return next((s for s in self.series.values() if s.weekday == weekday), None)
+
+    def series_by_key(self, key):
+        return self.series.get(key)
+
+    @property
+    def weekly_plan(self):
+        """{0: Series, 2: Series, …} — co se kterého dne natáčí."""
+        return {s.weekday: s for s in self.series.values()}
 
     def prompt_block(self):
         """Kompaktní textový popis značky pro systémový prompt Claude."""
@@ -72,6 +177,14 @@ class Brand:
             f"Tón: {self.tone}",
             f"Publikum: {self.audience}",
         ]
+        if self.series:
+            lines.append("")
+            lines.append("=== OPAKOVATELNÉ SÉRIE (páteř profilu) ===")
+            lines.append("Každý příspěvek patří do jedné z nich. Nevymýšlej nové rubriky.")
+            for series in sorted(self.series.values(), key=lambda s: s.weekday):
+                lines.append("")
+                lines.append(series.prompt_block())
+            lines.append("")
         if self.pillars:
             lines.append("Obsahové pilíře: " + "; ".join(str(p) for p in self.pillars))
         if self.topics:

@@ -24,6 +24,11 @@ CONTENT_PLAN = {
                 "type": "object",
                 "properties": {
                     "title": {"type": "string", "description": "Pracovní název pro frontu."},
+                    "series": {
+                        "type": "string",
+                        "description": "Klíč série, do které námět patří (přesně jak je "
+                                       "zadaný v termínech). Prázdné jen u obsahu mimo série.",
+                    },
                     "format": {"type": "string", "enum": FORMATS},
                     "template": {"type": "string", "enum": TEMPLATES},
                     "topic": {"type": "string"},
@@ -39,8 +44,9 @@ CONTENT_PLAN = {
                     },
                     "why": {"type": "string", "description": "Co z dat tenhle nápad opírá."},
                 },
-                "required": ["title", "format", "template", "topic", "pillar", "hook_style",
-                             "cta_type", "angle", "key_points", "needs_user_media", "why"],
+                "required": ["title", "series", "format", "template", "topic", "pillar",
+                             "hook_style", "cta_type", "angle", "key_points",
+                             "needs_user_media", "why"],
                 "additionalProperties": False,
             },
         },
@@ -187,5 +193,45 @@ COMMENT_REPLIES = {
         },
     },
     "required": ["replies"],
+    "additionalProperties": False,
+}
+
+
+REPURPOSE = {
+    "type": "object",
+    "properties": {
+        "variants": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 4,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "source_media_id": {"type": "string"},
+                    "title": {"type": "string"},
+                    "series": {"type": "string"},
+                    "variant": {
+                        "type": "string",
+                        "enum": ["jiny_uhel", "jiny_format", "hlubsi", "prakticky",
+                                 "anglicky"],
+                        "description": "Jak se s námětem naloží podruhé.",
+                    },
+                    "language": {"type": "string", "enum": ["cs", "en"]},
+                    "format": {"type": "string", "enum": FORMATS},
+                    "hook_style": {"type": "string", "enum": HOOK_STYLES},
+                    "angle": {"type": "string",
+                              "description": "Čím se nová verze liší od původní."},
+                    "key_points": {"type": "array", "items": {"type": "string"},
+                                   "maxItems": 6},
+                    "why": {"type": "string",
+                            "description": "Proč právě tenhle námět stojí za zopakování."},
+                },
+                "required": ["source_media_id", "title", "series", "variant", "language",
+                             "format", "hook_style", "angle", "key_points", "why"],
+                "additionalProperties": False,
+            },
+        },
+    },
+    "required": ["variants"],
     "additionalProperties": False,
 }

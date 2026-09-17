@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from datetime import timezone as dt_timezone
 from pathlib import Path
 
 from . import __version__
@@ -46,6 +47,18 @@ def _settings(args):
     settings = Settings.load(overrides=overrides).ensure_dirs()
     setup_logging(getattr(args, "log_level", None) or settings.log_level, settings.log_path)
     return settings
+
+
+def _local(iso_value, settings):
+    """Čas v databázi je UTC; člověku ho ukazujeme v jeho pásmu."""
+    if not iso_value:
+        return "—"
+    from .util import local_tz, parse_iso
+
+    parsed = parse_iso(iso_value)
+    if not parsed:
+        return str(iso_value)[:16]
+    return f"{parsed.astimezone(local_tz(settings.timezone)):%a %d.%m. %H:%M}"
 
 
 def _print(data):
@@ -181,10 +194,10 @@ def cmd_strategy(args):
 def cmd_plan(args):
     agent = _agent(args)
     try:
-        items = agent.step_plan(count=args.count, notes=args.notes)
+        items = agent.planner.plan(count=args.count, days=args.days, notes=args.notes)
         for item in items:
-            print(f"#{item.id:<4} {item.scheduled_for or '—':<27} "
-                  f"{item.format:<9} {item.template:<9} {item.title}")
+            print(f"#{item.id:<4} {_local(item.scheduled_for, agent.settings):<18} "
+                  f"{item.pillar or item.format:<30} {item.title}")
         if not items:
             print("Fronta je plná — nic nového neplánuji.")
         return 0
@@ -204,8 +217,14 @@ def cmd_queue(args):
             for item in items:
                 flag = {"planned": "·", "produced": "○", "approved": "●",
                         "published": "✓", "failed": "✗", "skipped": "-"}.get(item.status, "?")
+                marks = f"{item.format}"
+                if item.language and item.language != "cs":
+                    marks += f"/{item.language}"
+                if item.variant:
+                    marks += f" ↻{item.variant}"
                 print(f"{flag} #{item.id:<4} {item.status:<10} "
-                      f"{(item.scheduled_for or '—')[:16]:<17} {item.format:<9} {item.title}")
+                      f"{_local(item.scheduled_for, agent.settings):<18} "
+                      f"{(item.series or '—')[:14]:<15} {marks:<16} {item.title}")
                 if item.error:
                     print(f"      ↳ {item.error}")
             return 0
@@ -421,6 +440,159 @@ def cmd_token(args):
     return 0
 
 
+def cmd_seed(args):
+    agent = _agent(args)
+    try:
+        created, skipped = agent.seeder.run(path=args.file, days=args.days)
+        for item in created:
+            print(f"#{item.id:<4} {_local(item.scheduled_for, agent.settings):<18} "
+                  f"{item.pillar:<30} {item.title}")
+        if skipped:
+            print(f"\nPřeskočeno (už ve frontě): {len(skipped)}")
+        if created:
+            missing = [i for i in created if i.brief.get("needs_user_media")]
+            if missing:
+                print(f"\n{len(missing)} námětů čeká na tvoje video. Až natočíš:")
+                print(f"    igagent queue attach {created[0].id} ~/video.mp4")
+                print("    igagent produce")
+        return 0
+    finally:
+        agent.close()
+
+
+def cmd_repurpose(args):
+    agent = _agent(args)
+    try:
+        if args.status:
+            every = agent.settings.brand.repurpose_every or 10
+            since = agent.repurposer.published_since_last()
+            print(f"Od poslední recyklace vyšlo {since} videí (práh {every}).")
+            print(f"Kol recyklace zatím: {agent.repurposer.repurpose_rounds_done()}")
+            winners = agent.repurposer.candidates()
+            if winners:
+                print("\nNejlepší dosud nerecyklované náměty:")
+                for post in winners[:5]:
+                    print(f"  skóre {post['score']:>6.0f}  {post['media_id']:<20} "
+                          f"{(post.get('caption') or '')[:60]}")
+            else:
+                print("\nZatím žádný námět nepřekonal práh pro recyklaci.")
+            return 0
+
+        created = agent.step_repurpose(count=args.count, force=args.force)
+        if not created:
+            print("Nic k recyklaci. Stav zjistíš přes `igagent repurpose --status`.")
+            return 0
+        for item in created:
+            print(f"#{item.id:<4} {item.variant:<12} {item.language}  {item.title}")
+            print(f"      z: {item.repurposed_from}  ·  {item.brief.get('angle', '')[:80]}")
+        return 0
+    finally:
+        agent.close()
+
+
+def cmd_kpi(args):
+    """Tabulka KPI po jednotlivých videích — to, co se má sledovat místo views."""
+    from .analytics.metrics import build_baselines, score_breakdown, summarize
+
+    agent = _agent(args)
+    try:
+        rows = agent.store.posts_with_latest_metrics(limit=args.limit)
+        measured = [r for r in rows if r.get("reach")]
+        if not measured:
+            print("Zatím nejsou změřená data. Spusť `igagent collect`.")
+            return 0
+
+        baselines = build_baselines(measured)
+        print(f"{'datum':<11}{'série':<16}{'dosah':>7}{'follow/1k':>11}"
+              f"{'sdíl/1k':>9}{'ulož/1k':>9}{'dokouk.':>9}{'skóre':>8}")
+        print("-" * 80)
+        for row in measured[:args.limit]:
+            detail = score_breakdown(row, baselines, row.get("duration_seconds"))
+            values = {c["kpi"]: c["hodnota"] for c in detail["složky"]}
+            print(f"{(row.get('published_at') or '')[:10]:<11}"
+                  f"{(row.get('series') or '—')[:15]:<16}"
+                  f"{row.get('reach') or 0:>7}"
+                  f"{_num(values.get('follow_rate')):>11}"
+                  f"{_num(values.get('share_rate')):>9}"
+                  f"{_num(values.get('save_rate')):>9}"
+                  f"{_pct(values.get('watch_through')):>9}"
+                  f"{_num(detail['skóre'], 0):>8}")
+
+        print()
+        summary = summarize(measured, agent.store.latest_followers())
+        for key, value in summary.items():
+            print(f"  {key:<26} {value}")
+        print()
+        print("  Pozn.: „udržení prvních tří sekund“ Graph API nedává.")
+        print("  Nejbližší dostupná náhrada je poměr zhlédnutí k dosahu — do skóre")
+        print("  vstupuje, ale není to totéž číslo jako retence v aplikaci.")
+        return 0
+    finally:
+        agent.close()
+
+
+def cmd_kalendar(args):
+    agent = _agent(args)
+    try:
+        rows = agent.planner.scheduler.next_week_overview(days=args.days)
+        if not rows:
+            print("Žádné volné termíny sérií — fronta je na tohle období plná.")
+            return 0
+        queue = {item.scheduled_for: item for item in agent.store.queue(limit=200)}
+        print(f"{'kdy':<20}{'série':<32}{'stav'}")
+        print("-" * 72)
+        for row in rows:
+            iso = row["kdy"].astimezone(dt_timezone.utc).isoformat()
+            item = queue.get(iso)
+            state = f"#{item.id} {item.status}" if item else "volné"
+            flag = " ← potřebuje aktuální moment" if row["aktualni_moment"] else ""
+            print(f"{row['kdy']:%a %d.%m. %H:%M}      {row['serie']:<32}{state}{flag}")
+        moments = agent.planner.pending_moments()
+        print(f"\nZadané momenty k rozboru: {len(moments)}")
+        for moment in moments[:5]:
+            print(f"  · {moment}")
+        return 0
+    finally:
+        agent.close()
+
+
+def cmd_moment(args):
+    """Momenty pro sérii, která reaguje na aktuální dění."""
+    settings = _settings(args)
+    path = Path(settings.data_dir) / "moments.txt"
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    if args.moment_command == "add":
+        with path.open("a", encoding="utf-8") as handle:
+            handle.write(args.text.strip() + "\n")
+        print("Přidáno. Agent to použije při nejbližším plánování série "
+              "„Co se právě stalo“.")
+        return 0
+
+    lines = [line for line in path.read_text(encoding="utf-8").splitlines()
+             if line.strip()] if path.exists() else []
+    if args.moment_command == "list":
+        if not lines:
+            print("Žádné momenty. Přidej: igagent moment add 'popis momentu'")
+        for index, line in enumerate(lines, 1):
+            print(f"{index}. {line}")
+        return 0
+
+    if args.moment_command == "clear":
+        path.write_text("", encoding="utf-8")
+        print("Seznam momentů vyprázdněn.")
+        return 0
+    return 0
+
+
+def _num(value, decimals=1):
+    return "—" if value is None else f"{value:.{decimals}f}"
+
+
+def _pct(value):
+    return "—" if value is None else f"{100 * value:.0f}%"
+
+
 def _format_strategy(profile):
     lines = [f"Strategie · vzorek {profile.get('sample_size', 0)} měřených příspěvků"]
     if profile.get("warning"):
@@ -486,6 +658,7 @@ def build_parser():
     plan = sub.add_parser("plan", help="Naplánuje obsah")
     plan.add_argument("-n", "--count", type=int, default=None)
     plan.add_argument("--notes", default=None, help="Kontext pro období (akce, svátky…)")
+    plan.add_argument("--days", type=int, default=None, help="Horizont plánování")
     plan.set_defaults(func=cmd_plan)
 
     queue = sub.add_parser("queue", help="Práce s frontou")
@@ -515,6 +688,33 @@ def build_parser():
     publish.add_argument("--dry-run", action="store_true")
     publish.add_argument("--force", action="store_true", help="Obejde pojistky (opatrně)")
     publish.set_defaults(func=cmd_publish)
+
+    seed = sub.add_parser("seed", help="Nasadí startovní dávku námětů do fronty")
+    seed.add_argument("--file", default="config/seed-first-8.yaml")
+    seed.add_argument("--days", type=int, default=60, help="Do kolika dní hledat termíny")
+    seed.set_defaults(func=cmd_seed)
+
+    repurpose = sub.add_parser("repurpose", help="Znovu zpracuje vítězné náměty")
+    repurpose.add_argument("-n", "--count", type=int, default=2)
+    repurpose.add_argument("--force", action="store_true", help="Nečekej na práh")
+    repurpose.add_argument("--status", action="store_true", help="Jen ukaž stav")
+    repurpose.set_defaults(func=cmd_repurpose)
+
+    kpi = sub.add_parser("kpi", help="Tabulka KPI po videích (místo views)")
+    kpi.add_argument("--limit", type=int, default=30)
+    kpi.set_defaults(func=cmd_kpi)
+
+    kalendar = sub.add_parser("kalendar", help="Co kdy natočit podle sérií")
+    kalendar.add_argument("--days", type=int, default=14)
+    kalendar.set_defaults(func=cmd_kalendar)
+
+    moment = sub.add_parser("moment", help="Momenty pro sérii „Co se právě stalo“")
+    msub = moment.add_subparsers(dest="moment_command", required=True)
+    add_moment = msub.add_parser("add")
+    add_moment.add_argument("text")
+    msub.add_parser("list")
+    msub.add_parser("clear")
+    moment.set_defaults(func=cmd_moment)
 
     analyze = sub.add_parser("analyze", help="Analýza profilu")
     analyze.add_argument("--days", type=int, default=28)

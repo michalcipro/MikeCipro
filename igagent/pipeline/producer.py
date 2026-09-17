@@ -161,7 +161,8 @@ class Producer:
             "hook": script.get("hook_text", ""),
         }
         item = self._attach(item, content, [reel])
-        item.assets = {**(item.assets or {}), "cover": str(cover), "script": script}
+        item.assets = {**(item.assets or {}), "cover": str(cover), "script": script,
+                       "duration_seconds": round(self.reels.probe(reel)["duration"], 2)}
         return item
 
     # ------------------------------------------------------------ společné

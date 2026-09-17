@@ -50,6 +50,10 @@ class QueueItem:
     hashtags: list = None
     source_media: list = None
     media_id: str = None
+    series: str = ""
+    language: str = "cs"
+    repurposed_from: str = None
+    variant: str = None
     error: str = None
     attempts: int = 0
     created_at: str = None
@@ -75,6 +79,7 @@ class QueueItem:
         """Vlastnosti, které se učící smyčka snaží optimalizovat."""
         return {
             "format": self.format,
+            "series": self.series,
             "topic": self.topic,
             "pillar": self.pillar,
             "hook_style": self.hook_style,
@@ -91,7 +96,37 @@ class Store:
         self.conn.row_factory = sqlite3.Row
         self.conn.execute("PRAGMA foreign_keys = ON")
         self.conn.executescript(SCHEMA.read_text(encoding="utf-8"))
+        self._migrate()
         self.conn.commit()
+
+    # ---------------------------------------------------------- migrace
+    # `CREATE TABLE IF NOT EXISTS` nepřidá sloupec do tabulky, která už
+    # existuje — starší databáze se proto dorovnají tady.
+    MIGRATIONS = {
+        "posts": {
+            "series": "TEXT",
+            "language": "TEXT DEFAULT 'cs'",
+            "duration_seconds": "REAL",
+            "repurposed_from": "TEXT",
+            "variant": "TEXT",
+        },
+        "queue": {
+            "series": "TEXT",
+            "language": "TEXT NOT NULL DEFAULT 'cs'",
+            "repurposed_from": "TEXT",
+            "variant": "TEXT",
+        },
+    }
+
+    def _migrate(self):
+        for table, columns in self.MIGRATIONS.items():
+            existing = {row["name"] for row in
+                        self.conn.execute(f"PRAGMA table_info({table})").fetchall()}
+            for column, definition in columns.items():
+                if column not in existing:
+                    log.info("Přidávám sloupec %s.%s", table, column)
+                    self.conn.execute(
+                        f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
 
     # ------------------------------------------------------------ obecné
     def close(self):
@@ -153,7 +188,8 @@ class Store:
         cols = ("media_id", "queue_id", "format", "product_type", "permalink", "caption",
                 "published_at", "local_hour", "local_weekday", "topic", "pillar",
                 "hook_style", "cta_type", "template", "caption_len", "hashtag_count",
-                "hashtags", "children_count", "created_by", "meta")
+                "hashtags", "children_count", "created_by", "series", "language",
+                "duration_seconds", "repurposed_from", "variant", "meta")
         data = {c: post.get(c) for c in cols}
         data["hashtags"] = _dump(post.get("hashtags"))
         data["meta"] = _dump(post.get("meta"))
@@ -215,7 +251,8 @@ class Store:
         rows = self.conn.execute(
             """SELECT p.*, m.reach, m.likes, m.comments, m.saves, m.shares,
                       m.total_interactions, m.plays, m.avg_watch_time, m.follows,
-                      m.score, m.collected_at AS metrics_at, m.age_hours
+                      m.profile_visits, m.score, m.collected_at AS metrics_at,
+                      m.age_hours
                FROM posts p
                LEFT JOIN post_metrics m ON m.id = (
                     SELECT id FROM post_metrics x WHERE x.media_id = p.media_id

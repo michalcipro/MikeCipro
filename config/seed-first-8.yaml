@@ -1,0 +1,101 @@
+# Prvních osm videí — startovní dávka.
+#
+# Nasadíš je do fronty příkazem:
+#     igagent seed
+#
+# Každé video dostane nejbližší volný termín SVÉ série, takže se samo
+# rozloží do týdenního režimu (po / st / pá / ne).
+#
+# Série „co_se_stalo“ (pátky) tu schválně není: reaguje na konkrétní
+# aktuální moment, který nejde naplánovat dopředu. Moment zadáš přes
+#     igagent moment add "Sinner po chybě ve 4. gamu — výraz, načasování"
+# a agent na nejbližší pátek naplánuje rozbor.
+
+- title: "Sebevědomí před zápasem nepotřebuješ"
+  series: tvrda_pravda
+  hook_style: kontrarian
+  angle: >
+    Sebevědomí není podmínka vstupu do zápasu. Je to výsledek toho,
+    co jsi odvedl předtím — a v zápase ho nahrazuje rutina, ne pocit.
+  key_points:
+    - "Čekání na pocit sebevědomí odkládá začátek výkonu"
+    - "Co dělat místo toho: první dva gamy odehrát podle plánu, ne podle pocitu"
+    - "Sebevědomí přichází během zápasu, ne před ním"
+
+- title: "Mentální coaching není oprava problému"
+  series: tvrda_pravda
+  hook_style: kontrarian
+  angle: >
+    Mentální práce není servis pro rozbité hráče. Je to trénink dovednosti,
+    stejně jako podání — dělá se průběžně, ne až když to hoří.
+  key_points:
+    - "Nejčastější mýtus: přijdu, až budu mít problém"
+    - "Co se trénuje: pozornost, reakce na chybu, práce s tělem pod tlakem"
+    - "Proč to funguje líp preventivně než v krizi"
+
+- title: "Klid není podmínka dobrého výkonu"
+  series: tvrda_pravda
+  hook_style: kontrarian
+  angle: >
+    Nejlepší zápasy se často hrají v nervozitě. Cílem není nervozitu
+    odstranit, ale umět v ní hrát.
+  key_points:
+    - "Aktivace není nepřítel — plochá aktivace je horší než vysoká"
+    - "Co se dá ovlivnit: dech, tempo mezi body, oční pohyb"
+    - "Snaha se uklidnit často zvyšuje napětí"
+
+- title: "Co má sportovec udělat do deseti sekund po chybě"
+  series: udelej_to
+  hook_style: navod
+  angle: >
+    Konkrétní desetisekundový postup, který jde použít hned v dalším zápase.
+    Ne „nemysli na to“, ale co přesně udělat s očima, dechem a tempem.
+  key_points:
+    - "0–3 s: otočit se zády k síti, pohled na výplet"
+    - "3–7 s: jeden dlouhý výdech, uvolnit ruku na gripu"
+    - "7–10 s: jedna věta k dalšímu bodu — co budu dělat, ne co nedělat"
+    - "Proč deset sekund: tolik máš mezi body podle pravidel"
+
+- title: "Nejhorší věta, kterou může trenér říct nervóznímu hráči"
+  series: udelej_to
+  hook_style: chyba
+  angle: >
+    „Uklidni se“ je nejběžnější a nejhorší reakce. Co říct místo toho,
+    aby to hráči reálně pomohlo.
+  key_points:
+    - "Proč „uklidni se“ zhoršuje stav: potvrdí hráči, že je něco špatně"
+    - "Co funguje: úkol místo hodnocení"
+    - "Tři věty, které jde použít o přestávce"
+
+- title: "Proč mladí sportovci přenášejí trénink do zápasu jen částečně"
+  series: z_terenu
+  hook_style: pribeh
+  angle: >
+    Co se opakuje napříč juniory: v tréninku to umí, v zápase ne.
+    Není to o technice ani o snaze.
+  key_points:
+    - "Co se v zápase mění a v tréninku chybí"
+    - "Co vidím u většiny juniorů, se kterými pracuju"
+    - "Jak trénink přiblížit zápasu, aby se přenos zlepšil"
+
+- title: "Co jsme sledovali u hráček ve Wisconsinu"
+  series: z_terenu
+  hook_style: pribeh
+  angle: >
+    Konkrétní zkušenost z diagnostiky NCAA hráček — co se měřilo
+    a co z toho vyšlo. Anonymizovaně, bez jmen.
+  key_points:
+    - "Co přesně se v diagnostice sledovalo"
+    - "Co překvapilo i hráčky samotné"
+    - "Co si z toho může vzít hráč, který takovou diagnostiku nemá"
+
+- title: "Tohle není test reakce. Je to test toho, co uděláš pod tlakem"
+  series: z_terenu
+  hook_style: kontrarian
+  angle: >
+    Vysvětlení, co neurovizuální diagnostika ve skutečnosti měří —
+    a proč rychlost reakce sama o sobě nic neříká.
+  key_points:
+    - "Co si lidé myslí, že se měří"
+    - "Co se měří doopravdy: rozhodování a chyby pod tlakem"
+    - "Co trenér z lavičky nevidí, ale data ukážou"

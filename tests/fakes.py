@@ -144,13 +144,15 @@ class FakeBrain:
         self.calls = []
 
     def plan_content(self, count, strategy=None, recent_posts=None, calendar_notes=None,
-                     available_media=None):
-        self.calls.append(("plan", count))
+                     available_media=None, slots=None, moments=None):
+        self.calls.append(("plan", count, [s.key for _, s in (slots or [])]))
         items = []
         for index in range(count):
-            fmt = self.formats[index % len(self.formats)]
+            series = slots[index][1] if slots and index < len(slots) else None
+            fmt = series.format if series else self.formats[index % len(self.formats)]
             items.append({
                 "title": f"Nápad {index + 1}",
+                "series": series.key if series else "",
                 "format": fmt,
                 "template": "tip_list" if fmt != "REEL" else "video",
                 "topic": "návyky",
@@ -163,6 +165,24 @@ class FakeBrain:
                 "why": "test",
             })
         return {"reasoning": "test plán", "items": items}
+
+    def repurpose(self, winners, count=2, strategy=None, english=False, recent_posts=None):
+        self.calls.append(("repurpose", len(winners), english))
+        variants = []
+        for index, winner in enumerate(winners[:count]):
+            variants.append({
+                "source_media_id": winner["media_id"],
+                "title": f"Znovu: {winner.get('topic') or 'námět'} {index + 1}",
+                "series": winner.get("series") or "tvrda_pravda",
+                "variant": "anglicky" if (english and index == 0) else "jiny_uhel",
+                "language": "en" if (english and index == 0) else "cs",
+                "format": "REEL",
+                "hook_style": "kontrarian",
+                "angle": "jiný pohled na stejnou myšlenku",
+                "key_points": ["bod"],
+                "why": "fungovalo to",
+            })
+        return {"variants": variants}
 
     def write_post(self, item, strategy=None, reference_image=None):
         self.calls.append(("write_post", item.id))

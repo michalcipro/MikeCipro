@@ -19,6 +19,8 @@ from ..util import ensure_dir, get_logger, to_iso, utcnow, write_json
 from .planner import Planner
 from .producer import Producer
 from .publisher import QueuePublisher
+from .repurpose import Repurposer
+from .seed import Seeder
 
 log = get_logger(__name__)
 
@@ -37,6 +39,9 @@ class Agent:
         self.planner = Planner(self.store, settings, self.brain, self.learner)
         self.producer = Producer(self.store, settings, self.brain, self.learner)
         self.queue_publisher = QueuePublisher(self.store, settings, self.client, dry_run=dry_run)
+        self.repurposer = Repurposer(self.store, settings, self.brain, self.learner,
+                                     self.planner.scheduler)
+        self.seeder = Seeder(self.store, settings, self.planner.scheduler)
 
     # ------------------------------------------------------------ kroky
     def step_collect(self):
@@ -52,6 +57,10 @@ class Agent:
 
     def step_plan(self, count=None, notes=None):
         return self.planner.plan(count=count, notes=notes)
+
+    def step_repurpose(self, count=2, force=False):
+        """Po každých N videích sáhne po vítězných námětech a zpracuje je znovu."""
+        return self.repurposer.run(count=count, force=force)
 
     def step_produce(self, horizon_hours=48, limit=3):
         """Vyrábí jen to, co brzy poletí ven — ať se nepálí tokeny do zásoby."""
@@ -78,9 +87,14 @@ class Agent:
         cutoff = to_iso(utcnow() - dt.timedelta(days=days))
         recent = [r for r in rows if (r.get("published_at") or "") >= cutoff]
         snapshots = self.store.account_snapshots(limit=days)
+        from ..analytics.metrics import summarize
+
         analysis = self.brain.analyze_profile(
             snapshot={"posledni": snapshots[0] if snapshots else {},
-                      "historie": snapshots[:14]},
+                      "historie": snapshots[:14],
+                      "souhrn_kpi": summarize(
+                          [r for r in recent if r.get("reach")],
+                          self.store.latest_followers())},
             posts=[_post_for_report(r) for r in recent],
             strategy=dict(self.learner.current_profile()),
             comments=self.store.recent_comment_texts(limit=60),
@@ -96,12 +110,14 @@ class Agent:
 
     # ------------------------------------------------------------ celý cyklus
     def run_cycle(self, do_plan=True, do_produce=True, do_publish=True, do_report=True):
+        """Jeden průchod celou smyčkou. Každý krok selhává samostatně."""
         summary = {"started_at": to_iso(utcnow()), "steps": {}, "errors": {}}
 
         for name, func in (
             ("collect", self.step_collect),
             ("learn", self.step_learn),
             ("plan", self.step_plan if do_plan else None),
+            ("repurpose", self.step_repurpose if do_plan else None),
             ("produce", self.step_produce if do_produce else None),
             ("publish", self.step_publish if do_publish else None),
             ("report", self.step_report if do_report else None),
@@ -139,22 +155,34 @@ def _describe(result):
 
 
 def _post_for_report(row):
+    """Data jednoho videa pro analytika — KPI napřed, dosah až jako kontext."""
+    from ..analytics.metrics import kpi_rates, watch_through
+
+    rates = kpi_rates(row, row.get("duration_seconds"))
     return {
+        "serie": row.get("series"),
+        "jazyk": row.get("language"),
         "format": row.get("format"),
         "tema": row.get("topic"),
         "hook": row.get("hook_style"),
         "cta": row.get("cta_type"),
         "hodina": row.get("local_hour"),
         "den": row.get("local_weekday"),
-        "dosah": row.get("reach"),
-        "lajky": row.get("likes"),
-        "komentare": row.get("comments"),
-        "ulozeni": row.get("saves"),
-        "sdileni": row.get("shares"),
         "skore": row.get("score"),
+        "nova_sledovani_na_1k": _round(rates.get("follow_rate")),
+        "sdileni_na_1k": _round(rates.get("share_rate")),
+        "ulozeni_na_1k": _round(rates.get("save_rate")),
+        "zhlednuti_k_dosahu": _round(rates.get("hook_rate")),
+        "dokoukani_pct": watch_through(row, row.get("duration_seconds")),
+        "dosah": row.get("reach"),
+        "recyklace_z": row.get("repurposed_from"),
         "popisek_zacatek": (row.get("caption") or "")[:120],
         "odkaz": row.get("permalink"),
     }
+
+
+def _round(value, decimals=2):
+    return None if value is None else round(value, decimals)
 
 
 def _report_markdown(analysis, days):

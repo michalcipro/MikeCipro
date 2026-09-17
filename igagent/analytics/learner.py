@@ -27,9 +27,14 @@ PRIOR_MEAN = 100.0        # skóre průměrného příspěvku
 PRIOR_WEIGHT = 3.0        # kolik „virtuálních" pozorování má prior
 UCB_C = 1.2               # ochota zkoušet nejisté varianty
 MIN_SAMPLE_FOR_ADVICE = 8
+MIN_N_FOR_RANKING = 2     # kolik pozorování musí hodnota mít, než ji doporučíme
 
-LEARNED_FEATURES = ("format", "topic", "pillar", "hook_style", "cta_type",
-                    "template", "hour", "weekday")
+# Pozor na rozdíl: `choose()` smí sáhnout i po hodnotě s jediným pozorováním
+# (to je průzkum), ale doporučení ve strategii — „tvoje nejlepší hodina je…" —
+# se z jednoho příspěvku dělat nesmí. Proto ranking filtrujeme.
+
+LEARNED_FEATURES = ("series", "format", "topic", "pillar", "hook_style", "cta_type",
+                    "template", "hour", "weekday", "language")
 
 WEEKDAYS_CS = ["pondělí", "úterý", "středa", "čtvrtek", "pátek", "sobota", "neděle"]
 
@@ -68,10 +73,12 @@ class Learner:
         baselines = build_baselines(measured)
         followers = self.store.latest_followers()
 
-        scored = 0
+        scored, unscored = 0, []
         for row in measured:
-            score = score_post(row, baselines, followers)
+            score = score_post(row, baselines, followers,
+                               duration_seconds=row.get("duration_seconds"))
             if score is None:
+                unscored.append(row["media_id"])
                 continue
             row["score"] = score
             latest = self.store.latest_metrics(row["media_id"])
@@ -80,6 +87,12 @@ class Learner:
             scored += 1
         log.info("Přepočítáno skóre u %d příspěvků (vzorek %s).", scored,
                  (baselines or {}).get("global", {}).get("n", 0))
+        if unscored:
+            # ticho by tu bylo zavádějící — tyhle příspěvky do učení nevstupují
+            log.info("%d příspěvků nejde ohodnotit (chybí konverzní metriky, "
+                     "typicky starší nebo ručně publikované): %s",
+                     len(unscored), ", ".join(unscored[:5])
+                     + ("…" if len(unscored) > 5 else ""))
         return measured
 
     def rebuild_feature_stats(self, rows=None):
@@ -172,9 +185,10 @@ class Learner:
             "followers": followers,
             "follower_change_period": growth,
             "rankings": rankings,
-            "best_hours": [int(r["value"]) for r in rankings["hour"][:4]
+            "best_hours": [int(r["value"]) for r in _reliable(rankings["hour"])[:4]
                            if str(r["value"]).isdigit()],
-            "best_weekdays": [_weekday_name(r["value"]) for r in rankings["weekday"][:3]],
+            "best_weekdays": [_weekday_name(r["value"])
+                              for r in _reliable(rankings["weekday"])[:3]],
             "format_mix": self.weighted_format_mix(self.settings.brand.format_mix),
             "caption_length": _caption_length_insight(measured),
             "do_more": _advice(rankings, above=True),
@@ -199,6 +213,12 @@ class Learner:
 
 
 # ------------------------------------------------------------------ pomocné
+
+def _reliable(ranking, min_n=MIN_N_FOR_RANKING):
+    """Jen hodnoty s dost pozorováními. Když žádná není, vrátí prázdno —
+    to je poctivější než doporučit něco na základě jediného příspěvku."""
+    return [row for row in ranking if row["n"] >= min_n]
+
 
 def _feature_value(row, feature):
     if feature == "hour":

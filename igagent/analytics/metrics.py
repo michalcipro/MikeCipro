@@ -1,12 +1,30 @@
 """Metriky a skórování příspěvků.
 
-Skóre je relativní k vlastnímu účtu, ne k nějakému absolutnímu benchmarku:
-100 = medián účtu, 200 = dvakrát lepší než medián, 50 = poloviční.
-Díky tomu skóre nezestárne, když účet poroste — a nedá se ošidit tím,
-že přibude sledujících.
+Co se tu počítá — a hlavně co se nepočítá
+-----------------------------------------
+Views nejsou cíl. Video, které vidí 30 000 lidí a nepřivede nikoho, je horší
+než video pro 800 lidí, po kterém přijde osm nových sledujících. Proto se
+neskóruje dosah, ale **konverze dosahu**: vše se dělí počtem zasažených lidí.
 
-Váhy interakcí odrážejí, co algoritmus Instagramu odměňuje nejvíc:
-sdílení a uložení váží víc než lajk.
+Pět složek skóre (váhy v `KPI_WEIGHTS`, jdou přenastavit):
+
+  follow_rate    nové sledování na 1 000 zasažených   ← hlavní ukazatel
+  share_rate     sdílení na 1 000 zasažených
+  save_rate      uložení na 1 000 zasažených
+  hook_rate      zhlédnutí / dosah                     ← udržení na začátku
+  watch_through  průměrná doba sledování / délka videa
+
+Každá složka se porovnává s **mediánem tvého vlastního účtu**, takže
+100 = průměrný příspěvek. Skóre tím nezestárne, když účet poroste.
+
+Poctivá poznámka k „udržení prvních tří sekund": Instagram Graph API tenhle
+údaj nedává. `hook_rate` (zhlédnutí / dosah) je nejbližší dostupná náhrada —
+říká, kolik ze zasažených lidí video vůbec spustilo a nechalo běžet. Trend
+sleduje dobře, ale není to totéž číslo, jaké vidíš v aplikaci u retence.
+
+Malý dosah = velký šum: 1 sledování ze 40 lidí by jinak vypadalo jako
+zázrak. Proto se každá míra stahuje k mediánu podle velikosti dosahu
+(empirický Bayes, `PRIOR_REACH`).
 """
 
 from __future__ import annotations
@@ -15,9 +33,31 @@ from statistics import median
 
 from ..util import clamp
 
+# Váhy KPI. Součet nemusí být 1 — normalizuje se podle dostupných složek.
+KPI_WEIGHTS = {
+    "follow_rate": 0.35,
+    "share_rate": 0.20,
+    "save_rate": 0.20,
+    "hook_rate": 0.15,
+    "watch_through": 0.10,
+}
+
+# Kolik „virtuálního" dosahu má prior. Čím vyšší, tím opatrnější jsou
+# závěry z příspěvků s malým dosahem.
+PRIOR_REACH = 500.0
+
+# Když účet nemá historii, použijí se tyhle orientační mediány.
+COLD_START_RATES = {
+    "follow_rate": 3.0,        # 3 nová sledování na 1 000 zasažených
+    "share_rate": 8.0,
+    "save_rate": 15.0,
+    "hook_rate": 1.4,
+    "watch_through": 0.45,
+}
+
+# Pro přehled a report (ne pro skóre).
 INTERACTION_WEIGHTS = {"likes": 1.0, "comments": 2.0, "saves": 3.0, "shares": 4.0}
 
-# mapování názvů z Graph API na naše sloupce
 INSIGHT_ALIASES = {
     "reach": "reach",
     "impressions": "impressions",
@@ -41,6 +81,16 @@ INSIGHT_ALIASES = {
 
 AGE_BUCKETS = ((0, 36), (36, 168), (168, 10 ** 6))   # <36 h, do 7 dní, starší
 
+CS_LABELS = {
+    "follow_rate": "nová sledování / 1 000 zasažených",
+    "share_rate": "sdílení / 1 000 zasažených",
+    "save_rate": "uložení / 1 000 zasažených",
+    "hook_rate": "zhlédnutí / dosah (náhrada za udržení)",
+    "watch_through": "podíl zhlédnuté délky",
+}
+
+
+# ---------------------------------------------------------------- normalizace
 
 def normalize_media_insights(raw, fallback=None):
     """Sjednotí názvy metrik z API a doplní lajky/komentáře z detailu média."""
@@ -56,11 +106,41 @@ def normalize_media_insights(raw, fallback=None):
 
 
 def weighted_interactions(metrics):
-    """Vážený součet interakcí — saves a shares váží nejvíc."""
+    """Vážený součet interakcí — jen pro přehled, do skóre nevstupuje."""
     total = 0.0
     for key, weight in INTERACTION_WEIGHTS.items():
         total += (metrics.get(key) or 0) * weight
     return total
+
+
+def seconds_of(avg_watch_time):
+    """Graph API vrací průměrnou dobu sledování v milisekundách."""
+    if not avg_watch_time:
+        return None
+    return avg_watch_time / 1000.0 if avg_watch_time > 1000 else float(avg_watch_time)
+
+
+# ---------------------------------------------------------------- KPI
+
+def kpi_rates(metrics, duration_seconds=None):
+    """Spočítá jednotlivá KPI. Co nejde spočítat, chybí (není to nula)."""
+    reach = metrics.get("reach") or 0
+    rates = {}
+    if reach > 0:
+        if metrics.get("follows") is not None:
+            rates["follow_rate"] = 1000.0 * metrics["follows"] / reach
+        if metrics.get("shares") is not None:
+            rates["share_rate"] = 1000.0 * metrics["shares"] / reach
+        if metrics.get("saves") is not None:
+            rates["save_rate"] = 1000.0 * metrics["saves"] / reach
+        if metrics.get("plays"):
+            rates["hook_rate"] = metrics["plays"] / reach
+
+    duration = duration_seconds or metrics.get("duration_seconds")
+    watched = seconds_of(metrics.get("avg_watch_time"))
+    if duration and watched:
+        rates["watch_through"] = clamp(watched / duration, 0.0, 1.0)
+    return rates
 
 
 def _bucket(age_hours):
@@ -71,61 +151,119 @@ def _bucket(age_hours):
     return len(AGE_BUCKETS) - 1
 
 
-def build_baselines(rows):
-    """Mediány dosahu a interakcí podle stáří příspěvku.
+def build_baselines(rows, min_samples=3):
+    """Mediány jednotlivých KPI — zvlášť podle stáří příspěvku.
 
-    Pro každý „věkový koš" spočítá medián zvlášť; když v koši nejsou aspoň
-    tři příspěvky, použije se globální medián. Bez dat se vrací None a skóre
-    se počítá z poměru k počtu sledujících.
+    Když v „koši" není dost příspěvků, sáhne se po globálním mediánu;
+    když nejsou ani ty, po orientačních hodnotách `COLD_START_RATES`.
     """
-    per_bucket = {index: {"reach": [], "weighted": []} for index in range(len(AGE_BUCKETS))}
-    all_reach, all_weighted = [], []
+    per_bucket = {index: {} for index in range(len(AGE_BUCKETS))}
+    global_rates = {}
+    reaches = []
+
     for row in rows:
         reach = row.get("reach")
         if not reach:
             continue
-        weighted = weighted_interactions(row)
-        index = _bucket(row.get("age_hours"))
-        per_bucket[index]["reach"].append(reach)
-        per_bucket[index]["weighted"].append(weighted)
-        all_reach.append(reach)
-        all_weighted.append(weighted)
+        reaches.append(reach)
+        rates = kpi_rates(row, row.get("duration_seconds"))
+        bucket = _bucket(row.get("age_hours"))
+        for key, value in rates.items():
+            per_bucket[bucket].setdefault(key, []).append(value)
+            global_rates.setdefault(key, []).append(value)
 
-    if not all_reach:
+    if not reaches:
         return None
 
-    global_reach = median(all_reach)
-    global_weighted = median(all_weighted) if all_weighted else 0.0
+    global_median = {key: median(values) for key, values in global_rates.items()}
     baselines = {}
     for index, data in per_bucket.items():
         baselines[index] = {
-            "reach": median(data["reach"]) if len(data["reach"]) >= 3 else global_reach,
-            "weighted": (median(data["weighted"]) if len(data["weighted"]) >= 3
-                         else global_weighted),
+            key: (median(values) if len(values) >= min_samples
+                  else global_median.get(key, COLD_START_RATES.get(key)))
+            for key, values in ({**global_rates, **data}).items()
         }
-    baselines["global"] = {"reach": global_reach, "weighted": global_weighted, "n": len(all_reach)}
+    baselines["global"] = {**global_median, "n": len(reaches),
+                           "median_reach": median(reaches)}
     return baselines
 
 
-def score_post(metrics, baselines=None, followers=None):
-    """Skóre 0–250, kde 100 = průměrný příspěvek tohoto účtu."""
-    reach = metrics.get("reach") or 0
-    weighted = weighted_interactions(metrics)
+def _shrink(rate, prior, reach):
+    """Stáhne míru k prioru podle toho, na jak velkém dosahu vznikla."""
+    if rate is None or prior is None:
+        return rate
+    weight = reach / (reach + PRIOR_REACH) if reach else 0.0
+    return weight * rate + (1 - weight) * prior
 
-    if baselines:
-        base = baselines[_bucket(metrics.get("age_hours"))]
-        reach_index = reach / base["reach"] if base["reach"] else 1.0
-        eng_index = weighted / base["weighted"] if base["weighted"] else 1.0
-    elif followers:
-        # bez historie: 30% dosah mezi sledujícími a 5% zapojení bereme jako průměr
-        reach_index = (reach / followers) / 0.30 if followers else 1.0
-        eng_index = (weighted / max(reach, 1)) / 0.05
-    else:
+
+def score_post(metrics, baselines=None, followers=None, weights=None,
+               duration_seconds=None):
+    """Skóre 0–250, kde 100 = průměrný příspěvek tohoto účtu.
+
+    `followers` se nepoužívá k výpočtu (míry jsou vztažené k dosahu),
+    zůstává kvůli zpětné kompatibilitě volání.
+    """
+    weights = weights or KPI_WEIGHTS
+    reach = metrics.get("reach") or 0
+    if not reach:
         return None
 
-    raw = 100.0 * (0.55 * reach_index + 0.45 * eng_index)
-    return round(clamp(raw, 0.0, 250.0), 2)
+    rates = kpi_rates(metrics, duration_seconds)
+    if not rates:
+        return None
 
+    bucket = (baselines or {}).get(_bucket(metrics.get("age_hours"))) if baselines else None
+    reference = {**COLD_START_RATES, **(bucket or {})}
+
+    total_weight = 0.0
+    total = 0.0
+    used = {}
+    for key, weight in weights.items():
+        if key not in rates:
+            continue
+        prior = reference.get(key) or COLD_START_RATES.get(key)
+        if not prior:
+            continue
+        adjusted = _shrink(rates[key], prior, reach)
+        index = adjusted / prior
+        used[key] = round(index, 3)
+        total += weight * index
+        total_weight += weight
+
+    if total_weight <= 0:
+        return None
+
+    return round(clamp(100.0 * total / total_weight, 0.0, 250.0), 2)
+
+
+def score_breakdown(metrics, baselines=None, duration_seconds=None, weights=None):
+    """Rozpad skóre po složkách — pro `igagent kpi` a pro report."""
+    weights = weights or KPI_WEIGHTS
+    rates = kpi_rates(metrics, duration_seconds)
+    bucket = (baselines or {}).get(_bucket(metrics.get("age_hours"))) if baselines else None
+    reference = {**COLD_START_RATES, **(bucket or {})}
+    reach = metrics.get("reach") or 0
+
+    rows = []
+    for key, weight in weights.items():
+        prior = reference.get(key) or COLD_START_RATES.get(key)
+        value = rates.get(key)
+        rows.append({
+            "kpi": key,
+            "popis": CS_LABELS.get(key, key),
+            "hodnota": None if value is None else round(value, 3),
+            "medián_účtu": None if prior is None else round(prior, 3),
+            "index": (None if value is None or not prior
+                      else round(_shrink(value, prior, reach) / prior, 2)),
+            "váha": weight,
+            "dostupné": value is not None,
+        })
+    return {"skóre": score_post(metrics, baselines, duration_seconds=duration_seconds,
+                                weights=weights),
+            "dosah": reach, "složky": rows}
+
+
+# ---------------------------------------------------------------- přehledy
 
 def engagement_rate(metrics, followers=None):
     """Klasická míra zapojení — pro report, ne pro učení."""
@@ -138,26 +276,38 @@ def engagement_rate(metrics, followers=None):
 
 
 def watch_through(metrics, duration_seconds=None):
-    """Podíl zhlédnuté délky Reelu (když máme průměrný čas sledování)."""
-    avg = metrics.get("avg_watch_time")
-    if not avg or not duration_seconds:
+    """Podíl zhlédnuté délky v procentech."""
+    duration = duration_seconds or metrics.get("duration_seconds")
+    watched = seconds_of(metrics.get("avg_watch_time"))
+    if not duration or not watched:
         return None
-    # Graph API vrací avg_watch_time v milisekundách
-    seconds = avg / 1000.0 if avg > 1000 else avg
-    return round(clamp(100.0 * seconds / duration_seconds, 0.0, 100.0), 1)
+    return round(clamp(100.0 * watched / duration, 0.0, 100.0), 1)
 
 
 def summarize(rows, followers=None):
-    """Pár čísel za období — pro report a pro prompt analytika."""
+    """Souhrn za období — vědomě vede KPI, ne dosah."""
     if not rows:
         return {}
     reaches = [r.get("reach") or 0 for r in rows]
     scores = [r.get("score") for r in rows if r.get("score") is not None]
+    totals = {"follows": 0, "shares": 0, "saves": 0, "reach": 0}
+    for row in rows:
+        for key in ("follows", "shares", "saves", "reach"):
+            totals[key] += row.get(key) or 0
+
+    per_1k = (lambda key: round(1000.0 * totals[key] / totals["reach"], 2)
+              if totals["reach"] else None)
+    watch = [watch_through(r, r.get("duration_seconds")) for r in rows]
+    watch = [w for w in watch if w is not None]
+
     return {
         "pocet_prispevku": len(rows),
-        "medi_dosah": round(median(reaches), 1) if reaches else 0,
-        "prumerny_dosah": round(sum(reaches) / len(reaches), 1) if reaches else 0,
-        "celkove_interakce": int(sum(weighted_interactions(r) for r in rows)),
+        "nova_sledovani_na_1k": per_1k("follows"),
+        "sdileni_na_1k": per_1k("shares"),
+        "ulozeni_na_1k": per_1k("saves"),
+        "prumerne_dokoukani_pct": round(sum(watch) / len(watch), 1) if watch else None,
         "medi_skore": round(median(scores), 1) if scores else None,
+        "celkovy_dosah": totals["reach"],
+        "medi_dosah": round(median(reaches), 1) if reaches else 0,
         "sledujici": followers,
     }
