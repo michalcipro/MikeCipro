@@ -6,11 +6,10 @@ from pathlib import Path
 
 from ..store import QueueItem
 from ..util import get_logger
+from .inbox import Inbox
 from .schedule import Scheduler
 
 log = get_logger(__name__)
-
-MEDIA_SUFFIXES = {".jpg", ".jpeg", ".png", ".heic", ".webp", ".mp4", ".mov", ".m4v"}
 
 
 class Planner:
@@ -20,14 +19,22 @@ class Planner:
         self.brain = brain
         self.learner = learner
         self.scheduler = Scheduler(settings, learner, store)
+        self.inbox = Inbox(settings, store)
 
     def available_media(self, inbox=None):
-        """Soubory, které jsi agentovi nasypal do složky `inbox`."""
-        inbox = Path(inbox or self.settings.data_dir / "inbox")
-        if not inbox.exists():
-            return []
-        return sorted(str(p) for p in inbox.iterdir()
-                      if p.is_file() and p.suffix.lower() in MEDIA_SUFFIXES)
+        """Volné soubory v inboxu — jen pro kontext při vymýšlení námětů.
+
+        Plánovač je **nepřipíná** k položkám. Dřív to dělal a přilepil jedno
+        video ke všem naplánovaným Reels naráz. Párování řeší `Inbox` podle
+        čísla v názvu souboru (`igagent inbox`).
+        """
+        if inbox is not None:
+            path = Path(inbox)
+            if not path.exists():
+                return []
+            return sorted(str(p) for p in path.iterdir() if p.is_file())
+        used = self.inbox.attached_paths()
+        return [str(p) for p in self.inbox.files() if str(p.resolve()) not in used]
 
     def plan(self, count=None, days=None, inbox=None, notes=None, moments=None):
         """Naplní frontu. Se sériemi plánuje na jejich pevné termíny."""
@@ -114,8 +121,6 @@ class Planner:
             },
             source_media=[],
         )
-        if item.brief["needs_user_media"] and media:
-            item.source_media = _guess_media({"format": item.format}, media)
         return self.store.enqueue(item)
 
     def pending_moments(self):
@@ -130,14 +135,3 @@ class Planner:
         rows = self.store.posts_with_latest_metrics(limit=limit)
         return [{"format": r.get("format"), "caption": r.get("caption"),
                  "topic": r.get("topic"), "score": r.get("score")} for r in rows]
-
-
-def _guess_media(idea, media):
-    """Hrubé přiřazení souborů k nápadu — podle formátu a názvu."""
-    video = [m for m in media if Path(m).suffix.lower() in (".mp4", ".mov", ".m4v")]
-    photos = [m for m in media if m not in video]
-    if idea.get("format") == "REEL":
-        return video[:1] or photos[:5]
-    if idea.get("format") == "CAROUSEL":
-        return photos[:8]
-    return photos[:1]

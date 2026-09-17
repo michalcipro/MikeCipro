@@ -172,6 +172,9 @@ Vypíše, co je nastavené a co chybí. Než půjdeš dál, mělo by být zelen�
 
 ## Používání
 
+> **Praktický průvodce celým procesem** — kam co nahrávat, jak vypadá týden,
+> co dělat v jednotlivých situacích: [`docs/JAK-TO-FUNGUJE.md`](docs/JAK-TO-FUNGUJE.md)
+
 ### Denní režim (doporučený start)
 
 ```env
@@ -212,13 +215,23 @@ Hotová varianta: `scripts/crontab.example` a `scripts/run-cycle.sh`.
 
 ### Vlastní materiál
 
-Nasyp fotky a videa do `data/inbox/`. Agent je uvidí při plánování a bude
-kolem nich stavět nápady. Ručně:
+Natočená videa nahraj do `data/inbox/` a **pojmenuj je číslem námětu**
+z `igagent queue list`:
+
+```
+data/inbox/1-sebevedomi.mp4      → námět #1
+data/inbox/5-a.jpg, 5-b.jpg      → oba k námětu #5 (karusel)
+```
 
 ```bash
-igagent queue attach 7 ~/Videa/natoceno.mp4
-igagent produce --id 7
+igagent inbox            # ukáže, co se s čím spárovalo
+igagent inbox link       # připne soubory k námětům
+igagent produce          # vyrobí, co poletí ven do 48 h
 ```
+
+Soubor bez čísla agent sám nepřipne — jinak by přilepil jedno video k víc
+námětům. Buď ho přejmenuj, nebo použij `igagent inbox link --auto`.
+Zpracované soubory se uklidí do `data/inbox/hotovo/`.
 
 ### Ruční nástroje (bez fronty)
 

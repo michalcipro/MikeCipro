@@ -440,6 +440,63 @@ def cmd_token(args):
     return 0
 
 
+def cmd_inbox(args):
+    """Co leží ve složce inbox a ke kterému námětu to patří."""
+    agent = _agent(args)
+    try:
+        inbox = agent.planner.inbox
+        inbox.ensure()
+
+        if args.inbox_command == "link":
+            linked, leftover, waiting = inbox.link(auto=args.auto, dry_run=args.dry_run)
+            if not linked:
+                print("Nic k připnutí.")
+            for item, paths in linked:
+                names = ", ".join(Path(p).name for p in paths)
+                prefix = "[zkouška] " if args.dry_run else ""
+                print(f"{prefix}#{item.id:<4} ← {names}")
+                print(f"       {item.title}")
+            if leftover:
+                print(f"\nBez čísla v názvu ({len(leftover)}):")
+                for path in leftover:
+                    print(f"  · {path.name}")
+                print("  Přejmenuj je na „<číslo>-nazev.mp4“, nebo použij "
+                      "`igagent inbox link --auto`.")
+            if waiting:
+                print(f"\nPořád čeká na video ({len(waiting)}):")
+                for item in waiting:
+                    print(f"  #{item.id:<4} {item.title}")
+            return 0
+
+        status = inbox.status()
+        print(f"Složka: {status['slozka']}")
+        print(f"Souborů: {status['souboru']}\n")
+
+        if status["prirazeno"]:
+            print("Připraveno k připnutí (podle čísla v názvu):")
+            for item_id, names in status["prirazeno"].items():
+                item = agent.store.get_queue_item(item_id)
+                title = item.title if item else "(neznámý námět)"
+                print(f"  #{item_id:<4} ← {', '.join(names)}")
+                print(f"        {title}")
+            print("\n  Připnout: igagent inbox link")
+        if status["bez_cisla"]:
+            print("\nBez čísla v názvu — agent je sám nepřipne:")
+            for name in status["bez_cisla"]:
+                print(f"  · {name}")
+        if status["cekaji_na_video"]:
+            print("\nNáměty, které čekají na tvoje video:")
+            for item_id, title in status["cekaji_na_video"]:
+                print(f"  #{item_id:<4} {title}")
+            print("\n  Pojmenuj soubor číslem námětu, např. "
+                  f"„{status['cekaji_na_video'][0][0]}-nazev.mp4“.")
+        if not status["souboru"] and not status["cekaji_na_video"]:
+            print("Inbox je prázdný a nic nečeká. 👌")
+        return 0
+    finally:
+        agent.close()
+
+
 def cmd_seed(args):
     agent = _agent(args)
     try:
@@ -452,9 +509,13 @@ def cmd_seed(args):
         if created:
             missing = [i for i in created if i.brief.get("needs_user_media")]
             if missing:
-                print(f"\n{len(missing)} námětů čeká na tvoje video. Až natočíš:")
-                print(f"    igagent queue attach {created[0].id} ~/video.mp4")
-                print("    igagent produce")
+                inbox_dir = agent.settings.data_dir / "inbox"
+                print(f"\n{len(missing)} námětů čeká na tvoje video.")
+                print(f"Až natočíš, nahraj soubory do {inbox_dir}/ a pojmenuj je")
+                print("číslem námětu — třeba:")
+                for item in missing[:3]:
+                    print(f"    {item.id}-{_slug_hint(item.title)}.mp4")
+                print("\nPak:  igagent inbox   →   igagent inbox link   →   igagent produce")
         return 0
     finally:
         agent.close()
@@ -585,6 +646,12 @@ def cmd_moment(args):
     return 0
 
 
+def _slug_hint(title):
+    from .util import slugify
+
+    return slugify(title, max_len=20)
+
+
 def _num(value, decimals=1):
     return "—" if value is None else f"{value:.{decimals}f}"
 
@@ -688,6 +755,14 @@ def build_parser():
     publish.add_argument("--dry-run", action="store_true")
     publish.add_argument("--force", action="store_true", help="Obejde pojistky (opatrně)")
     publish.set_defaults(func=cmd_publish)
+
+    inbox = sub.add_parser("inbox", help="Co leží v inboxu a kam to patří")
+    isub = inbox.add_subparsers(dest="inbox_command")
+    link = isub.add_parser("link", help="Připne soubory k námětům")
+    link.add_argument("--auto", action="store_true",
+                      help="Soubory bez čísla doplnit podle pořadí termínů")
+    link.add_argument("--dry-run", action="store_true", help="Jen ukázat, nic nezapsat")
+    inbox.set_defaults(func=cmd_inbox, inbox_command=None, auto=False, dry_run=False)
 
     seed = sub.add_parser("seed", help="Nasadí startovní dávku námětů do fronty")
     seed.add_argument("--file", default="config/seed-first-8.yaml")

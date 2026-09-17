@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from ..errors import BrainError, MediaError
+from .inbox import Inbox
 from ..media.graphics import GraphicsStudio
 from ..media.photos import PhotoStudio
 from ..media.video import ReelStudio
@@ -24,9 +25,10 @@ class Producer:
         self.graphics = GraphicsStudio(settings.brand, settings.out_dir)
         self.photos = PhotoStudio(settings.brand, settings.out_dir)
         self.reels = ReelStudio(settings.brand, settings.work_dir, settings.out_dir)
+        self.inbox = Inbox(settings, store)
 
     # ------------------------------------------------------------ vstup
-    def produce(self, item, qa=None):
+    def produce(self, item, qa=None, archive_source=True):
         """Vyrobí média a texty pro jednu položku. Vrací aktualizovanou položku."""
         qa = self.settings.qa_images if qa is None else qa
         strategy = dict(self.learner.current_profile())
@@ -54,6 +56,9 @@ class Producer:
         item.status = "approved" if self.settings.autopilot == "full" else "produced"
         item.error = None
         self.store.update_queue(item)
+        if item.status != "failed" and archive_source:
+            # zdroj je zpracovaný — ať se nenabízí dalšímu námětu
+            self.inbox.archive(item.source_media or [])
         self.store.log_event("produced", item.id,
                              {"format": item.format, "assets": item.assets})
         return item
