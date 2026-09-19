@@ -122,6 +122,18 @@ def _render_settings(a: argparse.Namespace, captions_path: str | None) -> Render
     )
 
 
+def _render_progress():
+    shown = {"last": -1}
+
+    def cb(frac: float) -> None:
+        pct = int(frac * 100)
+        if pct >= shown["last"] + 10 or (pct == 100 and shown["last"] != 100):
+            shown["last"] = pct
+            _log(f"render {pct}%")
+
+    return cb
+
+
 def _default_output(inp: str, suffix: str, ext: str) -> str:
     p = Path(inp)
     return str(p.with_name(p.stem + suffix + ext))
@@ -183,7 +195,7 @@ def cmd_cut(a: argparse.Namespace) -> int:
         _log(f"timeline image written to {a.timeline}")
     settings = _render_settings(a, captions)
     _log(f"rendering {plan.total:.1f}s reel to {out}")
-    cmd = render(plan, settings, out, an.source)
+    cmd = render(plan, settings, out, an.source, progress=None if a.dry_run else _render_progress())
     if a.dry_run:
         print(" ".join(_quote(c) for c in cmd))
     else:
@@ -208,11 +220,20 @@ def cmd_render(a: argparse.Namespace) -> int:
     print(format_plan(plan))
     settings = _render_settings(a, captions)
     _log(f"rendering {plan.total:.1f}s reel to {out}")
-    cmd = render(plan, settings, out)
+    cmd = render(plan, settings, out, progress=None if a.dry_run else _render_progress())
     if a.dry_run:
         print(" ".join(_quote(c) for c in cmd))
     else:
         _log(f"done: {out}")
+    return 0
+
+
+def cmd_web(a: argparse.Namespace) -> int:
+    from pathlib import Path as _P
+
+    from .web import serve
+
+    serve(a.host, a.port, open_browser=not a.no_browser, workdir=_P(a.workdir) if a.workdir else None)
     return 0
 
 
@@ -298,6 +319,13 @@ def build_parser() -> argparse.ArgumentParser:
     _add_plan_args(pc)
     _add_render_args(pc)
     pc.set_defaults(func=cmd_cut)
+
+    pw = sub.add_parser("web", help="start the local web UI (http://127.0.0.1:8765)")
+    pw.add_argument("--port", type=int, default=8765)
+    pw.add_argument("--host", default="127.0.0.1", help="bind address (keep 127.0.0.1 unless you know why)")
+    pw.add_argument("--no-browser", action="store_true", help="do not open the browser automatically")
+    pw.add_argument("--workdir", default=None, help="where uploads and results are stored (default ~/.reelcut/web)")
+    pw.set_defaults(func=cmd_web)
 
     ps = sub.add_parser("setup", help="check the installation; downloads ffmpeg without admin rights if missing")
     ps.add_argument("--no-download", action="store_true", help="only report, never download ffmpeg")

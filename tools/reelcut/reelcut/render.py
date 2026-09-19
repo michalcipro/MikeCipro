@@ -4,8 +4,10 @@ cross-fades, loudness normalisation and optional burned-in captions."""
 from __future__ import annotations
 
 import subprocess
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Callable
 
 from .ffmpeg import FFmpegError, MediaInfo, capabilities, ffmpeg_bin, probe
 from .planner import Plan
@@ -118,7 +120,7 @@ def build_command(plan: Plan, info: MediaInfo, settings: RenderSettings, out_pat
         raise FFmpegError("This ffmpeg build lacks the subtitles filter (libass); captions cannot be burned in")
     loudnorm = settings.loudnorm and "loudnorm" in caps["filters"]
     encoder = pick_video_encoder(settings.video_codec)
-    cmd = [ffmpeg_bin(), "-hide_banner", "-loglevel", "error", "-stats", "-nostdin", "-y"]
+    cmd = [ffmpeg_bin(), "-hide_banner", "-loglevel", "error", "-nostdin", "-y"]
     for c in plan.clips:
         cmd += ["-ss", f"{c.start:.3f}", "-t", f"{c.duration:.3f}", "-i", info.path]
 
@@ -188,17 +190,60 @@ def build_command(plan: Plan, info: MediaInfo, settings: RenderSettings, out_pat
     return cmd
 
 
-def render(plan: Plan, settings: RenderSettings, out_path: str, info: MediaInfo | None = None) -> list[str]:
-    """Render the plan to ``out_path``. Returns the ffmpeg command used."""
+def output_duration(plan: Plan, settings: RenderSettings) -> float:
+    n = len(plan.clips)
+    if settings.transition == "fade" and n > 1:
+        shortest = min(c.duration for c in plan.clips)
+        fd = max(0.05, min(settings.transition_duration, shortest / 2 - 0.01))
+        return plan.total - fd * (n - 1)
+    return plan.total
+
+
+def render(
+    plan: Plan,
+    settings: RenderSettings,
+    out_path: str,
+    info: MediaInfo | None = None,
+    progress: Callable[[float], None] | None = None,
+) -> list[str]:
+    """Render the plan to ``out_path``. Returns the ffmpeg command used.
+
+    ``progress`` (0..1) is called as ffmpeg advances through the output.
+    """
     info = info or probe(plan.source)
     cmd = build_command(plan, info, settings, out_path)
     if settings.dry_run:
         return cmd
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-    proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    if progress is None:
+        proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        if proc.returncode != 0:
+            raise FFmpegError("Render failed:\n" + "\n".join(proc.stderr.strip().splitlines()[-25:]))
+        return cmd
+
+    total = max(output_duration(plan, settings), 0.01)
+    run_cmd = cmd[:1] + ["-progress", "pipe:1", "-nostats"] + cmd[1:]
+    with tempfile.TemporaryFile() as err:
+        proc = subprocess.Popen(run_cmd, stdout=subprocess.PIPE, stderr=err, text=True)
+        assert proc.stdout is not None
+        last = -1.0
+        for line in proc.stdout:
+            if line.startswith(("out_time_us=", "out_time_ms=")):
+                try:
+                    t = int(line.split("=", 1)[1]) / 1e6
+                except ValueError:
+                    continue
+                frac = min(1.0, t / total)
+                if frac - last >= 0.01:
+                    progress(frac)
+                    last = frac
+        proc.wait()
+        err.seek(0)
+        stderr = err.read().decode(errors="replace")
     if proc.returncode != 0:
-        raise FFmpegError("Render failed:\n" + "\n".join(proc.stderr.strip().splitlines()[-25:]))
+        raise FFmpegError("Render failed:\n" + "\n".join(stderr.strip().splitlines()[-25:]))
+    progress(1.0)
     return cmd
 
 
-__all__ = ["ASPECTS", "RenderSettings", "build_command", "pick_video_encoder", "render"]
+__all__ = ["ASPECTS", "RenderSettings", "build_command", "output_duration", "pick_video_encoder", "render"]

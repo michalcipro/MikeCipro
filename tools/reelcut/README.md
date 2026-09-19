@@ -7,6 +7,7 @@ nikdy nestřihne uprostřed věty. Výstup je rovnou připravený pro IG: 9:16,
 nejsilnější moment jako „cold open“ na začátku.
 
 ```
+reelcut web                            # webové rozhraní na http://127.0.0.1:8765
 reelcut setup                          # zkontroluje instalaci, případně stáhne ffmpeg
 reelcut cut video.mp4 -t 30            # analýza + plán + render do video_reel.mp4
 reelcut analyze video.mp4 --timeline tl.png   # jen analýza + obrázek timeline
@@ -153,6 +154,25 @@ Aktualizace na novější verzi nástroje: `cd ~/MikeCipro && git pull`
   novým souborem stejného jména, cache se sama zneplatní podle velikosti a času.
 
 ## Použití
+
+### `reelcut web` – rozhraní v prohlížeči
+
+```
+reelcut web
+```
+
+Spustí lokální server (jen `127.0.0.1`, nic neopouští počítač) a otevře
+prohlížeč. V něm:
+
+1. přetáhnete video (zkopíruje se do `~/.reelcut/web/uploads`) nebo zadáte
+   cestu k souboru na disku (bez kopírování),
+2. zvolíte délku, styl, práci s řečí, formát obrazu a přechody,
+3. sledujete průběh analýzy a renderu,
+4. reel si přehrajete, stáhnete, prohlédnete timeline a tabulku klipů,
+   kliknutím na klip skočíte v náhledu zdroje na daný moment,
+5. nevyhovující klipy zaškrtnete a reel vyrenderujete znovu bez nich.
+
+Volby: `--port 8765`, `--no-browser`, `--workdir` (výchozí `~/.reelcut/web`).
 
 ### `reelcut cut` – vše v jednom
 

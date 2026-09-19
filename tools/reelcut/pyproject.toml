@@ -13,6 +13,7 @@ dependencies = [
     "numpy>=1.24",
     "opencv-python-headless>=4.8",
     "static-ffmpeg>=3.0",
+    "flask>=3.0",
 ]
 
 [project.optional-dependencies]
@@ -29,7 +30,7 @@ where = ["."]
 include = ["reelcut*"]
 
 [tool.setuptools.package-data]
-reelcut = ["models/*.onnx", "models/LICENSE*"]
+reelcut = ["models/*.onnx", "models/LICENSE*", "webui/*.html"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

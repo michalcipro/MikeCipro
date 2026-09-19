@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>reelcut</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1'%3E%3Cstop offset='0' stop-color='%23f0587a'/%3E%3Cstop offset='1' stop-color='%23a855f7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Cpath d='M24 18l22 14-22 14z' fill='%23fff'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #0f1117; --card: #171a23; --card-2: #1f2330; --line: #2a2f3d; --text: #e9ecf3; --muted: #9aa3b5;
+    --accent: #f0587a; --accent-2: #a855f7; --ok: #3ddc97; --warn: #f5b942; --err: #ff6b6b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif; }
+  header { display: flex; align-items: baseline; gap: 16px; padding: 22px 28px 6px; flex-wrap: wrap; }
+  .logo { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .tag { color: var(--muted); }
+  main { max-width: 1080px; margin: 0 auto; padding: 8px 20px 60px; display: grid; gap: 18px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; }
+  .card h2 { margin: 0 0 14px; font-size: 17px; }
+  .card h3 { margin: 22px 0 8px; font-size: 15px; }
+  .hidden { display: none !important; }
+  .drop { border: 2px dashed var(--line); border-radius: 12px; padding: 34px; text-align: center; color: var(--muted); transition: .15s; cursor: pointer; }
+  .drop.over { border-color: var(--accent); color: var(--text); background: rgba(240,88,122,.06); }
+  .drop b { color: var(--text); }
+  .or { text-align: center; color: var(--muted); margin: 10px 0; font-size: 13px; }
+  form.path { display: flex; gap: 8px; }
+  input[type=text], input[type=number], select { background: var(--card-2); border: 1px solid var(--line); color: var(--text); border-radius: 8px; padding: 9px 11px; font: inherit; width: 100%; }
+  input[type=text]:focus, select:focus { outline: none; border-color: var(--accent-2); }
+  button, a.btn { background: var(--card-2); border: 1px solid var(--line); color: var(--text); border-radius: 9px; padding: 9px 16px; font: inherit; cursor: pointer; text-decoration: none; display: inline-block; }
+  button:hover, a.btn:hover { border-color: var(--accent-2); }
+  button.primary, a.btn.primary { background: linear-gradient(90deg, var(--accent), var(--accent-2)); border: none; color: #fff; font-weight: 700; padding: 12px 22px; }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  .bar { height: 10px; background: var(--card-2); border-radius: 99px; overflow: hidden; margin: 10px 0; }
+  .bar > div { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .3s; }
+  .source { display: grid; grid-template-columns: 240px 1fr; gap: 18px; margin-top: 16px; align-items: start; }
+  video { width: 100%; background: #000; border-radius: 10px; max-height: 420px; }
+  .meta { color: var(--muted); font-size: 14px; }
+  .meta b { color: var(--text); }
+  .row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; flex-wrap: wrap; }
+  .row label { min-width: 150px; }
+  input[type=range] { flex: 1; accent-color: var(--accent); }
+  output { font-weight: 700; min-width: 48px; display: inline-block; }
+  .styles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .style { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; cursor: pointer; background: var(--card-2); }
+  .style.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .style b { display: block; }
+  .style span { color: var(--muted); font-size: 13px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+  .grid label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  .check { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .check input { accent-color: var(--accent); width: 16px; height: 16px; }
+  details { margin-top: 14px; }
+  summary { cursor: pointer; color: var(--muted); }
+  details .grid { margin-top: 12px; }
+  .actions { margin-top: 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .phase { font-weight: 700; }
+  pre.log { background: #0b0d13; border: 1px solid var(--line); border-radius: 10px; padding: 12px; font-size: 12.5px; max-height: 220px; overflow: auto; color: var(--muted); white-space: pre-wrap; }
+  .result { display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: start; }
+  .result video { max-height: 560px; }
+  .warn { color: var(--warn); font-size: 14px; margin: 8px 0; }
+  .error { color: var(--err); font-weight: 600; }
+  img.timeline { width: 100%; border-radius: 10px; border: 1px solid var(--line); margin-top: 12px; background: #fff; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 8px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 600; font-size: 12.5px; text-transform: uppercase; letter-spacing: .04em; }
+  tr.clip { cursor: pointer; }
+  tr.clip:hover { background: rgba(168,85,247,.08); }
+  tr.clip.excluded td { opacity: .4; text-decoration: line-through; }
+  .kind { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 12px; font-weight: 700; }
+  .kind.speech { background: rgba(61,220,151,.18); color: var(--ok); }
+  .kind.visual { background: rgba(245,185,66,.18); color: var(--warn); }
+  .kind.hook { background: rgba(240,88,122,.2); color: var(--accent); }
+  .hint { color: var(--muted); font-size: 13px; margin: 0 0 8px; }
+  ul.jobs { list-style: none; padding: 0; margin: 0; }
+  ul.jobs li { display: flex; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  ul.jobs li span.m { color: var(--muted); flex: 1; }
+  .caps { margin-left: auto; color: var(--muted); font-size: 13px; }
+  @media (max-width: 760px) { .source, .result { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">reelcut</div>
+  <div class="tag">Automatický střih Instagram Reels · vše běží jen na vašem počítači</div>
+  <div class="caps" id="caps"></div>
+</header>
+<main>
+  <section class="card" id="step-source">
+    <h2>1. Video</h2>
+    <div class="drop" id="drop">
+      <b>Přetáhněte video sem</b> nebo klikněte a vyberte soubor<br>
+      <span>MP4, MOV, M4V, MKV, WEBM · soubor se zkopíruje do pracovní složky</span>
+      <input type="file" id="file" accept="video/*,.mov,.mp4,.m4v,.mkv,.webm" hidden>
+    </div>
+    <div class="or">nebo použijte soubor přímo z disku (bez kopírování, vhodné pro velká videa)</div>
+    <form class="path" id="pathform">
+      <input type="text" id="path" placeholder="/Users/jmeno/Movies/video.mov">
+      <button type="submit">Použít</button>
+    </form>
+    <div class="bar hidden" id="upload-bar"><div></div></div>
+    <div class="error hidden" id="source-error"></div>
+    <div class="source hidden" id="source">
+      <video id="preview" controls preload="metadata" playsinline></video>
+      <div class="meta" id="source-meta"></div>
+    </div>
+  </section>
+
+  <section class="card" id="step-settings">
+    <h2>2. Nastavení</h2>
+    <div class="row">
+      <label for="target">Cílová délka</label>
+      <input type="range" id="target" min="5" max="90" step="1" value="30">
+      <output id="target-out">30 s</output>
+    </div>
+    <div class="styles" id="styles"></div>
+    <div class="grid">
+      <div><label>Řeč a rozhovory</label>
+        <select id="speech_mode">
+          <option value="keep">Zachovat vcelku, přednostně (výchozí)</option>
+          <option value="prefer">Zvýhodnit, ale soutěží s ostatním</option>
+          <option value="ignore">Ignorovat (jen obraz a hudba)</option>
+        </select></div>
+      <div><label>Formát obrazu</label>
+        <select id="fit">
+          <option value="crop">Výřez na výšku, sleduje obličeje (výchozí)</option>
+          <option value="blur">Celý obraz + rozmazané pozadí</option>
+          <option value="none">Ponechat původní rámování</option>
+        </select></div>
+      <div><label>Poměr stran</label>
+        <select id="aspect">
+          <option value="9:16">9:16 (Reels, 1080×1920)</option>
+          <option value="4:5">4:5 (feed)</option>
+          <option value="1:1">1:1</option>
+          <option value="16:9">16:9</option>
+          <option value="source">Původní</option>
+        </select></div>
+      <div><label>Přechody</label>
+        <select id="transition">
+          <option value="cut">Ostré střihy (výchozí)</option>
+          <option value="fade">Prolínačky</option>
+        </select></div>
+    </div>
+    <div class="check"><input type="checkbox" id="hook" checked><label for="hook">Začít nejsilnějším momentem (cold open)</label></div>
+    <details>
+      <summary>Pokročilé nastavení</summary>
+      <div class="grid">
+        <div><label>Nejkratší klip (s)</label><input type="number" id="min_clip" value="1.0" step="0.1" min="0.3" max="10"></div>
+        <div><label>Nejdelší klip (s)</label><input type="number" id="max_clip" value="5.0" step="0.5" min="0.5" max="30"></div>
+        <div><label>Max. délka řečového klipu (s)</label><input type="number" id="max_speech_clip" value="15" step="1" min="2" max="90"></div>
+        <div><label>Práh kvality (0–1)</label><input type="number" id="min_quality" value="0.3" step="0.05" min="0" max="1"></div>
+        <div><label>Pořadí klipů</label><select id="order"><option value="chrono">Chronologicky</option><option value="score">Podle skóre</option></select></div>
+        <div><label>Kvalita (CRF, nižší = lepší)</label><input type="number" id="crf" value="18" min="10" max="35"></div>
+        <div><label>Rychlost kódování</label><select id="preset"><option value="medium">Střední (výchozí)</option><option value="fast">Rychlá</option><option value="veryfast">Velmi rychlá</option><option value="slow">Pomalá (nejlepší)</option></select></div>
+        <div><label>Jazyk přepisu</label><input type="text" id="language" placeholder="cs, en… (prázdné = auto)"></div>
+      </div>
+      <div class="check"><input type="checkbox" id="snap" checked><label for="snap">Přichytávat střihy na beat</label></div>
+      <div class="check"><input type="checkbox" id="loudnorm" checked><label for="loudnorm">Normalizovat hlasitost (−14 LUFS)</label></div>
+      <div class="check"><input type="checkbox" id="transcribe"><label for="transcribe">Přepis řeči (faster-whisper): střih po větách</label></div>
+      <div class="check"><input type="checkbox" id="captions"><label for="captions">Vypálit titulky (vyžaduje přepis)</label></div>
+    </details>
+    <div class="actions">
+      <button class="primary" id="run" disabled>Sestříhat reel</button>
+      <span class="hint" id="run-hint">Nejdřív nahrajte video.</span>
+    </div>
+  </section>
+
+  <section class="card hidden" id="step-progress">
+    <h2>3. Průběh</h2>
+    <div class="phase" id="phase"></div>
+    <div class="bar"><div id="progress"></div></div>
+    <pre class="log" id="log"></pre>
+  </section>
+
+  <section class="card hidden" id="step-result">
+    <h2>4. Výsledek</h2>
+    <div class="result">
+      <video id="result-video" controls playsinline></video>
+      <div>
+        <div class="actions" style="margin-top:0">
+          <a class="btn primary" id="download">Stáhnout reel</a>
+          <a class="btn" id="download-plan">Plán (JSON)</a>
+          <a class="btn hidden" id="download-srt">Titulky (.srt)</a>
+        </div>
+        <div id="summary" class="meta" style="margin-top:12px"></div>
+        <div id="warnings"></div>
+        <img class="timeline hidden" id="timeline" alt="timeline">
+      </div>
+    </div>
+    <h3>Klipy</h3>
+    <p class="hint">Kliknutím na řádek přeskočíte v náhledu zdroje (nahoře) na daný moment. Zaškrtnutím klip vyřadíte a můžete reel vyrenderovat znovu.</p>
+    <table id="clips"></table>
+    <div class="actions">
+      <button class="primary" id="rerender">Znovu vyrenderovat bez vyřazených klipů</button>
+      <span class="hint" id="rerender-hint"></span>
+    </div>
+  </section>
+
+  <section class="card" id="history">
+    <h2>Historie</h2>
+    <ul class="jobs" id="jobs"><li><span class="m">Zatím žádné úlohy.</span></li></ul>
+  </section>
+</main>
+
+<script>
+const $ = (s) => document.querySelector(s);
+let source = null, job = null, pollTimer = null, caps = null;
+const excluded = new Set();
+
+const tc = (s) => { s = Math.max(0, s || 0); const m = Math.floor(s / 60); return `${String(m).padStart(2, '0')}:${(s - m * 60).toFixed(1).padStart(4, '0')}`; };
+const esc = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+async function api(url, opts = {}) {
+  const r = await fetch(url, opts);
+  const body = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(body.error || r.statusText);
+  return body;
+}
+
+async function loadCaps() {
+  caps = await api('/api/capabilities');
+  $('#caps').textContent = `v${caps.version}` + (caps.transcribe ? ' · přepis k dispozici' : '') ;
+  const box = $('#styles');
+  box.innerHTML = '';
+  caps.styles.forEach((s, i) => {
+    const d = document.createElement('div');
+    d.className = 'style' + (i === 0 ? ' active' : '');
+    d.dataset.name = s.name;
+    d.innerHTML = `<b>${esc(s.name)}</b><span>${esc(s.description)}</span>`;
+    d.onclick = () => { box.querySelectorAll('.style').forEach((x) => x.classList.remove('active')); d.classList.add('active'); };
+    box.appendChild(d);
+  });
+  if (!caps.transcribe) {
+    $('#transcribe').disabled = true; $('#captions').disabled = true;
+    $('#transcribe').nextElementSibling.textContent += ' — není nainstalováno (uv tool install … "[transcribe]")';
+  }
+}
+
+function setSource(src) {
+  source = src;
+  $('#source').classList.remove('hidden');
+  $('#source-error').classList.add('hidden');
+  const v = $('#preview');
+  v.src = src.media_url;
+  $('#source-meta').innerHTML = `<b>${esc(src.name)}</b><br>${src.width}×${src.height} (${src.height > src.width ? 'na výšku' : 'na šířku'}), ${src.fps.toFixed(2)} fps<br>délka ${tc(src.duration)}, zvuk: ${src.has_audio ? 'ano' : 'ne'}<br><span style="font-size:12px">${src.uploaded ? 'zkopírováno do pracovní složky' : esc(src.path)}</span>`;
+  $('#run').disabled = false;
+  $('#run-hint').textContent = 'Připraveno.';
+  const max = Math.max(5, Math.min(90, Math.floor(src.duration)));
+  $('#target').max = Math.max(max, 5);
+  if (+$('#target').value > max) { $('#target').value = max; $('#target-out').textContent = `${max} s`; }
+}
+
+function showSourceError(msg) { const e = $('#source-error'); e.textContent = msg; e.classList.remove('hidden'); }
+
+function upload(file) {
+  const bar = $('#upload-bar'); bar.classList.remove('hidden'); bar.firstElementChild.style.width = '0%';
+  $('#source-error').classList.add('hidden');
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', '/api/sources/upload');
+  xhr.upload.onprogress = (e) => { if (e.lengthComputable) bar.firstElementChild.style.width = `${Math.round(100 * e.loaded / e.total)}%`; };
+  xhr.onload = () => {
+    bar.classList.add('hidden');
+    try {
+      const body = JSON.parse(xhr.responseText || '{}');
+      if (xhr.status >= 400) throw new Error(body.error || xhr.statusText);
+      setSource(body);
+    } catch (err) { showSourceError(err.message); }
+  };
+  xhr.onerror = () => { bar.classList.add('hidden'); showSourceError('Nahrávání selhalo.'); };
+  const fd = new FormData(); fd.append('file', file, file.name);
+  xhr.send(fd);
+}
+
+const drop = $('#drop');
+drop.onclick = () => $('#file').click();
+$('#file').onchange = (e) => { if (e.target.files[0]) upload(e.target.files[0]); };
+['dragenter', 'dragover'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', (e) => { const f = e.dataTransfer.files[0]; if (f) upload(f); });
+$('#pathform').onsubmit = async (e) => {
+  e.preventDefault();
+  try { setSource(await api('/api/sources/path', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: $('#path').value }) })); }
+  catch (err) { showSourceError(err.message); }
+};
+$('#target').oninput = (e) => { $('#target-out').textContent = `${e.target.value} s`; };
+
+function collectParams() {
+  const val = (id) => $(id).value;
+  const chk = (id) => $(id).checked;
+  return {
+    target: +val('#target'), style: $('#styles .style.active')?.dataset.name || 'auto',
+    speech_mode: val('#speech_mode'), fit: val('#fit'), aspect: val('#aspect'), transition: val('#transition'),
+    hook: chk('#hook'), min_clip: +val('#min_clip'), max_clip: +val('#max_clip'), max_speech_clip: +val('#max_speech_clip'),
+    min_quality: +val('#min_quality'), order: val('#order'), crf: +val('#crf'), preset: val('#preset'), language: val('#language'),
+    snap: chk('#snap'), loudnorm: chk('#loudnorm'), transcribe: chk('#transcribe'), captions: chk('#captions'),
+  };
+}
+
+$('#run').onclick = async () => {
+  if (!source) return;
+  try {
+    const j = await api('/api/jobs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source_id: source.id, ...collectParams() }) });
+    watch(j);
+  } catch (err) { alert(err.message); }
+};
+
+function watch(j) {
+  job = j; excluded.clear();
+  $('#phase').textContent = j.phase || 'Ve frontě';
+  $('#progress').style.width = '0%';
+  $('#log').textContent = (j.log || []).join('\n');
+  $('#step-progress').classList.remove('hidden');
+  $('#step-result').classList.add('hidden');
+  $('#step-progress').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  clearTimeout(pollTimer);
+  poll();
+}
+
+async function poll() {
+  try { job = await api(`/api/jobs/${job.id}`); } catch (err) { $('#phase').textContent = err.message; return; }
+  const pct = Math.round((job.progress || 0) * 100);
+  $('#phase').textContent = `${job.phase}${job.state === 'analyzing' || job.state === 'rendering' ? ` · ${pct} %` : ''}`;
+  $('#progress').style.width = (job.state === 'done' ? 100 : pct) + '%';
+  $('#log').textContent = (job.log || []).join('\n');
+  $('#log').scrollTop = $('#log').scrollHeight;
+  if (job.state === 'done') { showResult(job); loadJobs(); return; }
+  if (job.state === 'error') { $('#phase').innerHTML = `<span class="error">Chyba: ${esc(job.error)}</span>`; loadJobs(); return; }
+  pollTimer = setTimeout(poll, 1000);
+}
+
+function showResult(j) {
+  $('#step-result').classList.remove('hidden');
+  const v = $('#result-video'); v.src = `${j.output_url}?t=${j.finished || Date.now()}`;
+  $('#download').href = `${j.output_url}?download=1`; $('#download').download = j.download_name;
+  $('#download-plan').href = j.plan_url || '#';
+  const srt = $('#download-srt'); if (j.captions_url) { srt.href = j.captions_url; srt.classList.remove('hidden'); } else srt.classList.add('hidden');
+  const p = j.plan || { clips: [], warnings: [], total: 0 };
+  $('#summary').innerHTML = `<b>${p.total.toFixed(1)} s</b> · ${p.clips.length} klipů · styl ${esc(p.style)} · cíl ${j.params.target} s`;
+  $('#warnings').innerHTML = (p.warnings || []).map((w) => `<div class="warn">⚠ ${esc(w)}</div>`).join('');
+  const img = $('#timeline'); if (j.timeline_url) { img.src = `${j.timeline_url}?t=${j.finished || Date.now()}`; img.classList.remove('hidden'); } else img.classList.add('hidden');
+  const rows = p.clips.map((c, i) => `<tr class="clip" data-i="${i}" data-start="${c.start}">
+      <td><input type="checkbox" class="ex" data-i="${i}" title="vyřadit"></td>
+      <td>${i + 1}</td><td>${tc(c.out_start)}–${tc(c.out_start + (c.end - c.start))}</td>
+      <td>${tc(c.start)}–${tc(c.end)}</td><td>${(c.end - c.start).toFixed(1)} s</td>
+      <td><span class="kind ${esc(c.kind)}">${esc(c.kind)}</span></td><td>${(c.score || 0).toFixed(2)}</td>
+      <td>${esc(c.reason)}${c.text ? `<br><i>„${esc(c.text)}“</i>` : ''}</td></tr>`).join('');
+  $('#clips').innerHTML = `<thead><tr><th></th><th>#</th><th>V reelu</th><th>Ve zdroji</th><th>Délka</th><th>Typ</th><th>Skóre</th><th>Důvod</th></tr></thead><tbody>${rows}</tbody>`;
+  $('#clips').querySelectorAll('tr.clip').forEach((tr) => {
+    tr.onclick = (e) => {
+      if (e.target.classList.contains('ex')) return;
+      const pv = $('#preview'); pv.currentTime = +tr.dataset.start; pv.play().catch(() => {});
+      $('#step-source').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+  });
+  $('#clips').querySelectorAll('input.ex').forEach((cb) => {
+    cb.onchange = () => { const i = +cb.dataset.i; cb.checked ? excluded.add(i) : excluded.delete(i); cb.closest('tr').classList.toggle('excluded', cb.checked); updateRerenderHint(); };
+  });
+  updateRerenderHint();
+  $('#step-result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function updateRerenderHint() {
+  const p = job?.plan; if (!p) return;
+  const keep = p.clips.filter((_, i) => !excluded.has(i));
+  const total = keep.reduce((a, c) => a + (c.end - c.start), 0);
+  $('#rerender-hint').textContent = excluded.size ? `Vyřazeno ${excluded.size}, zůstane ${keep.length} klipů · ${total.toFixed(1)} s` : 'Nic není vyřazeno; render proběhne se stejnými klipy (hodí se po změně formátu nebo přechodů).';
+}
+
+$('#rerender').onclick = async () => {
+  if (!job?.plan) return;
+  const clips = job.plan.clips.filter((_, i) => !excluded.has(i));
+  if (!clips.length) { alert('Nechte alespoň jeden klip.'); return; }
+  const p = collectParams();
+  const params = { fit: p.fit, aspect: p.aspect, transition: p.transition, crf: p.crf, preset: p.preset, loudnorm: p.loudnorm, captions: p.captions };
+  try { watch(await api(`/api/jobs/${job.id}/rerender`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clips, params }) })); }
+  catch (err) { alert(err.message); }
+};
+
+async function loadJobs() {
+  const jobs = await api('/api/jobs').catch(() => []);
+  const ul = $('#jobs');
+  if (!jobs.length) { ul.innerHTML = '<li><span class="m">Zatím žádné úlohy.</span></li>'; return; }
+  ul.innerHTML = jobs.map((j) => `<li><b>${esc(j.source_name)}</b><span class="m">${esc(j.phase)} · cíl ${j.target} s · ${esc(j.style)}${j.total ? ` · ${j.total} s / ${j.clips} klipů` : ''} · ${new Date(j.created * 1000).toLocaleTimeString('cs-CZ')}</span>${j.state === 'done' ? `<button data-id="${j.id}">Zobrazit</button>` : ''}</li>`).join('');
+  ul.querySelectorAll('button').forEach((b) => { b.onclick = async () => { job = await api(`/api/jobs/${b.dataset.id}`); excluded.clear(); if (job.source) setSource(job.source); showResult(job); }; });
+}
+
+loadCaps().then(loadJobs).catch((err) => { $('#caps').textContent = err.message; });
+</script>
+</body>
+</html>
