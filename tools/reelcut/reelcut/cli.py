@@ -59,6 +59,9 @@ def _add_plan_args(p: argparse.ArgumentParser) -> None:
     g.add_argument("--hook-length", type=float, default=2.5, help="cold-open length in seconds (default 2.5)")
     g.add_argument("--order", default="chrono", choices=["chrono", "score"], help="clip order after the hook")
     g.add_argument("--no-snap", action="store_true", help="do not snap cuts to audio transients")
+    g.add_argument("--max-pause", type=float, default=1.0,
+                   help="cut silences inside speech longer than this many seconds (default 1.0)")
+    g.add_argument("--keep-pauses", action="store_true", help="never remove pauses inside speech")
     g.add_argument("--min-quality", type=float, default=0.3,
                    help="skip visual clips scoring below this fraction of the best clip (default 0.3; 0 = fill at any cost)")
 
@@ -103,6 +106,7 @@ def _plan_settings(a: argparse.Namespace) -> PlanSettings:
         order=a.order,
         snap_onsets=not a.no_snap,
         min_quality=a.min_quality,
+        max_pause=0.0 if a.keep_pauses else a.max_pause,
     )
 
 

@@ -83,6 +83,10 @@
   .kind.visual { background: rgba(245,185,66,.18); color: var(--warn); }
   .kind.hook { background: rgba(240,88,122,.2); color: var(--accent); }
   .hint { color: var(--muted); font-size: 13px; margin: 0 0 8px; }
+  img.thumb { width: 72px; height: auto; border-radius: 6px; display: block; background: #000; }
+  td input.t { width: 66px; padding: 4px 6px; font-size: 13px; }
+  td .ord button { padding: 1px 6px; font-size: 12px; margin-right: 2px; }
+  .proxy-note { color: var(--warn); font-size: 12.5px; margin-top: 6px; }
   ul.jobs { list-style: none; padding: 0; margin: 0; }
   ul.jobs li { display: flex; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
   ul.jobs li span.m { color: var(--muted); flex: 1; }
@@ -160,6 +164,7 @@
         </select></div>
     </div>
     <div class="check"><input type="checkbox" id="hook" checked><label for="hook">Začít nejsilnějším momentem (cold open)</label></div>
+    <div class="check"><input type="checkbox" id="tighten" checked><label for="tighten">Zkrátit pauzy v řeči delší než</label><input type="number" id="max_pause" value="1.0" step="0.1" min="0.3" max="5" style="width:70px"><span class="hint" style="margin:0">s (věty zůstanou celé, jen se vystřihne ticho)</span></div>
     <details>
       <summary>Pokročilé nastavení</summary>
       <div class="grid">
@@ -207,7 +212,7 @@
       </div>
     </div>
     <h3>Klipy</h3>
-    <p class="hint">Kliknutím na řádek přeskočíte v náhledu zdroje (nahoře) na daný moment. Zaškrtnutím klip vyřadíte a můžete reel vyrenderovat znovu.</p>
+    <p class="hint">Kliknutím na řádek přeskočíte v náhledu zdroje (nahoře) na daný moment. Zaškrtnutím klip vyřadíte, šipkami změníte pořadí, časy začátku a konce lze přepsat. Pak reel vyrenderujte znovu.</p>
     <table id="clips"></table>
     <div class="actions">
       <button class="primary" id="rerender">Znovu vyrenderovat bez vyřazených klipů</button>
@@ -260,6 +265,19 @@ function addSource(src) {
   sources.push(src);
   selectSource(sources.length - 1);
   renderSources();
+  if (src.proxy === 'pending') pollProxy(src.id);
+}
+
+async function pollProxy(id) {
+  for (let i = 0; i < 600; i++) {
+    await new Promise((r) => setTimeout(r, 2000));
+    const idx = sources.findIndex((s) => s.id === id);
+    if (idx < 0) return;
+    const fresh = await api(`/api/sources/${id}`).catch(() => null);
+    if (!fresh) return;
+    sources[idx] = fresh;
+    if (fresh.proxy !== 'pending') { if (selected === idx) { $('#preview').src = `${fresh.media_url}?v=${Date.now()}`; selectSource(idx); } return; }
+  }
 }
 
 function selectSource(i) {
@@ -268,7 +286,8 @@ function selectSource(i) {
   if (!src) return;
   const v = $('#preview');
   if (!v.src.endsWith(src.media_url)) v.src = src.media_url;
-  $('#source-meta').innerHTML = `<b>${esc(src.name)}</b><br>${src.width}×${src.height} (${src.height > src.width ? 'na výšku' : 'na šířku'}), ${src.fps.toFixed(2)} fps · délka ${tc(src.duration)} · zvuk: ${src.has_audio ? 'ano' : 'ne'}<br><span style="font-size:12px">${src.uploaded ? 'zkopírováno do pracovní složky' : esc(src.path)}</span>`;
+  const proxyNote = src.proxy === 'pending' ? '<div class="proxy-note">Připravuje se náhledová kopie (formát videa prohlížeč nepřehraje přímo). Střih může běžet mezitím.</div>' : (src.proxy === 'failed' ? '<div class="proxy-note">Náhledovou kopii se nepodařilo vytvořit; náhled nemusí jít přehrát, střih funguje.</div>' : '');
+  $('#source-meta').innerHTML = `<b>${esc(src.name)}</b><br>${src.width}×${src.height} (${src.height > src.width ? 'na výšku' : 'na šířku'}), ${src.fps.toFixed(2)} fps · délka ${tc(src.duration)} · zvuk: ${src.has_audio ? 'ano' : 'ne'} · ${esc(src.codec || '')}<br><span style="font-size:12px">${src.uploaded ? 'zkopírováno do pracovní složky' : esc(src.path)}</span>${proxyNote}`;
   renderSources();
 }
 
@@ -349,6 +368,7 @@ function collectParams() {
     hook: chk('#hook'), min_clip: +val('#min_clip'), max_clip: +val('#max_clip'), max_speech_clip: +val('#max_speech_clip'),
     min_quality: +val('#min_quality'), order: val('#order'), crf: +val('#crf'), preset: val('#preset'), language: val('#language'),
     snap: chk('#snap'), loudnorm: chk('#loudnorm'), transcribe: chk('#transcribe'), captions: chk('#captions'),
+    tighten: chk('#tighten'), max_pause: +val('#max_pause'),
   };
 }
 
@@ -427,45 +447,65 @@ function showResult(j) {
   $('#summary').innerHTML = `<b>${p.total.toFixed(1)} s</b> · ${p.clips.length} klipů · styl ${esc(p.style)} · cíl ${j.params.target} s${multi ? `<br>zdroje: ${esc(names)}` : ''}`;
   $('#warnings').innerHTML = (p.warnings || []).map((w) => `<div class="warn">⚠ ${esc(w)}</div>`).join('');
   const img = $('#timeline'); if (j.timeline_url) { img.src = `${j.timeline_url}?t=${j.finished || Date.now()}`; img.classList.remove('hidden'); } else img.classList.add('hidden');
-  const rows = p.clips.map((c, i) => `<tr class="clip" data-i="${i}" data-start="${c.start}" data-src="${esc(c.source || p.source || '')}">
-      <td><input type="checkbox" class="ex" data-i="${i}" title="vyřadit"></td>
-      <td>${i + 1}</td><td>${tc(c.out_start)}–${tc(c.out_start + (c.end - c.start))}</td>
+  editClips = p.clips.map((c, i) => ({ ...c, uid: i, excluded: false, thumb: (j.thumbs || [])[i] || null }));
+  renderClipTable(j, multi);
+  updateRerenderHint();
+  $('#step-result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+let editClips = [];
+
+function renderClipTable(j, multi) {
+  const p = j.plan;
+  const rows = editClips.map((c, i) => `<tr class="clip ${c.excluded ? 'excluded' : ''}" data-i="${i}" data-src="${esc(c.source || p.source || '')}">
+      <td><input type="checkbox" class="ex" data-i="${i}" title="vyřadit" ${c.excluded ? 'checked' : ''}></td>
+      <td>${i + 1}<div class="ord"><button data-act="up" data-i="${i}" title="výš">↑</button><button data-act="down" data-i="${i}" title="níž">↓</button></div></td>
+      <td>${c.thumb ? `<img class="thumb" src="${c.thumb}" alt="">` : ''}</td>
       ${multi ? `<td>${esc(baseName(c.source || p.source))}</td>` : ''}
-      <td>${tc(c.start)}–${tc(c.end)}</td><td>${(c.end - c.start).toFixed(1)} s</td>
+      <td><input class="t" type="number" step="0.1" min="0" data-i="${i}" data-k="start" value="${c.start.toFixed(1)}"> – <input class="t" type="number" step="0.1" min="0" data-i="${i}" data-k="end" value="${c.end.toFixed(1)}"></td>
+      <td>${(c.end - c.start).toFixed(1)} s</td>
       <td><span class="kind ${esc(c.kind)}">${esc(c.kind)}</span></td><td>${(c.score || 0).toFixed(2)}</td>
       <td>${esc(c.reason)}${c.text ? `<br><i>„${esc(c.text)}“</i>` : ''}</td></tr>`).join('');
-  $('#clips').innerHTML = `<thead><tr><th></th><th>#</th><th>V reelu</th>${multi ? '<th>Zdroj</th>' : ''}<th>Ve zdroji</th><th>Délka</th><th>Typ</th><th>Skóre</th><th>Důvod</th></tr></thead><tbody>${rows}</tbody>`;
+  $('#clips').innerHTML = `<thead><tr><th></th><th>#</th><th></th>${multi ? '<th>Zdroj</th>' : ''}<th>Ve zdroji (s)</th><th>Délka</th><th>Typ</th><th>Skóre</th><th>Důvod</th></tr></thead><tbody>${rows}</tbody>`;
   $('#clips').querySelectorAll('tr.clip').forEach((tr) => {
     tr.onclick = (e) => {
-      if (e.target.classList.contains('ex')) return;
+      if (e.target.matches('input, button')) return;
       const path = tr.dataset.src;
-      const idx = sources.findIndex((s) => s.path === path) >= 0 ? sources.findIndex((s) => s.path === path) : -1;
+      let idx = sources.findIndex((s) => s.path === path);
+      if (idx < 0) { const js = (j.sources || []).find((s) => s.path === path); if (js) { addSource(js); idx = sources.length - 1; } }
       if (idx >= 0) selectSource(idx);
-      else { const js = (j.sources || []).find((s) => s.path === path); if (js && !sources.some((s) => s.id === js.id)) addSource(js); else if (js) selectSource(sources.findIndex((s) => s.id === js.id)); }
       const pv = $('#preview');
-      const seek = () => { pv.currentTime = +tr.dataset.start; pv.play().catch(() => {}); };
+      const t = editClips[+tr.dataset.i].start;
+      const seek = () => { pv.currentTime = t; pv.play().catch(() => {}); };
       if (pv.readyState >= 1) seek(); else pv.addEventListener('loadedmetadata', seek, { once: true });
       $('#step-source').scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
   });
   $('#clips').querySelectorAll('input.ex').forEach((cb) => {
-    cb.onchange = () => { const i = +cb.dataset.i; cb.checked ? excluded.add(i) : excluded.delete(i); cb.closest('tr').classList.toggle('excluded', cb.checked); updateRerenderHint(); };
+    cb.onchange = () => { editClips[+cb.dataset.i].excluded = cb.checked; cb.closest('tr').classList.toggle('excluded', cb.checked); updateRerenderHint(); };
+  });
+  $('#clips').querySelectorAll('input.t').forEach((inp) => {
+    inp.onchange = () => { const c = editClips[+inp.dataset.i]; c[inp.dataset.k] = +inp.value; if (c.end <= c.start) c.end = c.start + 0.5; renderClipTable(j, multi); };
+  });
+  $('#clips').querySelectorAll('.ord button').forEach((b) => {
+    b.onclick = () => { const i = +b.dataset.i; const k = b.dataset.act === 'up' ? i - 1 : i + 1; if (k < 0 || k >= editClips.length) return; [editClips[i], editClips[k]] = [editClips[k], editClips[i]]; renderClipTable(j, multi); };
   });
   updateRerenderHint();
-  $('#step-result').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function updateRerenderHint() {
-  const p = job?.plan; if (!p) return;
-  const keep = p.clips.filter((_, i) => !excluded.has(i));
+  const keep = editClips.filter((c) => !c.excluded);
   const total = keep.reduce((a, c) => a + (c.end - c.start), 0);
-  $('#rerender-hint').textContent = excluded.size ? `Vyřazeno ${excluded.size}, zůstane ${keep.length} klipů · ${total.toFixed(1)} s` : 'Nic není vyřazeno; render proběhne se stejnými klipy (hodí se po změně formátu nebo přechodů).';
+  const excludedN = editClips.length - keep.length;
+  const changed = job?.plan && editClips.some((c, i) => job.plan.clips[c.uid] && (Math.abs(job.plan.clips[c.uid].start - c.start) > 1e-6 || Math.abs(job.plan.clips[c.uid].end - c.end) > 1e-6 || c.uid !== i));
+  $('#rerender-hint').textContent = (excludedN || changed) ? `${excludedN ? `Vyřazeno ${excludedN}, ` : ''}${changed ? 'upraveno, ' : ''}výsledek ${keep.length} klipů · ${total.toFixed(1)} s` : 'Nic není změněno; render proběhne se stejnými klipy (hodí se po změně formátu nebo přechodů).';
 }
 
 $('#rerender').onclick = async () => {
   if (!job?.plan) return;
-  const clips = job.plan.clips.filter((_, i) => !excluded.has(i));
+  const clips = editClips.filter((c) => !c.excluded).map(({ uid, excluded, thumb, ...c }) => ({ ...c, parts: [] }));
   if (!clips.length) { alert('Nechte alespoň jeden klip.'); return; }
+  if (clips.some((c) => c.end <= c.start)) { alert('Konec klipu musí být za začátkem.'); return; }
   const p = collectParams();
   const params = { fit: p.fit, aspect: p.aspect, transition: p.transition, crf: p.crf, preset: p.preset, loudnorm: p.loudnorm, captions: p.captions };
   try { watch(await api(`/api/jobs/${job.id}/rerender`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clips, params }) })); }

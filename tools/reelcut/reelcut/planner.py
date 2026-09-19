@@ -37,9 +37,12 @@ class Clip:
     text: str | None = None
     out_start: float = 0.0
     source: str | None = None  # video file this clip comes from (None = plan.source)
+    parts: list[list[float]] = field(default_factory=list)  # sub-ranges kept when pauses are removed
 
     @property
     def duration(self) -> float:
+        if self.parts:
+            return sum(b - a for a, b in self.parts)
         return self.end - self.start
 
     @property
@@ -57,7 +60,9 @@ class Clip:
 
     @classmethod
     def from_dict(cls, d: dict) -> "Clip":
-        return cls(**{k: d[k] for k in cls.__dataclass_fields__ if k in d})
+        c = cls(**{k: d[k] for k in cls.__dataclass_fields__ if k in d})
+        c.parts = [[float(a), float(b)] for a, b in (c.parts or [])]
+        return c
 
 
 @dataclass
@@ -76,6 +81,8 @@ class PlanSettings:
     snap_window: float = 0.12
     max_clips_per_shot: int = 2
     min_quality: float = 0.3  # drop visual candidates scoring below this fraction of the best one
+    max_pause: float = 1.0  # remove silences inside speech longer than this (0 = keep every pause)
+    pause_pad: float = 0.15  # air left on each side of a removed pause
 
     def to_dict(self) -> dict:
         return dict(self.__dict__)
@@ -196,6 +203,29 @@ def _split_speech(an: Analysis, start: float, end: float, limit: float, min_part
     return _split_speech(an, start, p, limit, min_part) + _split_speech(an, p, end, limit, min_part)
 
 
+def _find_pauses(an: Analysis, a: float, b: float, max_pause: float, pad: float, thr: float = 0.15) -> list[tuple[float, float]]:
+    """Silences inside [a, b] longer than ``max_pause`` (shrunk by ``pad`` on both sides)."""
+    ia, ib = an.index(a), an.index(b)
+    prob = an.speech_prob[ia:ib + 1]
+    gaps: list[tuple[float, float]] = []
+    i = 0
+    n = len(prob)
+    while i < n:
+        if prob[i] < thr:
+            j = i
+            while j < n and prob[j] < thr:
+                j += 1
+            gs, ge = a + i * an.dt, a + j * an.dt
+            if i > 0 and j < n and ge - gs >= max_pause:  # interior pause only
+                gs, ge = gs + pad, ge - pad
+                if ge - gs >= 0.25:
+                    gaps.append((gs, ge))
+            i = j
+        else:
+            i += 1
+    return gaps
+
+
 def _best_windows(curve: np.ndarray, dt: float, a: float, b: float, length: float, max_n: int, min_sep: float) -> list[tuple[float, float, float]]:
     ia, ib = int(round(a / dt)), int(round(b / dt))
     ib = min(ib, len(curve))
@@ -276,8 +306,13 @@ def speech_candidates(an: Analysis, s: PlanSettings, moment: np.ndarray) -> list
                 continue
             score = an.mean_between(moment, a2, b2)
             peak = float(moment[an.index(a2):an.index(b2) + 1].max())
-            out.append(Clip(a2, b2, "speech", score, _describe(an, a2, b2, "speech"), _shot_index(an, a2), peak,
-                            text=seg.text))
+            clip = Clip(a2, b2, "speech", score, _describe(an, a2, b2, "speech"), _shot_index(an, a2), peak, text=seg.text)
+            if s.max_pause > 0:
+                gaps = _find_pauses(an, a2, b2, s.max_pause, s.pause_pad)
+                if gaps:
+                    clip.parts = [[x, y] for x, y in _subtract((a2, b2), gaps) if y - x > 0.05]
+                    clip.reason += f", {len(gaps)} pause{'s' if len(gaps) > 1 else ''} removed"
+            out.append(clip)
     return out
 
 
@@ -470,6 +505,22 @@ def apply_hook(
     return new, hook
 
 
+def expand_parts(clips: list[Clip]) -> list[Clip]:
+    """Turn clips with removed pauses into consecutive clips (jump cuts)."""
+    out: list[Clip] = []
+    for c in clips:
+        if len(c.parts) > 1:
+            for i, (a, b) in enumerate(c.parts):
+                out.append(Clip(a, b, c.kind, c.score, c.reason if i == 0 else "continues after a removed pause",
+                                c.shot, c.peak, c.crop_cx, c.crop_cy, c.text if i == 0 else None, source=c.source))
+        else:
+            if c.parts:
+                c.start, c.end = c.parts[0]
+                c.parts = []
+            out.append(c)
+    return out
+
+
 def localize_clips(an: Analysis, clips: list[Clip]) -> None:
     """Map composite-timeline clips back to their source file and local times."""
     if not an.is_composite:
@@ -519,7 +570,7 @@ def build_plan(an: Analysis, s: PlanSettings, style: Style | str = "auto") -> Pl
         chosen.sort(key=lambda c: c.score, reverse=True)
     else:
         chosen.sort(key=lambda c: c.start)
-    clips = ([hook] if hook else []) + chosen
+    clips = expand_parts(([hook] if hook else []) + chosen)
 
     for c in clips:
         c.start = max(0.0, min(c.start, an.duration))
@@ -539,4 +590,4 @@ def build_plan(an: Analysis, s: PlanSettings, style: Style | str = "auto") -> Pl
     return Plan(an.source.path, style_obj.name, s, clips, warnings, an.duration)
 
 
-__all__ = ["Clip", "Plan", "PlanSettings", "build_plan", "finalize_timeline", "localize_clips"]
+__all__ = ["Clip", "Plan", "PlanSettings", "build_plan", "expand_parts", "finalize_timeline", "localize_clips"]

@@ -158,3 +158,19 @@ def test_combined_analysis_and_multi_source_plan():
     assert all(c.duration <= 4.5 for c in speech)
     loaded = Plan.from_dict(plan.to_dict())
     assert loaded.sources == plan.sources and loaded.clips[0].source == plan.clips[0].source
+
+
+def test_pauses_inside_speech_are_removed():
+    an = make_analysis(duration=40.0, speech=[(10.0, 20.0)])
+    an.speech_prob[int(14.0 / an.dt):int(15.6 / an.dt)] = 0.02  # 1.6 s of silence inside the answer
+    an.speech_prob[int(17.0 / an.dt):int(17.4 / an.dt)] = 0.02  # short breath: stays
+    plan = build_plan(an, PlanSettings(target=15.0, hook=False), "talk")
+    speech = sorted([c for c in plan.clips if c.kind == "speech"], key=lambda c: c.start)
+    assert len(speech) == 2, speech
+    assert abs(speech[0].end - 14.15) < 0.15 and abs(speech[1].start - 15.45) < 0.15
+    assert "pause removed" in speech[0].reason and "continues" in speech[1].reason
+    assert abs(speech[0].out_start + speech[0].duration - speech[1].out_start) < 1e-6  # consecutive in the reel
+    kept = build_plan(an, PlanSettings(target=15.0, hook=False, max_pause=0.0), "talk")
+    assert len([c for c in kept.clips if c.kind == "speech"]) == 1
+    loaded = Plan.from_dict(plan.to_dict())
+    assert len(loaded.clips) == len(plan.clips)

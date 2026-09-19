@@ -7,9 +7,11 @@ a background thread; the browser polls ``/api/jobs/<id>``.
 
 from __future__ import annotations
 
+import json
 import queue
 import re
 import shutil
+import subprocess
 import threading
 import time
 import uuid
@@ -20,9 +22,9 @@ from typing import Any, BinaryIO
 
 from . import __version__
 from .analysis import STYLES, AnalysisSettings, combine_analyses, get_analysis, resolve_style
-from .ffmpeg import REELCUT_HOME, FFmpegError, MediaInfo, probe
+from .ffmpeg import REELCUT_HOME, FFmpegError, MediaInfo, ffmpeg_bin, probe
 from .planner import Clip, Plan, PlanSettings, build_plan, finalize_timeline
-from .render import ASPECTS, RenderSettings, render
+from .render import ASPECTS, RenderSettings, pick_video_encoder, render
 from .report import timeline_png
 
 WEBUI_DIR = Path(__file__).parent / "webui"
@@ -85,6 +87,7 @@ def parse_params(raw: dict) -> dict:
         "max_clip": _num(raw.get("max_clip"), 5.0, 0.5, 30.0),
         "max_speech_clip": _num(raw.get("max_speech_clip"), 15.0, 2.0, 90.0),
         "min_quality": _num(raw.get("min_quality"), 0.3, 0.0, 1.0),
+        "max_pause": _num(raw.get("max_pause"), 1.0, 0.0, 5.0) if _bool(raw.get("tighten"), True) else 0.0,
         "order": _choice(raw.get("order"), ("chrono", "score"), "chrono"),
         "snap": _bool(raw.get("snap"), True),
         "fit": _choice(raw.get("fit"), ("crop", "blur", "none"), "crop"),
@@ -104,7 +107,7 @@ def _plan_settings(p: dict) -> PlanSettings:
     return PlanSettings(
         target=p["target"], min_clip=p["min_clip"], max_clip=p["max_clip"], max_speech_clip=p["max_speech_clip"],
         speech_mode=p["speech_mode"], hook=p["hook"], hook_length=p["hook_length"], order=p["order"],
-        snap_onsets=p["snap"], min_quality=p["min_quality"],
+        snap_onsets=p["snap"], min_quality=p["min_quality"], max_pause=p.get("max_pause", 1.0),
     )
 
 
@@ -125,13 +128,28 @@ class Source:
     info: MediaInfo
     uploaded: bool
     created: float = field(default_factory=time.time)
+    proxy_path: str | None = None  # browser-friendly 540p H.264 copy for the preview player
+    proxy_state: str = "none"  # none (original plays fine) | pending | ready | failed
+
+    @property
+    def media_path(self) -> str:
+        return self.proxy_path if self.proxy_state == "ready" and self.proxy_path else self.path
 
     def to_dict(self) -> dict:
         return {
             "id": self.id, "name": self.name, "path": self.path, "uploaded": self.uploaded,
             "duration": self.info.duration, "width": self.info.width, "height": self.info.height,
-            "fps": self.info.fps, "has_audio": self.info.has_audio, "media_url": f"/api/sources/{self.id}/media",
+            "fps": self.info.fps, "has_audio": self.info.has_audio, "codec": self.info.video_codec,
+            "media_url": f"/api/sources/{self.id}/media", "proxy": self.proxy_state,
         }
+
+    def to_json(self) -> dict:
+        return {"id": self.id, "path": self.path, "name": self.name, "uploaded": self.uploaded,
+                "created": self.created, "proxy_path": self.proxy_path, "proxy_state": self.proxy_state}
+
+
+def _needs_proxy(info: MediaInfo) -> bool:
+    return info.video_codec != "h264" or info.width * info.height > 1920 * 1080
 
 
 @dataclass
@@ -156,6 +174,17 @@ class Job:
     def file_url(self, name: str) -> str | None:
         return f"/api/jobs/{self.id}/{name}" if (self.dir / name).is_file() else None
 
+    def thumbs(self) -> list[str | None]:
+        if not self.plan:
+            return []
+        return [f"/api/jobs/{self.id}/thumbs/{i}.jpg" if (self.dir / "thumbs" / f"{i}.jpg").is_file() else None
+                for i in range(len(self.plan.clips))]
+
+    def to_json(self) -> dict:
+        return {"id": self.id, "source_ids": self.source_ids, "params": self.params, "state": self.state,
+                "error": self.error, "log": self.log[-60:], "created": self.created, "finished": self.finished,
+                "clips_override": self.clips_override}
+
     def to_dict(self, sources: list[Source]) -> dict:
         stem = Path(sources[0].name).stem if sources else "video"
         if len(sources) > 1:
@@ -176,6 +205,7 @@ class Job:
             "timeline_url": self.file_url("timeline.png"),
             "plan_url": self.file_url("plan.json"),
             "captions_url": self.file_url("captions.srt"),
+            "thumbs": self.thumbs(),
             "created": self.created,
             "finished": self.finished,
         }
@@ -188,12 +218,101 @@ class Manager:
         self.workdir = workdir
         (workdir / "uploads").mkdir(parents=True, exist_ok=True)
         (workdir / "jobs").mkdir(parents=True, exist_ok=True)
+        (workdir / "proxies").mkdir(parents=True, exist_ok=True)
         self.sources: dict[str, Source] = {}
         self.jobs: dict[str, Job] = {}
         self.lock = threading.Lock()
         self.queue: "queue.Queue[Job]" = queue.Queue()
+        self.proxy_queue: "queue.Queue[Source]" = queue.Queue()
+        self._load_state()
         self.worker = threading.Thread(target=self._worker, name="reelcut-worker", daemon=True)
         self.worker.start()
+        self.proxy_worker = threading.Thread(target=self._proxy_worker, name="reelcut-proxy", daemon=True)
+        self.proxy_worker.start()
+
+    # persistence
+    def _save_sources(self) -> None:
+        with self.lock:
+            data = [s.to_json() for s in sorted(self.sources.values(), key=lambda s: s.created)]
+        try:
+            (self.workdir / "sources.json").write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+        except OSError:
+            pass
+
+    def _save_job(self, job: Job) -> None:
+        try:
+            (job.dir / "job.json").write_text(json.dumps(job.to_json(), ensure_ascii=False, indent=1), encoding="utf-8")
+        except OSError:
+            pass
+
+    def _load_state(self) -> None:
+        src_file = self.workdir / "sources.json"
+        if src_file.is_file():
+            try:
+                for d in json.loads(src_file.read_text(encoding="utf-8")):
+                    path = Path(d["path"])
+                    if not path.is_file():
+                        continue
+                    try:
+                        info = probe(path)
+                    except (FFmpegError, OSError):
+                        continue
+                    src = Source(d["id"], str(path), d.get("name", path.name), info, bool(d.get("uploaded")),
+                                 float(d.get("created", 0)), d.get("proxy_path"), d.get("proxy_state", "none"))
+                    if src.proxy_state == "ready" and not (src.proxy_path and Path(src.proxy_path).is_file()):
+                        src.proxy_state = "none"
+                    if src.proxy_state == "pending":
+                        src.proxy_state = "none"
+                    self.sources[src.id] = src
+            except (ValueError, KeyError, TypeError):
+                pass
+        for jdir in sorted((self.workdir / "jobs").iterdir() if (self.workdir / "jobs").is_dir() else []):
+            jf = jdir / "job.json"
+            if not jf.is_file():
+                continue
+            try:
+                d = json.loads(jf.read_text(encoding="utf-8"))
+                job = Job(d["id"], list(d["source_ids"]), dict(d["params"]), jdir, d.get("clips_override"),
+                          d.get("state", "error"), 1.0, list(d.get("log", [])), None, d.get("error"),
+                          float(d.get("created", 0)), d.get("finished"))
+                if (jdir / "plan.json").is_file():
+                    job.plan = Plan.load(jdir / "plan.json")
+                if job.state not in ("done", "error"):
+                    job.state, job.error = "error", "Přerušeno restartem serveru"
+                if job.state == "done" and not (jdir / "reel.mp4").is_file():
+                    job.state, job.error = "error", "Výstupní soubor chybí"
+                if all(sid in self.sources for sid in job.source_ids):
+                    self.jobs[job.id] = job
+            except (ValueError, KeyError, TypeError):
+                continue
+
+    # preview proxies
+    def _proxy_worker(self) -> None:
+        while True:
+            src = self.proxy_queue.get()
+            try:
+                self._make_proxy(src)
+            except Exception as exc:  # noqa: BLE001
+                src.proxy_state = "failed"
+                src.proxy_path = None
+                print(f"[reelcut] proxy failed for {src.name}: {exc}", flush=True)
+            finally:
+                self._save_sources()
+                self.proxy_queue.task_done()
+
+    def _make_proxy(self, src: Source) -> None:
+        out = Path(src.proxy_path) if src.proxy_path else self.workdir / "proxies" / f"{src.id}.mp4"
+        src.proxy_path = str(out)
+        enc = pick_video_encoder()
+        vcodec = ["-c:v", "libx264", "-preset", "veryfast", "-crf", "26"] if enc == "libx264" else ["-c:v", enc, "-b:v", "2M"]
+        cmd = [ffmpeg_bin(), "-v", "error", "-nostdin", "-y", "-i", src.path, "-vf", "scale=-2:540,fps=30", *vcodec,
+               "-pix_fmt", "yuv420p", "-movflags", "+faststart"]
+        cmd += ["-c:a", "aac", "-b:a", "96k", "-ac", "2"] if src.info.has_audio else ["-an"]
+        cmd.append(str(out))
+        proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        if proc.returncode != 0:
+            raise FFmpegError(proc.stderr.strip().splitlines()[-1] if proc.stderr.strip() else "ffmpeg failed")
+        src.proxy_state = "ready"
 
     # sources
     def add_upload(self, filename: str, stream: BinaryIO) -> Source:
@@ -219,8 +338,14 @@ class Manager:
     def _register(self, sid: str, path: Path, name: str, *, uploaded: bool) -> Source:
         info = probe(path)
         src = Source(sid, str(path), name, info, uploaded)
+        if _needs_proxy(info):
+            src.proxy_state = "pending"
+            src.proxy_path = str((path.parent if uploaded else self.workdir / "proxies") / f"{sid}_preview.mp4")
         with self.lock:
             self.sources[sid] = src
+        self._save_sources()
+        if src.proxy_state == "pending":
+            self.proxy_queue.put(src)
         return src
 
     # jobs
@@ -242,6 +367,7 @@ class Manager:
         with self.lock:
             self.jobs[jid] = job
         job.log.append("Zařazeno do fronty")
+        self._save_job(job)
         self.queue.put(job)
         return job
 
@@ -260,6 +386,7 @@ class Manager:
                 job.log.append(f"Chyba: {exc}")
             finally:
                 job.finished = time.time()
+                self._save_job(job)
                 self.queue.task_done()
 
     def _run(self, job: Job) -> None:
@@ -342,9 +469,23 @@ class Manager:
             job.progress = frac
 
         render(plan, _render_settings(p, captions), str(job.dir / "reel.mp4"), None if an.is_composite else an.source, progress=on_render)
+        self._thumbnails(job, plan)
         job.state = "done"
         job.progress = 1.0
         log("Hotovo")
+
+    def _thumbnails(self, job: Job, plan: Plan) -> None:
+        tdir = job.dir / "thumbs"
+        tdir.mkdir(exist_ok=True)
+        sources = {s.path: s for s in self.sources_of(job)}
+        for i, c in enumerate(plan.clips):
+            path = c.source or plan.source
+            src = sources.get(path)
+            media = src.media_path if src else path  # the proxy seeks much faster
+            t = c.start + min(0.3, c.duration / 2)
+            cmd = [ffmpeg_bin(), "-v", "error", "-nostdin", "-y", "-ss", f"{t:.3f}", "-i", media,
+                   "-frames:v", "1", "-vf", "scale=192:-2", "-q:v", "5", str(tdir / f"{i}.jpg")]
+            subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 # --- flask app ----------------------------------------------------------------
@@ -412,12 +553,25 @@ def create_app(workdir: Path | None = None):
             abort(400, description=f"Soubor nejde přečíst jako video: {exc}")
         return jsonify(src.to_dict()), 201
 
+    @app.get("/api/sources/<sid>")
+    def source_info(sid: str):  # type: ignore[no-untyped-def]
+        src = manager.sources.get(sid)
+        if src is None:
+            abort(404, description="Zdroj nenalezen")
+        return jsonify(src.to_dict())
+
+    @app.get("/api/sources")
+    def list_sources():  # type: ignore[no-untyped-def]
+        with manager.lock:
+            items = sorted(manager.sources.values(), key=lambda s: s.created)
+        return jsonify([s.to_dict() for s in items])
+
     @app.get("/api/sources/<sid>/media")
     def source_media(sid: str):  # type: ignore[no-untyped-def]
         src = manager.sources.get(sid)
         if src is None:
             abort(404, description="Zdroj nenalezen")
-        return send_file(src.path, conditional=True)
+        return send_file(src.media_path, conditional=True)
 
     @app.post("/api/jobs")
     def create_job():  # type: ignore[no-untyped-def]
@@ -471,6 +625,14 @@ def create_app(workdir: Path | None = None):
             abort(400, description=f"Neplatné klipy: {exc}")
         new = manager.submit(job.source_ids, params, clips=clips)
         return jsonify(new.to_dict(manager.sources_of(new))), 202
+
+    @app.get("/api/jobs/<jid>/thumbs/<int:i>.jpg")
+    def job_thumb(jid: str, i: int):  # type: ignore[no-untyped-def]
+        job = job_or_404(jid)
+        path = job.dir / "thumbs" / f"{i}.jpg"
+        if not path.is_file():
+            abort(404)
+        return send_file(path, mimetype="image/jpeg", conditional=True)
 
     @app.get("/api/jobs/<jid>/<name>")
     def job_file(jid: str, name: str):  # type: ignore[no-untyped-def]

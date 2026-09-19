@@ -98,7 +98,64 @@ def test_upload_job_and_rerender(client, sample):
 def test_path_source(client, sample):
     r = client.post("/api/sources/path", json={"path": str(sample)})
     assert r.status_code == 201
-    assert r.get_json()["uploaded"] is False
+    body = r.get_json()
+    assert body["uploaded"] is False and body["proxy"] == "none" and body["codec"] == "h264"
+    assert client.get(f"/api/sources/{body['id']}").status_code == 200
+    assert any(s["id"] == body["id"] for s in client.get("/api/sources").get_json())
+
+
+def test_thumbnails_and_persistence(sample, tmp_path):
+    import shutil
+    from reelcut.web import Manager
+
+    work = tmp_path / "work"
+    app = create_app(work)
+    app.testing = True
+    c = app.test_client()
+    src = c.post("/api/sources/path", json={"path": str(sample)}).get_json()
+    r = c.post("/api/jobs", json={"source_id": src["id"], "target": 8, "hook": False, **FAST})
+    job = _wait(c, r.get_json()["id"])
+    assert job["state"] == "done", job
+    assert job["thumbs"] and all(job["thumbs"]), job["thumbs"]
+    assert c.get(job["thumbs"][0]).status_code == 200
+    assert (work / "sources.json").is_file() and (work / "jobs" / job["id"] / "job.json").is_file()
+
+    # a new manager (server restart) sees the same sources and finished jobs
+    m2 = Manager(work)
+    assert src["id"] in m2.sources
+    restored = m2.jobs[job["id"]]
+    assert restored.state == "done" and restored.plan and len(restored.plan.clips) == len(job["plan"]["clips"])
+    app2 = create_app(work)
+    app2.testing = True
+    c2 = app2.test_client()
+    assert c2.get(f"/api/jobs/{job['id']}").get_json()["output_url"]
+    assert c2.get("/api/jobs").get_json()[0]["id"] == job["id"]
+
+
+def test_proxy_for_non_h264_source(tmp_path):
+    import subprocess
+    from reelcut.ffmpeg import ffmpeg_bin
+
+    src = tmp_path / "old.mp4"
+    subprocess.run([ffmpeg_bin(), "-v", "error", "-y", "-f", "lavfi", "-t", "3", "-i", "testsrc2=size=640x360:rate=25",
+                    "-c:v", "mpeg4", "-q:v", "5", str(src)], check=True)
+    app = create_app(tmp_path / "work")
+    app.testing = True
+    c = app.test_client()
+    body = c.post("/api/sources/path", json={"path": str(src)}).get_json()
+    assert body["codec"] == "mpeg4" and body["proxy"] == "pending"
+    deadline = time.time() + 60
+    while time.time() < deadline:
+        body = c.get(f"/api/sources/{body['id']}").get_json()
+        if body["proxy"] != "pending":
+            break
+        time.sleep(0.5)
+    assert body["proxy"] == "ready", body
+    media = c.get(body["media_url"])
+    assert media.status_code == 200
+    proxy = next(iter(app.extensions["reelcut_manager"].sources.values()))
+    from reelcut.ffmpeg import probe as _probe
+    assert _probe(proxy.proxy_path).video_codec == "h264"
 
 
 def test_multi_source_job(client, sample, tmp_path):
