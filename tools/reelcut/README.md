@@ -7,6 +7,7 @@ nikdy nestřihne uprostřed věty. Výstup je rovnou připravený pro IG: 9:16,
 nejsilnější moment jako „cold open“ na začátku.
 
 ```
+reelcut setup                          # zkontroluje instalaci, případně stáhne ffmpeg
 reelcut cut video.mp4 -t 30            # analýza + plán + render do video_reel.mp4
 reelcut analyze video.mp4 --timeline tl.png   # jen analýza + obrázek timeline
 reelcut plan video.mp4 -t 45 --style talk     # jen plán střihu (JSON, dá se ručně upravit)
@@ -47,7 +48,9 @@ reelcut render video_plan.json -o reel.mp4    # render upraveného plánu
 
 ## Instalace
 
-Potřebujete **ffmpeg** (≥ 5) v PATH a Python ≥ 3.10.
+Potřebujete Python ≥ 3.10 a ffmpeg. ffmpeg nemusíte instalovat ručně:
+`reelcut setup` ho stáhne jako statický build do `~/.reelcut` (bez
+administrátorských práv), pokud ho nenajde v PATH.
 
 ```
 cd tools/reelcut
@@ -57,7 +60,43 @@ pip install -e ".[transcribe]"   # + faster-whisper: přepis, střih po větách
 pip install -e ".[all,dev]"      # vše + pytest
 ```
 
-## Krok za krokem na Macu
+## Bez administrátorských práv (bez Homebrew)
+
+Když nejste na Macu administrátor, Homebrew nainstalovat nejde. Tento postup
+nepotřebuje `sudo` vůbec: Python obstará `uv` (instaluje se do domovské
+složky) a ffmpeg si `reelcut setup` stáhne sám.
+
+1. Nainstalujte `uv` a načtěte ho do aktuálního Terminálu:
+   ```
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   source ~/.local/bin/env
+   ```
+2. Stáhněte (nebo aktualizujte) repozitář:
+   ```
+   cd ~
+   git clone https://github.com/michalcipro/MikeCipro.git 2>/dev/null || (cd MikeCipro && git pull)
+   cd ~/MikeCipro && git checkout claude/instagram-reel-cutting-tool-26udjc && git pull
+   ```
+3. Nainstalujte reelcut jako nástroj (uv si sám stáhne Python 3.12):
+   ```
+   uv tool install --python 3.12 --editable ~/MikeCipro/tools/reelcut
+   ```
+   Příkaz `reelcut` je pak dostupný v každém novém Terminálu bez aktivace venv.
+4. Nechte reelcut stáhnout ffmpeg a zkontrolovat instalaci:
+   ```
+   reelcut setup
+   ```
+   Stáhne cca 100 MB do `~/.reelcut/ffmpeg` (jen jednou) a vypíše `Ready`.
+5. Střih:
+   ```
+   reelcut cut ~/Movies/video.mp4 -t 30 --style talk --timeline timeline.png
+   ```
+
+Aktualizace na novější verzi nástroje: `cd ~/MikeCipro && git pull`
+(instalace je „editable“, změny se projeví hned). Přepis řeči navíc:
+`uv tool install --python 3.12 --editable "~/MikeCipro/tools/reelcut[transcribe]"`.
+
+## Krok za krokem na Macu (s Homebrew, vyžaduje administrátora)
 
 1. **Otevřete Terminál** – `Cmd + mezerník`, napište `Terminal`, Enter.
 2. **Nainstalujte Homebrew** (pokud ho nemáte; `brew --version` to prozradí):
@@ -204,4 +243,8 @@ plán i render.
 - `--fit crop` u horizontálního videa bez obličejů ořízne střed; pro záběry,
   kde je důležitý celý obraz, použijte `--fit blur`.
 - Model YuNet (`reelcut/models/face_detection_yunet_2023mar.onnx`) pochází z
-  OpenCV Zoo, licence Apache‑2.0.
+  OpenCV Zoo, licence Apache‑2.0. Statické buildy ffmpeg stahuje balíček
+  `static-ffmpeg` (MIT) z GitHubu; pořadí hledání binárek je popsané
+  v `reelcut/ffmpeg.py` (proměnné `REELCUT_FFMPEG_DIR`, `REELCUT_HOME`).
+- Bez `libx264` (některé statické buildy) render použije `h264_videotoolbox`
+  na Macu nebo `libopenh264`; `reelcut setup` ukáže, co je k dispozici.

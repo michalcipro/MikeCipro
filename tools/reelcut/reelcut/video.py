@@ -15,7 +15,7 @@ from typing import Callable, Iterator
 import cv2
 import numpy as np
 
-from .ffmpeg import FFmpegError, MediaInfo, require_binaries
+from .ffmpeg import FFmpegError, MediaInfo, ffmpeg_bin
 
 MODEL_PATH = Path(__file__).parent / "models" / "face_detection_yunet_2023mar.onnx"
 
@@ -61,10 +61,9 @@ def _analysis_dims(info: MediaInfo, width: int) -> tuple[int, int]:
 
 def iter_frames(info: MediaInfo, fps: float, width: int) -> Iterator[tuple[float, np.ndarray]]:
     """Yield (timestamp, BGR frame) sampled at ``fps`` and scaled to ``width``."""
-    require_binaries()
     w, h = _analysis_dims(info, width)
     cmd = [
-        "ffmpeg", "-v", "error", "-nostdin", "-i", info.path, "-an", "-sn", "-dn",
+        ffmpeg_bin(), "-v", "error", "-nostdin", "-i", info.path, "-an", "-sn", "-dn",
         "-vf", f"fps={fps},scale={w}:{h}:flags=area",
         "-f", "rawvideo", "-pix_fmt", "bgr24", "-",
     ]

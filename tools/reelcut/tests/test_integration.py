@@ -9,13 +9,13 @@ import pytest
 
 from reelcut.analysis import AnalysisSettings, build_analysis
 from reelcut.cli import main
-from reelcut.ffmpeg import probe
+from reelcut.ffmpeg import ffmpeg_bin, find_binary, probe
 from reelcut.planner import PlanSettings, build_plan
 from reelcut.render import RenderSettings, build_command, render
 
 from sample_video import build_sample, have_espeak
 
-pytestmark = pytest.mark.skipif(shutil.which("ffmpeg") is None or shutil.which("ffprobe") is None, reason="ffmpeg missing")
+pytestmark = pytest.mark.skipif(find_binary("ffmpeg") is None or find_binary("ffprobe") is None, reason="ffmpeg missing")
 
 
 @pytest.fixture(scope="module")
@@ -81,7 +81,7 @@ def test_render_fade_and_blur_command(analysis, tmp_path):
 def test_vertical_source_without_audio(tmp_path):
     src = tmp_path / "vert.mp4"
     subprocess.run(
-        ["ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-t", "5", "-i", "testsrc2=size=720x1280:rate=25",
+        [ffmpeg_bin(), "-v", "error", "-y", "-f", "lavfi", "-t", "5", "-i", "testsrc2=size=720x1280:rate=25",
          "-pix_fmt", "yuv420p", "-preset", "ultrafast", str(src)],
         check=True,
     )

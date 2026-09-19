@@ -16,6 +16,8 @@ import subprocess
 import tempfile
 from pathlib import Path
 
+from reelcut.ffmpeg import ffmpeg_bin
+
 SPEECH_1 = "This is the interview part of the video. The reel tool should keep this whole sentence intact and never cut it in the middle."
 SPEECH_2 = "And here is a second answer from the interview, which also has to stay complete in the final reel."
 
@@ -43,7 +45,7 @@ def build_sample(out: str | Path, *, speech: bool = True) -> Path:
     out = Path(out)
     with tempfile.TemporaryDirectory() as td:
         tmp = Path(td)
-        cmd = ["ffmpeg", "-v", "error", "-y"]
+        cmd = [ffmpeg_bin(), "-v", "error", "-y"]
         for src, dur in SEGMENTS:
             cmd += ["-f", "lavfi", "-t", str(dur), "-i", src]
         n_video = len(SEGMENTS)

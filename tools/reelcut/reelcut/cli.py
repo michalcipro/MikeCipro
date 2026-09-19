@@ -8,6 +8,7 @@ from pathlib import Path
 
 from . import __version__
 from .analysis import STYLES, AnalysisSettings, get_analysis, resolve_style
+from . import ffmpeg as ff
 from .ffmpeg import FFmpegError
 from .planner import Plan, PlanSettings, build_plan
 from .render import ASPECTS, RenderSettings, render
@@ -215,6 +216,54 @@ def cmd_render(a: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_setup(a: argparse.Namespace) -> int:
+    """Check (and, without admin rights, download) everything reelcut needs."""
+    import cv2
+
+    from .render import pick_video_encoder
+    from .video import MODEL_PATH
+
+    ok = True
+    print(f"python   {sys.version.split()[0]}  ({sys.executable})")
+    binaries: dict[str, str | None] = {}
+    for name in ("ffmpeg", "ffprobe"):
+        try:
+            binaries[name] = ff.find_binary(name, download=not a.no_download, log=_log)
+        except FFmpegError as exc:
+            _log(str(exc))
+            binaries[name] = None
+    for name, path in binaries.items():
+        if path:
+            print(f"{name:9}{ff.version_line(path)}\n         {path}")
+        else:
+            print(f"{name:9}MISSING")
+            ok = False
+    if all(binaries.values()):
+        caps = ff.capabilities()
+        for filt, feature in (
+            ("xfade", "--transition fade"),
+            ("loudnorm", "loudness normalisation"),
+            ("subtitles", "--captions (burned-in captions)"),
+        ):
+            state = "ok" if filt in caps["filters"] else f"missing -> {feature} unavailable"
+            print(f"filter   {filt:10}{state}")
+        try:
+            print(f"encoder  {pick_video_encoder()}")
+        except FFmpegError as exc:
+            print(f"encoder  MISSING ({exc})")
+            ok = False
+    faces_ok = hasattr(cv2, "FaceDetectorYN") and MODEL_PATH.is_file()
+    print(f"faces    {'ok (YuNet)' if faces_ok else 'unavailable (OpenCV without FaceDetectorYN)'}")
+    for module, extra, feature in (("webrtcvad", "vad", "better speech detection"), ("faster_whisper", "transcribe", "transcript + captions")):
+        try:
+            __import__(module)
+            print(f"optional {module:15}installed ({feature})")
+        except ImportError:
+            print(f"optional {module:15}not installed ({feature}); pip install 'reelcut[{extra}]'")
+    print("\nReady: run  reelcut cut video.mp4 -t 30" if ok else "\nNot ready: see the MISSING lines above.")
+    return 0 if ok else 1
+
+
 def _quote(s: str) -> str:
     return s if all(ch.isalnum() or ch in "-_./:=+,[]" for ch in s) else "'" + s.replace("'", "'\\''") + "'"
 
@@ -250,6 +299,10 @@ def build_parser() -> argparse.ArgumentParser:
     _add_render_args(pc)
     pc.set_defaults(func=cmd_cut)
 
+    ps = sub.add_parser("setup", help="check the installation; downloads ffmpeg without admin rights if missing")
+    ps.add_argument("--no-download", action="store_true", help="only report, never download ffmpeg")
+    ps.set_defaults(func=cmd_setup)
+
     pr = sub.add_parser("render", help="render a (hand-edited) plan JSON")
     pr.add_argument("plan")
     pr.add_argument("--input", default=None, help="override the source video path stored in the plan")
@@ -263,7 +316,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         return args.func(args)
-    except (FFmpegError, FileNotFoundError, ValueError, RuntimeError) as exc:
+    except (FFmpegError, FileNotFoundError, ValueError, RuntimeError, OSError) as exc:
         _log(f"error: {exc}")
         return 1
 

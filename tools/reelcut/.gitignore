@@ -8,3 +8,5 @@ dist/
 *_plan.json
 *_reel.mp4
 *_reel.srt
+.venv/
+uv.lock

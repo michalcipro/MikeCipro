@@ -7,7 +7,7 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
-from .ffmpeg import FFmpegError, MediaInfo, probe, require_binaries
+from .ffmpeg import FFmpegError, MediaInfo, capabilities, ffmpeg_bin, probe
 from .planner import Plan
 
 ASPECTS = {
@@ -34,6 +34,31 @@ class RenderSettings:
     caption_font_size: int = 16
     caption_margin: int = 60
     dry_run: bool = False
+    video_codec: str | None = None  # None = auto: libx264, else h264_videotoolbox / libopenh264
+
+
+H264_ENCODERS = ("libx264", "h264_videotoolbox", "libopenh264")
+
+
+def pick_video_encoder(requested: str | None = None) -> str:
+    """Return an available H.264 encoder (libx264 preferred)."""
+    available = capabilities()["encoders"]
+    if requested:
+        if requested not in available:
+            raise FFmpegError(f"Encoder {requested} is not available in this ffmpeg build")
+        return requested
+    for enc in H264_ENCODERS:
+        if enc in available:
+            return enc
+    raise FFmpegError("No H.264 encoder found in this ffmpeg build (need libx264, h264_videotoolbox or libopenh264).")
+
+
+def _encoder_args(encoder: str, settings: RenderSettings) -> list[str]:
+    if encoder == "libx264":
+        return ["-c:v", "libx264", "-preset", settings.preset, "-crf", str(settings.crf), "-profile:v", "high", "-level", "4.1"]
+    if encoder == "h264_videotoolbox":
+        return ["-c:v", "h264_videotoolbox", "-b:v", "12M", "-profile:v", "high"]
+    return ["-c:v", encoder, "-b:v", "12M"]
 
 
 def _even(x: float) -> int:
@@ -86,7 +111,14 @@ def build_command(plan: Plan, info: MediaInfo, settings: RenderSettings, out_pat
         shortest = min(c.duration for c in plan.clips)
         fd = max(0.05, min(fd, shortest / 2 - 0.01))
 
-    cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-stats", "-nostdin", "-y"]
+    caps = capabilities()
+    if use_fade and "xfade" not in caps["filters"]:
+        raise FFmpegError("This ffmpeg build lacks the xfade filter; use --transition cut")
+    if settings.captions and "subtitles" not in caps["filters"]:
+        raise FFmpegError("This ffmpeg build lacks the subtitles filter (libass); captions cannot be burned in")
+    loudnorm = settings.loudnorm and "loudnorm" in caps["filters"]
+    encoder = pick_video_encoder(settings.video_codec)
+    cmd = [ffmpeg_bin(), "-hide_banner", "-loglevel", "error", "-stats", "-nostdin", "-y"]
     for c in plan.clips:
         cmd += ["-ss", f"{c.start:.3f}", "-t", f"{c.duration:.3f}", "-i", info.path]
 
@@ -142,18 +174,14 @@ def build_command(plan: Plan, info: MediaInfo, settings: RenderSettings, out_pat
         post_a = f"[{ac}]"
         if ef > 0:
             post_a += f"afade=t=in:st=0:d={ef:.3f},afade=t=out:st={max(0.0, total - ef):.3f}:d={ef:.3f},"
-        if settings.loudnorm:
+        if loudnorm:
             post_a += "loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000,"
         post_a = post_a.rstrip(",") + "[aout]"
         parts.append(post_a)
         maps += ["-map", "[aout]"]
 
     cmd += ["-filter_complex", ";".join(parts)] + maps
-    cmd += [
-        "-c:v", "libx264", "-preset", settings.preset, "-crf", str(settings.crf),
-        "-profile:v", "high", "-level", "4.1", "-pix_fmt", "yuv420p", "-r", str(settings.fps),
-        "-movflags", "+faststart",
-    ]
+    cmd += _encoder_args(encoder, settings) + ["-pix_fmt", "yuv420p", "-r", str(settings.fps), "-movflags", "+faststart"]
     if has_audio:
         cmd += ["-c:a", "aac", "-b:a", settings.audio_bitrate, "-ar", "48000"]
     cmd.append(out_path)
@@ -162,7 +190,6 @@ def build_command(plan: Plan, info: MediaInfo, settings: RenderSettings, out_pat
 
 def render(plan: Plan, settings: RenderSettings, out_path: str, info: MediaInfo | None = None) -> list[str]:
     """Render the plan to ``out_path``. Returns the ffmpeg command used."""
-    require_binaries()
     info = info or probe(plan.source)
     cmd = build_command(plan, info, settings, out_path)
     if settings.dry_run:
@@ -174,4 +201,4 @@ def render(plan: Plan, settings: RenderSettings, out_path: str, info: MediaInfo 
     return cmd
 
 
-__all__ = ["ASPECTS", "RenderSettings", "build_command", "render"]
+__all__ = ["ASPECTS", "RenderSettings", "build_command", "pick_video_encoder", "render"]

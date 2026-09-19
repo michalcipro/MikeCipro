@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-from .ffmpeg import FFmpegError, require_binaries
+from .ffmpeg import FFmpegError, ffmpeg_bin
 
 try:  # optional, better VAD
     import webrtcvad  # type: ignore
@@ -61,9 +61,8 @@ class AudioFeatures:
 
 def load_audio(path: str, sr: int = SAMPLE_RATE) -> np.ndarray:
     """Decode the audio track to mono float32 in [-1, 1]."""
-    require_binaries()
     cmd = [
-        "ffmpeg", "-v", "error", "-nostdin", "-i", path, "-vn", "-sn", "-dn",
+        ffmpeg_bin(), "-v", "error", "-nostdin", "-i", path, "-vn", "-sn", "-dn",
         "-ac", "1", "-ar", str(sr), "-f", "s16le", "-acodec", "pcm_s16le", "-",
     ]
     proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
