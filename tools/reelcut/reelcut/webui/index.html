@@ -34,6 +34,17 @@
   .bar { height: 10px; background: var(--card-2); border-radius: 99px; overflow: hidden; margin: 10px 0; }
   .bar > div { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .3s; }
   .source { display: grid; grid-template-columns: 240px 1fr; gap: 18px; margin-top: 16px; align-items: start; }
+  ul.sources { list-style: none; padding: 0; margin: 0; }
+  ul.sources li { display: flex; gap: 10px; align-items: center; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; margin-bottom: 6px; cursor: pointer; background: var(--card-2); }
+  ul.sources li.active { border-color: var(--accent-2); }
+  ul.sources li .n { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  ul.sources li .m { color: var(--muted); font-size: 12.5px; white-space: nowrap; }
+  ul.sources li button { padding: 3px 8px; font-size: 13px; }
+  .mode { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; }
+  .mode label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+  ul.results { list-style: none; padding: 0; margin: 0 0 16px; }
+  ul.results li { display: flex; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  ul.results li span.m { color: var(--muted); flex: 1; }
   video { width: 100%; background: #000; border-radius: 10px; max-height: 420px; }
   .meta { color: var(--muted); font-size: 14px; }
   .meta b { color: var(--text); }
@@ -89,11 +100,11 @@
   <section class="card" id="step-source">
     <h2>1. Video</h2>
     <div class="drop" id="drop">
-      <b>Přetáhněte video sem</b> nebo klikněte a vyberte soubor<br>
-      <span>MP4, MOV, M4V, MKV, WEBM · soubor se zkopíruje do pracovní složky</span>
-      <input type="file" id="file" accept="video/*,.mov,.mp4,.m4v,.mkv,.webm" hidden>
+      <b>Přetáhněte jedno nebo více videí sem</b> nebo klikněte a vyberte soubory<br>
+      <span>MP4, MOV, M4V, MKV, WEBM · soubory se zkopírují do pracovní složky</span>
+      <input type="file" id="file" accept="video/*,.mov,.mp4,.m4v,.mkv,.webm" multiple hidden>
     </div>
-    <div class="or">nebo použijte soubor přímo z disku (bez kopírování, vhodné pro velká videa)</div>
+    <div class="or">nebo použijte soubor přímo z disku (bez kopírování, vhodné pro velká videa) – lze přidat opakovaně</div>
     <form class="path" id="pathform">
       <input type="text" id="path" placeholder="/Users/jmeno/Movies/video.mov">
       <button type="submit">Použít</button>
@@ -102,7 +113,14 @@
     <div class="error hidden" id="source-error"></div>
     <div class="source hidden" id="source">
       <video id="preview" controls preload="metadata" playsinline></video>
-      <div class="meta" id="source-meta"></div>
+      <div>
+        <ul class="sources" id="sources"></ul>
+        <div class="meta" id="source-meta"></div>
+        <div class="mode hidden" id="mode">
+          <label><input type="radio" name="mode" value="combine" checked> Jeden reel ze všech videí (v tomto pořadí)</label>
+          <label><input type="radio" name="mode" value="each"> Samostatný reel z každého videa</label>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -174,6 +192,7 @@
 
   <section class="card hidden" id="step-result">
     <h2>4. Výsledek</h2>
+    <ul class="results hidden" id="results"></ul>
     <div class="result">
       <video id="result-video" controls playsinline></video>
       <div>
@@ -204,11 +223,12 @@
 
 <script>
 const $ = (s) => document.querySelector(s);
-let source = null, job = null, pollTimer = null, caps = null;
+let sources = [], selected = -1, job = null, batch = [], pollTimer = null, caps = null;
 const excluded = new Set();
 
 const tc = (s) => { s = Math.max(0, s || 0); const m = Math.floor(s / 60); return `${String(m).padStart(2, '0')}:${(s - m * 60).toFixed(1).padStart(4, '0')}`; };
 const esc = (t) => String(t ?? '').replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const baseName = (p) => String(p || '').split('/').pop();
 
 async function api(url, opts = {}) {
   const r = await fetch(url, opts);
@@ -236,50 +256,86 @@ async function loadCaps() {
   }
 }
 
-function setSource(src) {
-  source = src;
-  $('#source').classList.remove('hidden');
-  $('#source-error').classList.add('hidden');
+function addSource(src) {
+  sources.push(src);
+  selectSource(sources.length - 1);
+  renderSources();
+}
+
+function selectSource(i) {
+  selected = i;
+  const src = sources[i];
+  if (!src) return;
   const v = $('#preview');
-  v.src = src.media_url;
-  $('#source-meta').innerHTML = `<b>${esc(src.name)}</b><br>${src.width}×${src.height} (${src.height > src.width ? 'na výšku' : 'na šířku'}), ${src.fps.toFixed(2)} fps<br>délka ${tc(src.duration)}, zvuk: ${src.has_audio ? 'ano' : 'ne'}<br><span style="font-size:12px">${src.uploaded ? 'zkopírováno do pracovní složky' : esc(src.path)}</span>`;
-  $('#run').disabled = false;
-  $('#run-hint').textContent = 'Připraveno.';
-  const max = Math.max(5, Math.min(90, Math.floor(src.duration)));
-  $('#target').max = Math.max(max, 5);
+  if (!v.src.endsWith(src.media_url)) v.src = src.media_url;
+  $('#source-meta').innerHTML = `<b>${esc(src.name)}</b><br>${src.width}×${src.height} (${src.height > src.width ? 'na výšku' : 'na šířku'}), ${src.fps.toFixed(2)} fps · délka ${tc(src.duration)} · zvuk: ${src.has_audio ? 'ano' : 'ne'}<br><span style="font-size:12px">${src.uploaded ? 'zkopírováno do pracovní složky' : esc(src.path)}</span>`;
+  renderSources();
+}
+
+function renderSources() {
+  $('#source').classList.toggle('hidden', !sources.length);
+  $('#mode').classList.toggle('hidden', sources.length < 2);
+  const ul = $('#sources');
+  ul.innerHTML = sources.map((s, i) => `<li class="${i === selected ? 'active' : ''}" data-i="${i}">
+      <span class="n" title="${esc(s.name)}">${i + 1}. ${esc(s.name)}</span><span class="m">${tc(s.duration)}</span>
+      <button data-act="up" title="posunout výš">↑</button><button data-act="down" title="posunout níž">↓</button><button data-act="rm" title="odebrat">✕</button></li>`).join('');
+  ul.querySelectorAll('li').forEach((li) => {
+    const i = +li.dataset.i;
+    li.onclick = (e) => {
+      const act = e.target.dataset.act;
+      if (act === 'rm') { sources.splice(i, 1); selected = Math.min(selected, sources.length - 1); if (selected >= 0) selectSource(selected); else renderSources(); }
+      else if (act === 'up' && i > 0) { [sources[i - 1], sources[i]] = [sources[i], sources[i - 1]]; selected = i - 1; renderSources(); }
+      else if (act === 'down' && i < sources.length - 1) { [sources[i + 1], sources[i]] = [sources[i], sources[i + 1]]; selected = i + 1; renderSources(); }
+      else selectSource(i);
+      e.stopPropagation();
+    };
+  });
+  const total = sources.reduce((a, s) => a + s.duration, 0);
+  $('#run').disabled = !sources.length;
+  $('#run-hint').textContent = sources.length ? (sources.length > 1 ? `${sources.length} videí, celkem ${tc(total)}.` : 'Připraveno.') : 'Nejdřív nahrajte video.';
+  const max = Math.max(5, Math.min(90, Math.floor(total || 30)));
+  $('#target').max = max;
   if (+$('#target').value > max) { $('#target').value = max; $('#target-out').textContent = `${max} s`; }
 }
 
 function showSourceError(msg) { const e = $('#source-error'); e.textContent = msg; e.classList.remove('hidden'); }
 
-function upload(file) {
-  const bar = $('#upload-bar'); bar.classList.remove('hidden'); bar.firstElementChild.style.width = '0%';
+function uploadOne(file) {
+  return new Promise((resolve) => {
+    const bar = $('#upload-bar'); bar.classList.remove('hidden'); bar.firstElementChild.style.width = '0%';
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/sources/upload');
+    xhr.upload.onprogress = (e) => { if (e.lengthComputable) bar.firstElementChild.style.width = `${Math.round(100 * e.loaded / e.total)}%`; };
+    xhr.onload = () => {
+      try {
+        const body = JSON.parse(xhr.responseText || '{}');
+        if (xhr.status >= 400) throw new Error(body.error || xhr.statusText);
+        addSource(body);
+      } catch (err) { showSourceError(`${file.name}: ${err.message}`); }
+      resolve();
+    };
+    xhr.onerror = () => { showSourceError(`${file.name}: nahrávání selhalo.`); resolve(); };
+    const fd = new FormData(); fd.append('file', file, file.name);
+    xhr.send(fd);
+  });
+}
+
+async function uploadFiles(files) {
   $('#source-error').classList.add('hidden');
-  const xhr = new XMLHttpRequest();
-  xhr.open('POST', '/api/sources/upload');
-  xhr.upload.onprogress = (e) => { if (e.lengthComputable) bar.firstElementChild.style.width = `${Math.round(100 * e.loaded / e.total)}%`; };
-  xhr.onload = () => {
-    bar.classList.add('hidden');
-    try {
-      const body = JSON.parse(xhr.responseText || '{}');
-      if (xhr.status >= 400) throw new Error(body.error || xhr.statusText);
-      setSource(body);
-    } catch (err) { showSourceError(err.message); }
-  };
-  xhr.onerror = () => { bar.classList.add('hidden'); showSourceError('Nahrávání selhalo.'); };
-  const fd = new FormData(); fd.append('file', file, file.name);
-  xhr.send(fd);
+  for (const f of files) await uploadOne(f);
+  $('#upload-bar').classList.add('hidden');
 }
 
 const drop = $('#drop');
 drop.onclick = () => $('#file').click();
-$('#file').onchange = (e) => { if (e.target.files[0]) upload(e.target.files[0]); };
+$('#file').onchange = (e) => { if (e.target.files.length) uploadFiles([...e.target.files]); e.target.value = ''; };
 ['dragenter', 'dragover'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('over'); }));
 ['dragleave', 'drop'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('over'); }));
-drop.addEventListener('drop', (e) => { const f = e.dataTransfer.files[0]; if (f) upload(f); });
+drop.addEventListener('drop', (e) => { if (e.dataTransfer.files.length) uploadFiles([...e.dataTransfer.files]); });
 $('#pathform').onsubmit = async (e) => {
   e.preventDefault();
-  try { setSource(await api('/api/sources/path', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: $('#path').value }) })); }
+  $('#source-error').classList.add('hidden');
+  try { addSource(await api('/api/sources/path', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: $('#path').value }) })); $('#path').value = ''; }
   catch (err) { showSourceError(err.message); }
 };
 $('#target').oninput = (e) => { $('#target-out').textContent = `${e.target.value} s`; };
@@ -297,58 +353,98 @@ function collectParams() {
 }
 
 $('#run').onclick = async () => {
-  if (!source) return;
+  if (!sources.length) return;
+  const mode = document.querySelector('input[name=mode]:checked')?.value || 'combine';
+  const params = collectParams();
   try {
-    const j = await api('/api/jobs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source_id: source.id, ...collectParams() }) });
-    watch(j);
+    const groups = (mode === 'each' && sources.length > 1) ? sources.map((s) => [s.id]) : [sources.map((s) => s.id)];
+    const jobs = [];
+    for (const ids of groups) jobs.push(await api('/api/jobs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source_ids: ids, ...params }) }));
+    watchAll(jobs);
   } catch (err) { alert(err.message); }
 };
 
-function watch(j) {
-  job = j; excluded.clear();
-  $('#phase').textContent = j.phase || 'Ve frontě';
-  $('#progress').style.width = '0%';
-  $('#log').textContent = (j.log || []).join('\n');
-  $('#step-progress').classList.remove('hidden');
+function watchAll(jobs) {
+  batch = jobs; excluded.clear();
+  $('#results').classList.toggle('hidden', jobs.length < 2);
+  $('#results').innerHTML = '';
   $('#step-result').classList.add('hidden');
+  $('#step-progress').classList.remove('hidden');
   $('#step-progress').scrollIntoView({ behavior: 'smooth', block: 'start' });
   clearTimeout(pollTimer);
-  poll();
+  pollBatch();
 }
 
-async function poll() {
-  try { job = await api(`/api/jobs/${job.id}`); } catch (err) { $('#phase').textContent = err.message; return; }
-  const pct = Math.round((job.progress || 0) * 100);
-  $('#phase').textContent = `${job.phase}${job.state === 'analyzing' || job.state === 'rendering' ? ` · ${pct} %` : ''}`;
-  $('#progress').style.width = (job.state === 'done' ? 100 : pct) + '%';
-  $('#log').textContent = (job.log || []).join('\n');
+function watch(j) { watchAll([j]); }
+
+async function pollBatch() {
+  const refreshed = [];
+  for (const j of batch) refreshed.push((j.state === 'done' || j.state === 'error') ? j : await api(`/api/jobs/${j.id}`).catch(() => j));
+  batch = refreshed;
+  const active = batch.find((j) => j.state !== 'done' && j.state !== 'error') || batch[batch.length - 1];
+  const idx = batch.indexOf(active);
+  const pct = Math.round((active.progress || 0) * 100);
+  const label = batch.length > 1 ? `Úloha ${idx + 1}/${batch.length} · ${esc((active.sources || []).map((s) => s.name).join(' + '))} · ` : '';
+  $('#phase').innerHTML = `${label}${esc(active.phase)}${active.state === 'analyzing' || active.state === 'rendering' ? ` · ${pct} %` : ''}`;
+  $('#progress').style.width = (active.state === 'done' ? 100 : pct) + '%';
+  $('#log').textContent = (active.log || []).join('\n');
   $('#log').scrollTop = $('#log').scrollHeight;
-  if (job.state === 'done') { showResult(job); loadJobs(); return; }
-  if (job.state === 'error') { $('#phase').innerHTML = `<span class="error">Chyba: ${esc(job.error)}</span>`; loadJobs(); return; }
-  pollTimer = setTimeout(poll, 1000);
+  const finished = batch.filter((j) => j.state === 'done' || j.state === 'error');
+  if (batch.length > 1) renderResults();
+  if (finished.length === batch.length) {
+    const last = batch.filter((j) => j.state === 'done').pop();
+    if (last) showResult(last);
+    const failed = batch.filter((j) => j.state === 'error');
+    if (failed.length) $('#phase').innerHTML = `<span class="error">Chyba: ${esc(failed.map((j) => j.error).join(' | '))}</span>`;
+    loadJobs();
+    return;
+  }
+  pollTimer = setTimeout(pollBatch, 1000);
+}
+
+function renderResults() {
+  const ul = $('#results');
+  ul.classList.remove('hidden');
+  ul.innerHTML = batch.map((j, i) => {
+    const name = esc((j.sources || []).map((s) => s.name).join(' + '));
+    const state = j.state === 'done' ? `${j.plan.total.toFixed(1)} s · ${j.plan.clips.length} klipů` : (j.state === 'error' ? `chyba: ${esc(j.error)}` : esc(j.phase));
+    const actions = j.state === 'done' ? `<a class="btn" href="${j.output_url}?download=1" download="${esc(j.download_name)}">Stáhnout</a><button data-i="${i}">Zobrazit</button>` : '';
+    return `<li><b>${i + 1}. ${name}</b><span class="m">${state}</span>${actions}</li>`;
+  }).join('');
+  ul.querySelectorAll('button').forEach((b) => { b.onclick = () => { excluded.clear(); showResult(batch[+b.dataset.i]); }; });
 }
 
 function showResult(j) {
+  job = j;
   $('#step-result').classList.remove('hidden');
   const v = $('#result-video'); v.src = `${j.output_url}?t=${j.finished || Date.now()}`;
   $('#download').href = `${j.output_url}?download=1`; $('#download').download = j.download_name;
   $('#download-plan').href = j.plan_url || '#';
   const srt = $('#download-srt'); if (j.captions_url) { srt.href = j.captions_url; srt.classList.remove('hidden'); } else srt.classList.add('hidden');
   const p = j.plan || { clips: [], warnings: [], total: 0 };
-  $('#summary').innerHTML = `<b>${p.total.toFixed(1)} s</b> · ${p.clips.length} klipů · styl ${esc(p.style)} · cíl ${j.params.target} s`;
+  const multi = (p.sources || []).length > 1;
+  const names = (j.sources || []).map((s) => s.name).join(' + ');
+  $('#summary').innerHTML = `<b>${p.total.toFixed(1)} s</b> · ${p.clips.length} klipů · styl ${esc(p.style)} · cíl ${j.params.target} s${multi ? `<br>zdroje: ${esc(names)}` : ''}`;
   $('#warnings').innerHTML = (p.warnings || []).map((w) => `<div class="warn">⚠ ${esc(w)}</div>`).join('');
   const img = $('#timeline'); if (j.timeline_url) { img.src = `${j.timeline_url}?t=${j.finished || Date.now()}`; img.classList.remove('hidden'); } else img.classList.add('hidden');
-  const rows = p.clips.map((c, i) => `<tr class="clip" data-i="${i}" data-start="${c.start}">
+  const rows = p.clips.map((c, i) => `<tr class="clip" data-i="${i}" data-start="${c.start}" data-src="${esc(c.source || p.source || '')}">
       <td><input type="checkbox" class="ex" data-i="${i}" title="vyřadit"></td>
       <td>${i + 1}</td><td>${tc(c.out_start)}–${tc(c.out_start + (c.end - c.start))}</td>
+      ${multi ? `<td>${esc(baseName(c.source || p.source))}</td>` : ''}
       <td>${tc(c.start)}–${tc(c.end)}</td><td>${(c.end - c.start).toFixed(1)} s</td>
       <td><span class="kind ${esc(c.kind)}">${esc(c.kind)}</span></td><td>${(c.score || 0).toFixed(2)}</td>
       <td>${esc(c.reason)}${c.text ? `<br><i>„${esc(c.text)}“</i>` : ''}</td></tr>`).join('');
-  $('#clips').innerHTML = `<thead><tr><th></th><th>#</th><th>V reelu</th><th>Ve zdroji</th><th>Délka</th><th>Typ</th><th>Skóre</th><th>Důvod</th></tr></thead><tbody>${rows}</tbody>`;
+  $('#clips').innerHTML = `<thead><tr><th></th><th>#</th><th>V reelu</th>${multi ? '<th>Zdroj</th>' : ''}<th>Ve zdroji</th><th>Délka</th><th>Typ</th><th>Skóre</th><th>Důvod</th></tr></thead><tbody>${rows}</tbody>`;
   $('#clips').querySelectorAll('tr.clip').forEach((tr) => {
     tr.onclick = (e) => {
       if (e.target.classList.contains('ex')) return;
-      const pv = $('#preview'); pv.currentTime = +tr.dataset.start; pv.play().catch(() => {});
+      const path = tr.dataset.src;
+      const idx = sources.findIndex((s) => s.path === path) >= 0 ? sources.findIndex((s) => s.path === path) : -1;
+      if (idx >= 0) selectSource(idx);
+      else { const js = (j.sources || []).find((s) => s.path === path); if (js && !sources.some((s) => s.id === js.id)) addSource(js); else if (js) selectSource(sources.findIndex((s) => s.id === js.id)); }
+      const pv = $('#preview');
+      const seek = () => { pv.currentTime = +tr.dataset.start; pv.play().catch(() => {}); };
+      if (pv.readyState >= 1) seek(); else pv.addEventListener('loadedmetadata', seek, { once: true });
       $('#step-source').scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
   });
@@ -381,7 +477,7 @@ async function loadJobs() {
   const ul = $('#jobs');
   if (!jobs.length) { ul.innerHTML = '<li><span class="m">Zatím žádné úlohy.</span></li>'; return; }
   ul.innerHTML = jobs.map((j) => `<li><b>${esc(j.source_name)}</b><span class="m">${esc(j.phase)} · cíl ${j.target} s · ${esc(j.style)}${j.total ? ` · ${j.total} s / ${j.clips} klipů` : ''} · ${new Date(j.created * 1000).toLocaleTimeString('cs-CZ')}</span>${j.state === 'done' ? `<button data-id="${j.id}">Zobrazit</button>` : ''}</li>`).join('');
-  ul.querySelectorAll('button').forEach((b) => { b.onclick = async () => { job = await api(`/api/jobs/${b.dataset.id}`); excluded.clear(); if (job.source) setSource(job.source); showResult(job); }; });
+  ul.querySelectorAll('button').forEach((b) => { b.onclick = async () => { const j = await api(`/api/jobs/${b.dataset.id}`); excluded.clear(); (j.sources || []).forEach((s) => { if (!sources.some((x) => x.id === s.id)) addSource(s); }); showResult(j); }; });
 }
 
 loadCaps().then(loadJobs).catch((err) => { $('#caps').textContent = err.message; });

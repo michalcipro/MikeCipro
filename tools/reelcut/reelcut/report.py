@@ -50,10 +50,12 @@ def format_plan(plan: Plan) -> str:
         f"(style {plan.style}, speech mode {plan.settings.speech_mode}, hook {'on' if plan.settings.hook else 'off'})",
         f"  {'#':>2}  {'out':>13}  {'source':>15}  {'len':>4}  {'kind':<6}  {'score':>5}  reason",
     ]
+    multi = len(plan.sources) > 1
     for i, c in enumerate(plan.clips, start=1):
         text = f'  "{c.text[:60]}"' if c.text else ""
+        where = f"{Path(c.source or plan.source).name} " if multi else ""
         lines.append(
-            f"  {i:>2}  {tc(c.out_start):>6}-{tc(c.out_end):<6}  {tc(c.start):>7}-{tc(c.end):<7}  {c.duration:>4.1f}  "
+            f"  {i:>2}  {tc(c.out_start):>6}-{tc(c.out_end):<6}  {where}{tc(c.start):>7}-{tc(c.end):<7}  {c.duration:>4.1f}  "
             f"{c.kind:<6}  {c.score:>5.2f}  {c.reason}{text}"
         )
     for w in plan.warnings:
@@ -89,6 +91,11 @@ def timeline_png(an: Analysis, style: Style, path: str | Path, plan: Plan | None
     for s in an.shots[1:]:
         x = x_of(s.start)
         cv2.line(img, (x, top), (x, base_y), (90, 90, 90), 1)
+    if an.is_composite:
+        for m, off in zip(an.sources, an.offsets):
+            x = x_of(off)
+            cv2.line(img, (x, top - 8), (x, base_y), (20, 20, 20), 2)
+            cv2.putText(img, Path(m.path).name[:28], (x + 4, base_y - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.42, (20, 20, 20), 1, cv2.LINE_AA)
 
     y = base_y + 12
     for name, curve, color in (
@@ -128,7 +135,7 @@ def timeline_png(an: Analysis, style: Style, path: str | Path, plan: Plan | None
         cv2.line(img, (x, axis_y), (x, axis_y + 6), (60, 60, 60), 1)
         cv2.putText(img, tc(t), (x - 18, axis_y + 22), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (60, 60, 60), 1, cv2.LINE_AA)
         t += step
-    title = Path(an.source.path).name
+    title = " + ".join(Path(m.path).name for m in an.sources) if an.is_composite else Path(an.source.path).name
     if plan is not None:
         title += f"  |  plan {plan.total:.1f}s / {len(plan.clips)} clips  (green=speech, orange=visual, red=hook)"
     cv2.putText(img, title, (left, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (30, 30, 30), 1, cv2.LINE_AA)

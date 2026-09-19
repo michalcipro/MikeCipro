@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import Any, BinaryIO
 
 from . import __version__
-from .analysis import STYLES, AnalysisSettings, get_analysis, resolve_style
+from .analysis import STYLES, AnalysisSettings, combine_analyses, get_analysis, resolve_style
 from .ffmpeg import REELCUT_HOME, FFmpegError, MediaInfo, probe
 from .planner import Clip, Plan, PlanSettings, build_plan, finalize_timeline
 from .render import ASPECTS, RenderSettings, render
@@ -137,7 +137,7 @@ class Source:
 @dataclass
 class Job:
     id: str
-    source_id: str
+    source_ids: list[str]
     params: dict
     dir: Path
     clips_override: list[dict] | None = None
@@ -149,11 +149,17 @@ class Job:
     created: float = field(default_factory=time.time)
     finished: float | None = None
 
+    @property
+    def source_id(self) -> str:
+        return self.source_ids[0]
+
     def file_url(self, name: str) -> str | None:
         return f"/api/jobs/{self.id}/{name}" if (self.dir / name).is_file() else None
 
-    def to_dict(self, source: Source | None) -> dict:
-        stem = Path(source.name).stem if source else "video"
+    def to_dict(self, sources: list[Source]) -> dict:
+        stem = Path(sources[0].name).stem if sources else "video"
+        if len(sources) > 1:
+            stem += f"_+{len(sources) - 1}"
         return {
             "id": self.id,
             "state": self.state,
@@ -162,7 +168,8 @@ class Job:
             "log": self.log[-60:],
             "error": self.error,
             "params": self.params,
-            "source": source.to_dict() if source else None,
+            "source": sources[0].to_dict() if sources else None,
+            "sources": [s.to_dict() for s in sources],
             "plan": self.plan.to_dict() if self.plan else None,
             "output_url": self.file_url("reel.mp4") if self.state == "done" else None,
             "download_name": f"{stem}_reel.mp4",
@@ -217,14 +224,21 @@ class Manager:
         return src
 
     # jobs
-    def submit(self, source_id: str, params: dict, clips: list[dict] | None = None) -> Job:
+    def sources_of(self, job: Job) -> list[Source]:
         with self.lock:
-            if source_id not in self.sources:
-                raise KeyError(source_id)
+            return [self.sources[i] for i in job.source_ids if i in self.sources]
+
+    def submit(self, source_ids: list[str], params: dict, clips: list[dict] | None = None) -> Job:
+        if not source_ids:
+            raise KeyError("no sources")
+        with self.lock:
+            for sid in source_ids:
+                if sid not in self.sources:
+                    raise KeyError(sid)
         jid = uuid.uuid4().hex[:10]
         d = self.workdir / "jobs" / jid
         d.mkdir(parents=True, exist_ok=True)
-        job = Job(jid, source_id, params, d, clips)
+        job = Job(jid, list(source_ids), params, d, clips)
         with self.lock:
             self.jobs[jid] = job
         job.log.append("Zařazeno do fronty")
@@ -249,33 +263,48 @@ class Manager:
                 self.queue.task_done()
 
     def _run(self, job: Job) -> None:
-        source = self.sources[job.source_id]
+        sources = self.sources_of(job)
+        if len(sources) != len(job.source_ids):
+            raise RuntimeError("Zdrojové video už není k dispozici; nahrajte ho znovu.")
+        source = sources[0]
         p = job.params
+        n_src = len(sources)
+        current = {"i": 0}
 
         def log(msg: str) -> None:
             job.log.append(msg)
             m = re.search(r"video analysis (\d+)%", msg)
             if m:
-                job.progress = int(m.group(1)) / 100
+                job.progress = (current["i"] + int(m.group(1)) / 100) / n_src
 
         job.state = "analyzing"
         job.progress = 0.0
-        an = get_analysis(
-            source.path,
-            AnalysisSettings(transcribe=p["transcribe"], language=p["language"]),
-            use_cache=True,
-            progress=log,
-        )
+        parts = []
+        for i, src in enumerate(sources):
+            current["i"] = i
+            if n_src > 1:
+                log(f"Video {i + 1}/{n_src}: {src.name}")
+            parts.append(get_analysis(
+                src.path,
+                AnalysisSettings(transcribe=p["transcribe"], language=p["language"]),
+                use_cache=True,
+                progress=log,
+            ))
+        an = combine_analyses(parts)
         style = resolve_style(p["style"])
 
         job.state = "planning"
         job.progress = 0.0
         settings = _plan_settings(p)
         if job.clips_override is not None:
+            infos = {s.path: s.info for s in sources}
             clips = [Clip.from_dict(c) for c in job.clips_override]
             for c in clips:
-                c.start = max(0.0, min(c.start, an.duration))
-                c.end = max(c.start, min(c.end, an.duration))
+                if c.source is None and n_src > 1:
+                    c.source = source.path
+                info = infos.get(c.source or source.path, source.info)
+                c.start = max(0.0, min(c.start, info.duration))
+                c.end = max(c.start, min(c.end, info.duration))
             clips = [c for c in clips if c.duration > 0.1]
             finalize_timeline(clips)
             plan = Plan(source.path, style.name, settings, clips, [], an.duration)
@@ -312,7 +341,7 @@ class Manager:
         def on_render(frac: float) -> None:
             job.progress = frac
 
-        render(plan, _render_settings(p, captions), str(job.dir / "reel.mp4"), an.source, progress=on_render)
+        render(plan, _render_settings(p, captions), str(job.dir / "reel.mp4"), None if an.is_composite else an.source, progress=on_render)
         job.state = "done"
         job.progress = 1.0
         log("Hotovo")
@@ -393,15 +422,20 @@ def create_app(workdir: Path | None = None):
     @app.post("/api/jobs")
     def create_job():  # type: ignore[no-untyped-def]
         data = request.get_json(silent=True) or {}
-        sid = str(data.get("source_id", ""))
+        ids = data.get("source_ids")
+        if not isinstance(ids, list):
+            ids = [data.get("source_id", "")]
+        ids = [str(i) for i in ids if i]
+        if not ids:
+            abort(400, description="Chybí zdrojové video")
         try:
             params = parse_params(data)
-            job = manager.submit(sid, params)
+            job = manager.submit(ids, params)
         except KeyError:
             abort(404, description="Zdroj nenalezen; nahrajte video znovu")
         except ValueError as exc:
             abort(400, description=str(exc))
-        return jsonify(job.to_dict(manager.sources.get(sid))), 202
+        return jsonify(job.to_dict(manager.sources_of(job))), 202
 
     @app.get("/api/jobs")
     def list_jobs():  # type: ignore[no-untyped-def]
@@ -409,10 +443,10 @@ def create_app(workdir: Path | None = None):
             jobs = sorted(manager.jobs.values(), key=lambda j: j.created, reverse=True)
         out = []
         for j in jobs[:50]:
-            src = manager.sources.get(j.source_id)
+            srcs = manager.sources_of(j)
             out.append({
                 "id": j.id, "state": j.state, "phase": PHASES.get(j.state, j.state), "created": j.created,
-                "source_name": src.name if src else "?", "target": j.params.get("target"), "style": j.params.get("style"),
+                "source_name": " + ".join(s.name for s in srcs) or "?", "target": j.params.get("target"), "style": j.params.get("style"),
                 "total": round(j.plan.total, 1) if j.plan else None, "clips": len(j.plan.clips) if j.plan else None,
             })
         return jsonify(out)
@@ -420,7 +454,7 @@ def create_app(workdir: Path | None = None):
     @app.get("/api/jobs/<jid>")
     def get_job(jid: str):  # type: ignore[no-untyped-def]
         job = job_or_404(jid)
-        return jsonify(job.to_dict(manager.sources.get(job.source_id)))
+        return jsonify(job.to_dict(manager.sources_of(job)))
 
     @app.post("/api/jobs/<jid>/rerender")
     def rerender(jid: str):  # type: ignore[no-untyped-def]
@@ -435,8 +469,8 @@ def create_app(workdir: Path | None = None):
                 float(c["start"]), float(c["end"])
         except (KeyError, TypeError, ValueError) as exc:
             abort(400, description=f"Neplatné klipy: {exc}")
-        new = manager.submit(job.source_id, params, clips=clips)
-        return jsonify(new.to_dict(manager.sources.get(job.source_id))), 202
+        new = manager.submit(job.source_ids, params, clips=clips)
+        return jsonify(new.to_dict(manager.sources_of(new))), 202
 
     @app.get("/api/jobs/<jid>/<name>")
     def job_file(jid: str, name: str):  # type: ignore[no-untyped-def]
@@ -446,8 +480,10 @@ def create_app(workdir: Path | None = None):
         path = job.dir / name
         if not path.is_file():
             abort(404, description="Soubor ještě neexistuje")
-        src = manager.sources.get(job.source_id)
-        stem = Path(src.name).stem if src else "video"
+        srcs = manager.sources_of(job)
+        stem = Path(srcs[0].name).stem if srcs else "video"
+        if len(srcs) > 1:
+            stem += f"_+{len(srcs) - 1}"
         as_attachment = request.args.get("download") == "1"
         download_name = f"{stem}_reel{path.suffix}" if name == "reel.mp4" else f"{stem}_{name}"
         return send_file(path, mimetype=OUTPUT_FILES[name], conditional=True, as_attachment=as_attachment, download_name=download_name)

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import time
+from bisect import bisect_right
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
@@ -159,10 +160,54 @@ class Analysis:
     vad_backend: str = "heuristic"
     version: str = __version__
     created_at: float = field(default_factory=time.time)
+    # composite analyses (several videos on one timeline): the parts and where each starts
+    sources: list[MediaInfo] = field(default_factory=list)
+    offsets: list[float] = field(default_factory=list)
 
     @property
     def duration(self) -> float:
         return self.source.duration
+
+    @property
+    def is_composite(self) -> bool:
+        return len(self.sources) > 1
+
+    @property
+    def boundaries(self) -> list[float]:
+        """Times where one source video ends and the next begins (empty for a single video)."""
+        return list(self.offsets[1:]) if self.is_composite else []
+
+    def part_index(self, t: float) -> int:
+        if not self.is_composite:
+            return 0
+        return min(max(bisect_right(self.offsets, t) - 1, 0), len(self.offsets) - 1)
+
+    def part_range(self, t: float) -> tuple[float, float]:
+        """Composite-time interval of the source video that contains ``t``."""
+        if not self.is_composite:
+            return 0.0, self.duration
+        i = self.part_index(t)
+        hi = self.offsets[i + 1] if i + 1 < len(self.offsets) else self.duration
+        return self.offsets[i], hi
+
+    def locate(self, t: float) -> tuple[MediaInfo, float]:
+        """Map a composite time to (source video, local time)."""
+        if not self.is_composite:
+            return self.source, t
+        i = self.part_index(t)
+        return self.sources[i], t - self.offsets[i]
+
+    def split_by_boundaries(self, a: float, b: float) -> list[tuple[float, float]]:
+        """Cut [a, b] at source boundaries so no piece spans two videos."""
+        out = []
+        cur = a
+        for x in self.boundaries:
+            if cur < x < b:
+                out.append((cur, x))
+                cur = x
+        if cur < b:
+            out.append((cur, b))
+        return out
 
     @property
     def n(self) -> int:
@@ -216,6 +261,8 @@ class Analysis:
             "tempo_bpm": self.tempo_bpm,
             "face_track": [f.to_dict() for f in self.face_track],
             "transcript": self.transcript,
+            "sources": [m.to_dict() for m in self.sources],
+            "offsets": [round(float(o), 3) for o in self.offsets],
         }
 
     @classmethod
@@ -236,6 +283,8 @@ class Analysis:
             vad_backend=d.get("vad_backend", "heuristic"),
             version=d.get("version", "?"),
             created_at=float(d.get("created_at", 0)),
+            sources=[MediaInfo.from_dict(m) for m in d.get("sources", [])],
+            offsets=[float(o) for o in d.get("offsets", [])],
         )
 
     def save(self, path: str | Path) -> None:
@@ -365,6 +414,64 @@ def build_analysis(
     )
 
 
+def combine_analyses(parts: list[Analysis]) -> Analysis:
+    """Place several analyses on one timeline (video after video, in order).
+
+    Curves, shots, speech, onsets and faces are shifted by each part's offset.
+    Transcript words keep their local times and are tagged with their source
+    path so captions still line up after the plan maps clips back to files.
+    """
+    if not parts:
+        raise ValueError("No analyses to combine")
+    if len(parts) == 1:
+        return parts[0]
+    dt = parts[0].dt
+    offsets: list[float] = []
+    total = 0.0
+    for p in parts:
+        offsets.append(total)
+        total += p.duration
+    n = int(np.ceil(total / dt)) + 1
+    curves = {k: np.zeros(n, dtype=np.float32) for k in CURVE_NAMES}
+    speech_prob = np.zeros(n, dtype=np.float32)
+    shots: list[Shot] = []
+    speech: list[SpeechSegment] = []
+    onsets: list[float] = []
+    faces: list[FaceSample] = []
+    words: list[dict] = []
+    sentences: list[dict] = []
+    for i, (p, off) in enumerate(zip(parts, offsets)):
+        ia = int(off / dt)
+        ib = int((off + p.duration) / dt) if i + 1 < len(parts) else n
+        m = max(0, min(len(p.speech_prob), ib - ia))
+        for k in CURVE_NAMES:
+            if k in p.curves:
+                curves[k][ia:ia + m] = p.curves[k][:m]
+        speech_prob[ia:ia + m] = p.speech_prob[:m]
+        for sh in p.shots:
+            shots.append(Shot(len(shots), sh.start + off, sh.end + off, dict(sh.features)))
+        speech += [SpeechSegment(sg.start + off, sg.end + off, sg.text) for sg in p.speech_segments]
+        onsets += [round(o + off, 3) for o in p.onsets]
+        faces += [FaceSample(f.t + off, f.cx, f.cy, f.size, f.count) for f in p.face_track]
+        if p.transcript:
+            words += [{**w, "source": p.source.path} for w in p.transcript.get("words", [])]
+            sentences += [{**sg, "source": p.source.path} for sg in p.transcript.get("segments", [])]
+    first = parts[0].source
+    source = MediaInfo(
+        path=first.path, duration=total, width=first.width, height=first.height, fps=first.fps, rotation=0,
+        has_audio=any(p.source.has_audio for p in parts), audio_sample_rate=first.audio_sample_rate,
+        video_codec="composite", size_bytes=sum(p.source.size_bytes for p in parts),
+        mtime=max(p.source.mtime for p in parts),
+    )
+    transcript = {"language": parts[0].transcript.get("language") if parts[0].transcript else None,
+                  "segments": sentences, "words": words} if words else None
+    return Analysis(
+        source=source, settings=parts[0].settings, dt=dt, curves=curves, speech_prob=speech_prob, shots=shots,
+        speech_segments=speech, onsets=sorted(onsets), tempo_bpm=None, face_track=faces, transcript=transcript,
+        vad_backend=parts[0].vad_backend, sources=[p.source for p in parts], offsets=offsets,
+    )
+
+
 # --- caching -----------------------------------------------------------------
 
 def cache_path(source: str | Path) -> Path:
@@ -410,6 +517,22 @@ def get_analysis(
     return an
 
 
+def get_combined_analysis(
+    sources: list[str],
+    settings: AnalysisSettings,
+    *,
+    use_cache: bool = True,
+    progress: Callable[[str], None] | None = None,
+) -> Analysis:
+    """Analyse each video (cached individually) and place them on one timeline."""
+    parts = []
+    for i, src in enumerate(sources):
+        if progress and len(sources) > 1:
+            progress(f"video {i + 1}/{len(sources)}: {Path(src).name}")
+        parts.append(get_analysis(src, settings, use_cache=use_cache, progress=progress))
+    return combine_analyses(parts)
+
+
 def resolve_style(name: str, overrides: dict[str, float] | None = None) -> Style:
     if name not in STYLES:
         raise ValueError(f"Unknown style '{name}'. Choose from: {', '.join(STYLES)}")
@@ -418,5 +541,5 @@ def resolve_style(name: str, overrides: dict[str, float] | None = None) -> Style
 
 __all__ = [
     "Analysis", "AnalysisSettings", "FaceSample", "Shot", "Style", "STYLES", "CURVE_NAMES", "DT",
-    "build_analysis", "get_analysis", "cache_path", "load_cached", "resolve_style",
+    "build_analysis", "combine_analyses", "get_analysis", "get_combined_analysis", "cache_path", "load_cached", "resolve_style",
 ]

@@ -99,3 +99,18 @@ def test_path_source(client, sample):
     r = client.post("/api/sources/path", json={"path": str(sample)})
     assert r.status_code == 201
     assert r.get_json()["uploaded"] is False
+
+
+def test_multi_source_job(client, sample, tmp_path):
+    a = client.post("/api/sources/path", json={"path": str(sample)}).get_json()
+    b = client.post("/api/sources/path", json={"path": str(sample)}).get_json()
+    r = client.post("/api/jobs", json={"source_ids": [a["id"], b["id"]], "target": 14, "min_quality": 0, **FAST})
+    assert r.status_code == 202
+    job = _wait(client, r.get_json()["id"])
+    assert job["state"] == "done", job
+    assert len(job["sources"]) == 2 and job["download_name"].endswith("_+1_reel.mp4")
+    assert all(c.get("source") for c in job["plan"]["clips"])
+    assert client.get(job["output_url"]).status_code == 200
+    assert client.post("/api/jobs", json={"source_ids": []}).status_code == 400
+    listed = client.get("/api/jobs").get_json()[0]
+    assert " + " in listed["source_name"]

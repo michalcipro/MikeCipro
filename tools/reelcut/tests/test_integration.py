@@ -7,10 +7,10 @@ import subprocess
 
 import pytest
 
-from reelcut.analysis import AnalysisSettings, build_analysis
+from reelcut.analysis import AnalysisSettings, build_analysis, combine_analyses
 from reelcut.cli import main
 from reelcut.ffmpeg import ffmpeg_bin, find_binary, probe
-from reelcut.planner import PlanSettings, build_plan
+from reelcut.planner import Clip, PlanSettings, build_plan, finalize_timeline
 from reelcut.render import RenderSettings, build_command, render
 
 from sample_video import build_sample, have_espeak
@@ -113,3 +113,48 @@ def test_real_speech_detected_as_speech(analysis):
     segs = sorted(analysis.speech_segments, key=lambda s: s.start)
     assert abs(segs[0].start - 8.3) < 0.6
     assert abs(segs[-1].start - 18.3) < 0.6
+
+
+@pytest.fixture(scope="module")
+def vertical_silent(tmp_path_factory):
+    src = tmp_path_factory.mktemp("video2") / "vert.mp4"
+    subprocess.run(
+        [ffmpeg_bin(), "-v", "error", "-y", "-f", "lavfi", "-t", "6", "-i", "testsrc2=size=720x1280:rate=25",
+         "-pix_fmt", "yuv420p", "-preset", "ultrafast", str(src)],
+        check=True,
+    )
+    return src
+
+
+def test_multi_source_render(analysis, vertical_silent, tmp_path):
+    an2 = build_analysis(str(vertical_silent), AnalysisSettings())
+    an = combine_analyses([analysis, an2])
+    assert an.is_composite and abs(an.duration - 30.0) < 0.3
+    plan = build_plan(an, PlanSettings(target=10.0, min_quality=0.0), "auto")
+    assert plan.clips and all(c.source for c in plan.clips)
+    for c in plan.clips:  # every clip lies inside its own file
+        limit = analysis.duration if c.source == analysis.source.path else an2.duration
+        assert 0 <= c.start < c.end <= limit + 1e-6, c
+    if str(vertical_silent) not in plan.sources:  # the silent test pattern scores low; force a clip from it
+        plan.clips.append(Clip(1.0, 3.0, "visual", 0.5, "manual", source=str(vertical_silent)))
+        finalize_timeline(plan.clips)
+    assert len(plan.sources) == 2, plan.sources
+    for fit in ("crop", "none"):
+        out = tmp_path / f"multi_{fit}.mp4"
+        render(plan, RenderSettings(preset="ultrafast", crf=30, fit=fit), str(out))
+        info = probe(out)
+        assert info.has_audio  # silence is generated for the clip without audio
+        assert abs(info.duration - plan.total) < 0.5
+        if fit == "crop":
+            assert (info.width, info.height) == (1080, 1920)
+        else:
+            assert (info.width, info.height) == (1280, 720)  # first clip's frame, others letterboxed
+
+
+def test_cli_multi_input(sample, vertical_silent, tmp_path, capsys):
+    assert main(["cut", str(sample), str(vertical_silent), "--target", "12", "--min-quality", "0",
+                 "-o", str(tmp_path / "m.mp4"), "--dry-run"]) == 0
+    captured = capsys.readouterr()
+    assert "video 1/2" in captured.err and "video 2/2" in captured.err
+    assert "Plan:" in captured.out and "ffmpeg" in captured.out
+    assert (tmp_path / "m_plan.json").exists()

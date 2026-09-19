@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 from . import __version__
-from .analysis import STYLES, AnalysisSettings, get_analysis, resolve_style
+from .analysis import STYLES, AnalysisSettings, get_analysis, get_combined_analysis, resolve_style
 from . import ffmpeg as ff
 from .ffmpeg import FFmpegError
 from .planner import Plan, PlanSettings, build_plan
@@ -154,23 +154,30 @@ def _write_captions(an, plan: Plan, out_video: str) -> str | None:
 
 def cmd_analyze(a: argparse.Namespace) -> int:
     style = resolve_style(a.style, a.weights)
-    an = get_analysis(a.input, _analysis_settings(a), use_cache=not a.no_cache, progress=_log)
-    print(format_analysis(an, style))
+    settings = _analysis_settings(a)
+    parts = []
+    for i, src in enumerate(a.input):
+        an = get_analysis(src, settings, use_cache=not a.no_cache, progress=_log)
+        parts.append(an)
+        if i:
+            print()
+        print(format_analysis(an, style))
+    combined = get_combined_analysis(a.input, settings, use_cache=not a.no_cache) if len(parts) > 1 else parts[0]
     if a.json:
-        an.save(a.json)
+        combined.save(a.json)
         _log(f"analysis saved to {a.json}")
     if a.timeline:
-        timeline_png(an, style, a.timeline)
+        timeline_png(combined, style, a.timeline)
         _log(f"timeline image written to {a.timeline}")
     return 0
 
 
 def cmd_plan(a: argparse.Namespace) -> int:
     style = resolve_style(a.style, a.weights)
-    an = get_analysis(a.input, _analysis_settings(a), use_cache=not a.no_cache, progress=_log)
+    an = get_combined_analysis(a.input, _analysis_settings(a), use_cache=not a.no_cache, progress=_log)
     plan = build_plan(an, _plan_settings(a), style)
     print(format_plan(plan))
-    out = a.json or _default_output(a.input, "_plan", ".json")
+    out = a.json or _default_output(a.input[0], "_plan", ".json")
     plan.save(out)
     _log(f"plan saved to {out} (edit it and run: reelcut render {out})")
     if a.timeline:
@@ -181,13 +188,13 @@ def cmd_plan(a: argparse.Namespace) -> int:
 
 def cmd_cut(a: argparse.Namespace) -> int:
     style = resolve_style(a.style, a.weights)
-    an = get_analysis(a.input, _analysis_settings(a), use_cache=not a.no_cache, progress=_log)
+    an = get_combined_analysis(a.input, _analysis_settings(a), use_cache=not a.no_cache, progress=_log)
     plan = build_plan(an, _plan_settings(a), style)
     print(format_plan(plan))
     if not plan.clips:
         _log("nothing to render")
         return 2
-    out = a.output or _default_output(a.input, "_reel", ".mp4")
+    out = a.output or _default_output(a.input[0], "_reel", ".mp4")
     plan.save(_default_output(out, "_plan", ".json"))
     captions = _write_captions(an, plan, out) if a.captions else None
     if a.timeline:
@@ -195,7 +202,7 @@ def cmd_cut(a: argparse.Namespace) -> int:
         _log(f"timeline image written to {a.timeline}")
     settings = _render_settings(a, captions)
     _log(f"rendering {plan.total:.1f}s reel to {out}")
-    cmd = render(plan, settings, out, an.source, progress=None if a.dry_run else _render_progress())
+    cmd = render(plan, settings, out, None if an.is_composite else an.source, progress=None if a.dry_run else _render_progress())
     if a.dry_run:
         print(" ".join(_quote(c) for c in cmd))
     else:
@@ -206,6 +213,9 @@ def cmd_cut(a: argparse.Namespace) -> int:
 def cmd_render(a: argparse.Namespace) -> int:
     plan = Plan.load(a.plan)
     if a.input:
+        if len(plan.sources) > 1:
+            _log("--input applies to single-source plans only; the plan lists its sources per clip")
+            return 1
         plan.source = a.input
     out = a.output or _default_output(plan.source, "_reel", ".mp4")
     captions = None
@@ -297,15 +307,15 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--version", action="version", version=f"reelcut {__version__}")
     sub = p.add_subparsers(dest="command", required=True)
 
-    pa = sub.add_parser("analyze", help="analyse the video and print shots, speech and strongest moments")
-    pa.add_argument("input")
+    pa = sub.add_parser("analyze", help="analyse the video(s) and print shots, speech and strongest moments")
+    pa.add_argument("input", nargs="+", help="one or more video files")
     pa.add_argument("--json", default=None, help="also save the full analysis to this file")
     pa.add_argument("--timeline", default=None, help="write a timeline PNG")
     _add_analysis_args(pa)
     pa.set_defaults(func=cmd_analyze)
 
     pp = sub.add_parser("plan", help="build the edit plan (EDL) without rendering")
-    pp.add_argument("input")
+    pp.add_argument("input", nargs="+", help="one or more video files (several = one reel from all of them, in this order)")
     pp.add_argument("--json", default=None, help="plan output path (default <input>_plan.json)")
     pp.add_argument("--timeline", default=None, help="write a timeline PNG with the chosen clips")
     _add_analysis_args(pp)
@@ -313,7 +323,7 @@ def build_parser() -> argparse.ArgumentParser:
     pp.set_defaults(func=cmd_plan)
 
     pc = sub.add_parser("cut", help="analyse, plan and render the reel in one go")
-    pc.add_argument("input")
+    pc.add_argument("input", nargs="+", help="one or more video files (several = one reel from all of them, in this order)")
     pc.add_argument("--timeline", default=None, help="write a timeline PNG with the chosen clips")
     _add_analysis_args(pc)
     _add_plan_args(pc)

@@ -130,3 +130,31 @@ def test_style_overrides():
     style = resolve_style("auto", {"motion": 5.0})
     assert style.weights["motion"] == 5.0
     assert style.name.endswith("custom")
+
+
+def test_combined_analysis_and_multi_source_plan():
+    from reelcut.analysis import combine_analyses
+
+    a = make_analysis(duration=20.0, shots=[(0, 10), (10, 20)], speech=[(16.0, 19.9)], hot=[(3.0, 6.0, 0.9)])
+    a.source.path = "a.mp4"
+    b = make_analysis(duration=15.0, shots=[(0, 15)], speech=[(0.1, 4.0)], hot=[(8.0, 11.0, 0.8)], width=720, height=1280)
+    b.source.path = "b.mp4"
+    an = combine_analyses([a, b])
+    assert an.is_composite and an.boundaries == [20.0] and abs(an.duration - 35.0) < 1e-6
+    assert [s.start for s in an.shots] == [0.0, 10.0, 20.0]
+    assert an.locate(25.0) == (b.source, 5.0) and an.part_range(25.0) == (20.0, 35.0)
+    assert an.split_by_boundaries(18.0, 23.0) == [(18.0, 20.0), (20.0, 23.0)]
+    assert [(round(s.start, 1), round(s.end, 1)) for s in an.speech_segments] == [(16.0, 19.9), (20.1, 24.0)]
+
+    plan = build_plan(an, PlanSettings(target=20.0), "auto")
+    assert plan.clips and set(plan.sources) <= {"a.mp4", "b.mp4"} and len(plan.sources) == 2
+    for c in plan.clips:
+        assert c.source in ("a.mp4", "b.mp4")
+        limit = 20.0 if c.source == "a.mp4" else 15.0
+        assert 0.0 <= c.start < c.end <= limit + 1e-6, c
+    speech = [c for c in plan.clips if c.kind == "speech"]
+    # the two speech segments touch at the boundary but must stay separate clips from separate files
+    assert len(speech) == 2 and {c.source for c in speech} == {"a.mp4", "b.mp4"}
+    assert all(c.duration <= 4.5 for c in speech)
+    loaded = Plan.from_dict(plan.to_dict())
+    assert loaded.sources == plan.sources and loaded.clips[0].source == plan.clips[0].source

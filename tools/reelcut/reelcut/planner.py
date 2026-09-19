@@ -36,6 +36,7 @@ class Clip:
     crop_cy: float = 0.5
     text: str | None = None
     out_start: float = 0.0
+    source: str | None = None  # video file this clip comes from (None = plan.source)
 
     @property
     def duration(self) -> float:
@@ -97,9 +98,20 @@ class Plan:
     def total(self) -> float:
         return sum(c.duration for c in self.clips)
 
+    @property
+    def sources(self) -> list[str]:
+        """Distinct source files used by the clips, in order of first use."""
+        out: list[str] = []
+        for c in self.clips:
+            src = c.source or self.source
+            if src not in out:
+                out.append(src)
+        return out or [self.source]
+
     def to_dict(self) -> dict:
         return {
             "source": self.source,
+            "sources": self.sources,
             "source_duration": round(self.source_duration, 3),
             "style": self.style,
             "settings": self.settings.to_dict(),
@@ -150,10 +162,12 @@ def _subtract(interval: tuple[float, float], blocks: list[tuple[float, float]]) 
     return free
 
 
-def _merge_speech(segments: list[SpeechSegment], limit: float, gap: float = 0.35) -> list[SpeechSegment]:
+def _merge_speech(segments: list[SpeechSegment], limit: float, gap: float = 0.35, boundaries: list[float] | None = None) -> list[SpeechSegment]:
     out: list[SpeechSegment] = []
+    bounds = boundaries or []
     for seg in sorted(segments, key=lambda s: s.start):
-        if out and seg.start - out[-1].end <= gap and seg.end - out[-1].start <= limit:
+        crosses = out and any(out[-1].start < b < seg.end for b in bounds)
+        if out and not crosses and seg.start - out[-1].end <= gap and seg.end - out[-1].start <= limit:
             prev = out[-1]
             text = " ".join(t for t in (prev.text, seg.text) if t) or None
             out[-1] = SpeechSegment(prev.start, max(prev.end, seg.end), text)
@@ -253,10 +267,11 @@ def speech_candidates(an: Analysis, s: PlanSettings, moment: np.ndarray) -> list
         return []
     limit = min(s.max_speech_clip, s.target * (1 + s.tolerance))
     out: list[Clip] = []
-    for seg in _merge_speech(an.speech_segments, limit):
+    for seg in _merge_speech(an.speech_segments, limit, boundaries=an.boundaries):
         for a, b in _split_speech(an, seg.start, seg.end, limit):
-            a2 = max(0.0, a - s.speech_pad)
-            b2 = min(an.duration, b + s.speech_pad)
+            lo, hi = an.part_range(a)
+            a2 = max(lo, a - s.speech_pad)
+            b2 = min(hi, b + s.speech_pad)
             if b2 - a2 < 0.5:
                 continue
             score = an.mean_between(moment, a2, b2)
@@ -399,7 +414,8 @@ def apply_hook(
         return peak_of(a, b) * 0.6 + mean * 0.4
 
     candidates: list[tuple[float, Clip]] = []
-    for a, b in _subtract((0.0, an.duration), blocked):
+    free = [piece for a, b in _subtract((0.0, an.duration), blocked) for piece in an.split_by_boundaries(a, b)]
+    for a, b in free:
         if b - a >= length:
             for ws, we, sc in _best_windows(moment, an.dt, a, b, length, 3, min_sep=2.0):
                 candidates.append((rank(ws, we, sc), Clip(ws, we, "hook", sc, "cold open: strongest moment", _shot_index(an, ws), peak_of(ws, we))))
@@ -448,7 +464,23 @@ def apply_hook(
     if pool:
         refill = [c for c in pool if not c.overlaps(hook) and not (c.shot == hook.shot and c.end <= hs + 1e-6)]
         new, total = _greedy_fill(an, s, moment, refill, new, total)
+    # a cold open must not cost a big part of the reel (single-shot sources have nothing to refill with)
+    if total < 0.85 * sum(c.duration for c in chosen):
+        return chosen, None
     return new, hook
+
+
+def localize_clips(an: Analysis, clips: list[Clip]) -> None:
+    """Map composite-timeline clips back to their source file and local times."""
+    if not an.is_composite:
+        return
+    for c in clips:
+        info, local = an.locate(c.start)
+        dur = c.duration
+        c.source = info.path
+        c.start = max(0.0, min(local, info.duration))
+        c.end = max(c.start, min(info.duration, c.start + dur))
+    clips[:] = [c for c in clips if c.duration > 0.05]
 
 
 def finalize_timeline(clips: list[Clip]) -> None:
@@ -495,6 +527,7 @@ def build_plan(an: Analysis, s: PlanSettings, style: Style | str = "auto") -> Pl
         fc = an.face_center(c.start, c.end)
         if fc:
             c.crop_cx, c.crop_cy = fc
+    localize_clips(an, clips)
     finalize_timeline(clips)
 
     total = sum(c.duration for c in clips)
@@ -506,4 +539,4 @@ def build_plan(an: Analysis, s: PlanSettings, style: Style | str = "auto") -> Pl
     return Plan(an.source.path, style_obj.name, s, clips, warnings, an.duration)
 
 
-__all__ = ["Clip", "Plan", "PlanSettings", "build_plan", "finalize_timeline"]
+__all__ = ["Clip", "Plan", "PlanSettings", "build_plan", "finalize_timeline", "localize_clips"]

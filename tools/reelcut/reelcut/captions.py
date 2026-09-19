@@ -20,7 +20,12 @@ def _srt_time(t: float) -> str:
 def caption_entries(plan: Plan, words: list[dict], *, max_words: int = 3, max_span: float = 1.2, min_show: float = 0.35) -> list[tuple[float, float, str]]:
     entries: list[tuple[float, float, str]] = []
     for clip in plan.clips:
-        inside = [w for w in words if w["start"] >= clip.start - 0.05 and w["end"] <= clip.end + 0.05 and w.get("word")]
+        src = clip.source or plan.source
+        inside = [
+            w for w in words
+            if w.get("word") and w.get("source", src) == src
+            and w["start"] >= clip.start - 0.05 and w["end"] <= clip.end + 0.05
+        ]
         group: list[dict] = []
 
         def flush() -> None:

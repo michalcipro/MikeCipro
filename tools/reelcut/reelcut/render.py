@@ -72,10 +72,19 @@ def _escape_filter_path(path: str) -> str:
     return path.replace("\\", "\\\\").replace(":", "\\:").replace("'", "\\'")
 
 
-def _frame_filter(info: MediaInfo, settings: RenderSettings, cx: float, cy: float) -> str:
-    """Scale/crop chain turning the source frame into the output frame."""
+def _frame_filter(info: MediaInfo, settings: RenderSettings, cx: float, cy: float, primary: MediaInfo | None = None) -> str:
+    """Scale/crop chain turning the source frame into the output frame.
+
+    ``primary`` is the first clip's source: with ``fit=none``/``aspect=source``
+    every clip is fitted (letterboxed if needed) into that frame size so clips
+    from different videos can be concatenated.
+    """
     if settings.aspect == "source" or settings.fit == "none":
-        return f"scale={_even(info.width)}:{_even(info.height)}:flags=lanczos"
+        base = primary or info
+        tw, th = _even(base.width), _even(base.height)
+        if (tw, th) == (_even(info.width), _even(info.height)):
+            return f"scale={tw}:{th}:flags=lanczos"
+        return f"scale={tw}:{th}:force_original_aspect_ratio=decrease:flags=lanczos,pad={tw}:{th}:(ow-iw)/2:(oh-ih)/2"
     tw, th = ASPECTS[settings.aspect]
     r_src, r_t = info.width / info.height, tw / th
     if settings.fit == "blur":
@@ -100,13 +109,30 @@ def _frame_filter(info: MediaInfo, settings: RenderSettings, cx: float, cy: floa
     return f"crop={_even(info.width)}:{ch}:0:{y},scale={tw}:{th}:flags=lanczos"
 
 
-def build_command(plan: Plan, info: MediaInfo, settings: RenderSettings, out_path: str) -> list[str]:
+def _info_map(plan: Plan, infos: MediaInfo | dict[str, MediaInfo]) -> dict[str, MediaInfo]:
+    if isinstance(infos, MediaInfo):
+        return {plan.source: infos, infos.path: infos}
+    return dict(infos)
+
+
+def build_command(plan: Plan, infos: MediaInfo | dict[str, MediaInfo], settings: RenderSettings, out_path: str) -> list[str]:
+    """Build the ffmpeg command. ``infos`` maps every source path used by the plan to its MediaInfo."""
     if not plan.clips:
         raise ValueError("Plan has no clips to render")
     if settings.aspect not in ASPECTS and settings.aspect != "source":
         raise ValueError(f"Unknown aspect {settings.aspect}; choose from {', '.join(ASPECTS)} or source")
+    info_map = _info_map(plan, infos)
+
+    def info_of(c) -> MediaInfo:  # type: ignore[no-untyped-def]
+        src = c.source or plan.source
+        try:
+            return info_map[src]
+        except KeyError as exc:
+            raise FFmpegError(f"No media info for source {src}") from exc
+
     n = len(plan.clips)
-    has_audio = info.has_audio
+    primary = info_of(plan.clips[0])
+    has_audio = any(info_of(c).has_audio for c in plan.clips)
     use_fade = settings.transition == "fade" and n > 1
     fd = settings.transition_duration
     if use_fade:
@@ -122,18 +148,31 @@ def build_command(plan: Plan, info: MediaInfo, settings: RenderSettings, out_pat
     encoder = pick_video_encoder(settings.video_codec)
     cmd = [ffmpeg_bin(), "-hide_banner", "-loglevel", "error", "-nostdin", "-y"]
     for c in plan.clips:
-        cmd += ["-ss", f"{c.start:.3f}", "-t", f"{c.duration:.3f}", "-i", info.path]
+        cmd += ["-ss", f"{c.start:.3f}", "-t", f"{c.duration:.3f}", "-i", info_of(c).path]
+    # clips whose source has no audio track get silence so the concat stays uniform
+    audio_index: dict[int, int] = {}
+    next_input = n
+    for i, c in enumerate(plan.clips):
+        if not has_audio:
+            continue
+        if info_of(c).has_audio:
+            audio_index[i] = i
+        else:
+            cmd += ["-f", "lavfi", "-t", f"{c.duration:.3f}", "-i", "anullsrc=channel_layout=stereo:sample_rate=48000"]
+            audio_index[i] = next_input
+            next_input += 1
 
     parts: list[str] = []
     for i, c in enumerate(plan.clips):
-        vf = _frame_filter(info, settings, c.crop_cx, c.crop_cy)
+        vf = _frame_filter(info_of(c), settings, c.crop_cx, c.crop_cy, primary)
         parts.append(
             f"[{i}:v]{vf},fps={settings.fps},setsar=1,format=yuv420p,trim=duration={c.duration:.3f},setpts=PTS-STARTPTS[v{i}]"
         )
         if has_audio:
             fade_out_start = max(0.0, c.duration - 0.03)
             parts.append(
-                f"[{i}:a]aresample=48000,atrim=duration={c.duration:.3f},asetpts=PTS-STARTPTS,"
+                f"[{audio_index[i]}:a]aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo,"
+                f"atrim=duration={c.duration:.3f},asetpts=PTS-STARTPTS,"
                 f"afade=t=in:st=0:d=0.03,afade=t=out:st={fade_out_start:.3f}:d=0.03[a{i}]"
             )
 
@@ -208,10 +247,18 @@ def render(
 ) -> list[str]:
     """Render the plan to ``out_path``. Returns the ffmpeg command used.
 
+    ``info`` may be given for a single-source plan to skip probing; other
+    sources referenced by clips are probed as needed.
     ``progress`` (0..1) is called as ffmpeg advances through the output.
     """
-    info = info or probe(plan.source)
-    cmd = build_command(plan, info, settings, out_path)
+    infos: dict[str, MediaInfo] = {}
+    if info is not None:
+        infos[info.path] = info
+        infos.setdefault(plan.source, info)
+    for src in plan.sources:
+        if src not in infos:
+            infos[src] = probe(src)
+    cmd = build_command(plan, infos, settings, out_path)
     if settings.dry_run:
         return cmd
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
