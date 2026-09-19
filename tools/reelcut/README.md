@@ -57,6 +57,62 @@ pip install -e ".[transcribe]"   # + faster-whisper: přepis, střih po větách
 pip install -e ".[all,dev]"      # vše + pytest
 ```
 
+## Krok za krokem na Macu
+
+1. **Otevřete Terminál** – `Cmd + mezerník`, napište `Terminal`, Enter.
+2. **Nainstalujte Homebrew** (pokud ho nemáte; `brew --version` to prozradí):
+   ```
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   ```
+3. **Nainstalujte ffmpeg, Python a git:**
+   ```
+   brew install ffmpeg python git
+   ```
+4. **Stáhněte repozitář a přepněte se na větev s nástrojem:**
+   ```
+   cd ~
+   git clone https://github.com/michalcipro/MikeCipro.git
+   cd MikeCipro
+   git checkout claude/instagram-reel-cutting-tool-26udjc
+   cd tools/reelcut
+   ```
+5. **Vytvořte virtuální prostředí a nainstalujte nástroj** (Homebrew Python bez
+   venv instalaci odmítne hláškou `externally-managed-environment`):
+   ```
+   python3 -m venv .venv
+   source .venv/bin/activate
+   pip install -e .
+   ```
+   Pro přepis řeči a titulky navíc: `pip install -e ".[transcribe]"` (první
+   spuštění stáhne model Whisper, cca 500 MB).
+6. **Ověřte instalaci:**
+   ```
+   reelcut --version
+   ffmpeg -version | head -1
+   ```
+7. **Sestříhejte reel.** Cestu k videu získáte nejjednodušeji tak, že soubor
+   přetáhnete z Finderu do okna Terminálu.
+   ```
+   reelcut cut ~/Movies/rozhovor.mp4 -t 30 --style talk --timeline timeline.png
+   ```
+   Vedle zdrojového videa vznikne `rozhovor_reel.mp4`, plán střihu
+   `rozhovor_reel_plan.json` a obrázek `timeline.png`.
+8. **Příště** stačí:
+   ```
+   cd ~/MikeCipro/tools/reelcut
+   source .venv/bin/activate
+   reelcut cut /cesta/k/videu.mp4 -t 30
+   ```
+
+Časté problémy:
+
+- `command not found: reelcut` – není aktivované venv, spusťte `source .venv/bin/activate`.
+- `externally-managed-environment` – instalujete mimo venv, viz krok 5.
+- Při prvním `git` vás macOS může vyzvat k instalaci Xcode Command Line Tools;
+  potvrďte a příkaz spusťte znovu.
+- Nástroj má cache analýzy `video.mp4.reelcut.json`; když video přepíšete
+  novým souborem stejného jména, cache se sama zneplatní podle velikosti a času.
+
 ## Použití
 
 ### `reelcut cut` – vše v jednom
