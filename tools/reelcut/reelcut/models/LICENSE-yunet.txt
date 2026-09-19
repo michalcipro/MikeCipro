@@ -1,0 +1,6 @@
+face_detection_yunet_2023mar.onnx
+---------------------------------
+YuNet face detector from the OpenCV Zoo (https://github.com/opencv/opencv_zoo),
+model authors: Shiqi Yu et al. (Shenzhen University).
+Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0).
+Bundled unmodified for offline face detection in reelcut.
