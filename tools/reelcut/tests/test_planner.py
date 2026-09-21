@@ -174,3 +174,17 @@ def test_pauses_inside_speech_are_removed():
     assert len([c for c in kept.clips if c.kind == "speech"]) == 1
     loaded = Plan.from_dict(plan.to_dict())
     assert len(loaded.clips) == len(plan.clips)
+
+
+def test_reel_spreads_across_many_sources():
+    from reelcut.analysis import combine_analyses
+
+    parts = []
+    for i in range(8):
+        a = make_analysis(duration=12.0, shots=[(0, 6), (6, 12)], hot=[(1.0, 5.0, 0.8), (7.0, 11.0, 0.8)])
+        a.source.path = f"v{i}.mp4"
+        parts.append(a)
+    an = combine_analyses(parts)
+    plan = build_plan(an, PlanSettings(target=30.0, hook=False, min_quality=0.0), "action")
+    assert plan.total >= 25.0
+    assert len(plan.sources) >= 5, plan.sources

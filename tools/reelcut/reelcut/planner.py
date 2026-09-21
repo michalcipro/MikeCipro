@@ -337,13 +337,19 @@ def visual_candidates(an: Analysis, s: PlanSettings, moment: np.ndarray, blocked
 
 # --- selection ----------------------------------------------------------------
 
-def _diversity(c: Clip, chosen: list[Clip]) -> float:
+def _diversity(c: Clip, chosen: list[Clip], part_of=None) -> float:
+    """Discount for repeating the same shot, neighbouring moments or the same source video."""
     f = 1.0
+    same_source = 0
     for o in chosen:
         if o.shot == c.shot and o.shot >= 0:
             f *= 0.75
         if abs(o.start - c.start) < 1.5 or abs(o.end - c.end) < 1.5:
             f *= 0.85
+        if part_of is not None and part_of(o.start) == part_of(c.start):
+            same_source += 1
+    if same_source:
+        f *= 0.9 ** same_source  # with many videos, spread the reel across them
     return f
 
 
@@ -371,19 +377,20 @@ def _greedy_fill(an: Analysis, s: PlanSettings, moment: np.ndarray, pool: list[C
     budget = s.target * (1 + s.tolerance)
     chosen = list(chosen)
     pool = [c for c in pool if not any(c.overlaps(o) for o in chosen)]
+    part_of = an.part_index if an.is_composite else None
     while pool:
         best, best_val = None, -1.0
         for c in pool:
             if total + c.duration > budget + 1e-6:
                 continue
-            val = c.score * _diversity(c, chosen)
+            val = c.score * _diversity(c, chosen, part_of)
             if val > best_val:
                 best, best_val = c, val
         if best is None:
             remaining = budget - total
             if remaining < s.min_clip:
                 break
-            ranked = sorted(pool, key=lambda c: c.score * _diversity(c, chosen), reverse=True)
+            ranked = sorted(pool, key=lambda c: c.score * _diversity(c, chosen, part_of), reverse=True)
             best = None
             for c in ranked:
                 best = _shrink(an, s, moment, c, min(remaining, s.max_clip))

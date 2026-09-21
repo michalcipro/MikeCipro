@@ -4,4 +4,4 @@ Pipeline: probe -> audio analysis (loudness, VAD, onsets) -> video analysis
 (shots, motion, sharpness, faces) -> scoring -> edit plan -> ffmpeg render.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

@@ -37,6 +37,8 @@ PHASES = {
     "error": "Chyba",
 }
 OUTPUT_FILES = {"reel.mp4": "video/mp4", "timeline.png": "image/png", "plan.json": "application/json", "captions.srt": "text/plain"}
+VIDEO_EXTENSIONS = {".mp4", ".mov", ".m4v", ".mkv", ".webm", ".avi", ".mts", ".m2ts", ".3gp", ".mpg", ".mpeg", ".wmv", ".flv"}
+MAX_SOURCES_PER_IMPORT = 200
 
 
 def _has(module: str) -> bool:
@@ -335,6 +337,35 @@ class Manager:
             raise FileNotFoundError(f"Soubor nenalezen: {path}")
         return self._register(uuid.uuid4().hex[:10], path, path.name, uploaded=False)
 
+    def add_paths(self, raws: list[str]) -> tuple[list[Source], list[str]]:
+        """Add files and/or folders (every video inside a folder, sorted by name). Returns (added, skipped)."""
+        files: list[Path] = []
+        skipped: list[str] = []
+        for raw in raws:
+            path = Path(raw.strip().strip("'\"")).expanduser()
+            if path.is_dir():
+                found = sorted(
+                    (p for p in path.iterdir() if p.is_file() and p.suffix.lower() in VIDEO_EXTENSIONS and not p.name.startswith(".")),
+                    key=lambda p: p.name.lower(),
+                )
+                if not found:
+                    skipped.append(f"{path}: žádné video ve složce")
+                files += found
+            elif path.is_file():
+                files.append(path)
+            else:
+                skipped.append(f"{path}: nenalezeno")
+        if len(files) > MAX_SOURCES_PER_IMPORT:
+            skipped.append(f"Přidáno jen prvních {MAX_SOURCES_PER_IMPORT} z {len(files)} souborů")
+            files = files[:MAX_SOURCES_PER_IMPORT]
+        added: list[Source] = []
+        for f in files:
+            try:
+                added.append(self._register(uuid.uuid4().hex[:10], f, f.name, uploaded=False))
+            except (FFmpegError, OSError) as exc:
+                skipped.append(f"{f.name}: nejde přečíst jako video ({str(exc).splitlines()[0][:80]})")
+        return added, skipped
+
     def _register(self, sid: str, path: Path, name: str, *, uploaded: bool) -> Source:
         info = probe(path)
         src = Source(sid, str(path), name, info, uploaded)
@@ -541,17 +572,18 @@ def create_app(workdir: Path | None = None):
 
     @app.post("/api/sources/path")
     def source_path():  # type: ignore[no-untyped-def]
+        """Add one file, several files or whole folders (JSON: path | paths). Returns {sources, skipped}."""
         data = request.get_json(silent=True) or {}
-        raw = str(data.get("path", "")).strip()
-        if not raw:
-            abort(400, description="Zadejte cestu k souboru")
-        try:
-            src = manager.add_path(raw)
-        except FileNotFoundError as exc:
-            abort(404, description=str(exc))
-        except FFmpegError as exc:
-            abort(400, description=f"Soubor nejde přečíst jako video: {exc}")
-        return jsonify(src.to_dict()), 201
+        raws = data.get("paths")
+        if not isinstance(raws, list):
+            raws = [line for line in str(data.get("path", "")).splitlines()]
+        raws = [str(r).strip() for r in raws if str(r).strip()]
+        if not raws:
+            abort(400, description="Zadejte cestu k souboru nebo složce")
+        added, skipped = manager.add_paths(raws)
+        if not added:
+            abort(404, description="; ".join(skipped) or "Nic nenalezeno")
+        return jsonify({"sources": [s.to_dict() for s in added], "skipped": skipped}), 201
 
     @app.get("/api/sources/<sid>")
     def source_info(sid: str):  # type: ignore[no-untyped-def]

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "reelcut"
-version = "0.1.0"
+version = "0.2.0"
 description = "Analyse a video and automatically cut the best moments into an Instagram Reel, keeping speech and interviews intact."
 readme = "README.md"
 requires-python = ">=3.10"

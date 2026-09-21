@@ -34,7 +34,9 @@
   .bar { height: 10px; background: var(--card-2); border-radius: 99px; overflow: hidden; margin: 10px 0; }
   .bar > div { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .3s; }
   .source { display: grid; grid-template-columns: 240px 1fr; gap: 18px; margin-top: 16px; align-items: start; }
-  ul.sources { list-style: none; padding: 0; margin: 0; }
+  ul.sources { list-style: none; padding: 0; margin: 0; max-height: 300px; overflow: auto; }
+  .src-tools { display: flex; gap: 10px; align-items: center; margin: 6px 0 8px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
+  .upload-status { font-size: 13px; color: var(--muted); margin-top: 6px; }
   ul.sources li { display: flex; gap: 10px; align-items: center; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; margin-bottom: 6px; cursor: pointer; background: var(--card-2); }
   ul.sources li.active { border-color: var(--accent-2); }
   ul.sources li .n { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -104,20 +106,22 @@
   <section class="card" id="step-source">
     <h2>1. Video</h2>
     <div class="drop" id="drop">
-      <b>Přetáhněte jedno nebo více videí sem</b> nebo klikněte a vyberte soubory<br>
-      <span>MP4, MOV, M4V, MKV, WEBM · soubory se zkopírují do pracovní složky</span>
+      <b>Přetáhněte sem libovolný počet videí nebo celou složku</b>, nebo klikněte a vyberte soubory (Cmd+klik pro víc souborů)<br>
+      <span>MP4, MOV, M4V, MKV, WEBM · soubory se zkopírují do pracovní složky · z 30 videí vznikne jeden reel</span>
       <input type="file" id="file" accept="video/*,.mov,.mp4,.m4v,.mkv,.webm" multiple hidden>
     </div>
-    <div class="or">nebo použijte soubor přímo z disku (bez kopírování, vhodné pro velká videa) – lze přidat opakovaně</div>
+    <div class="or">nebo zadejte cestu ke <b>složce</b> nebo souboru na disku (bez kopírování, nejrychlejší pro velká videa)</div>
     <form class="path" id="pathform">
-      <input type="text" id="path" placeholder="/Users/jmeno/Movies/video.mov">
-      <button type="submit">Použít</button>
+      <input type="text" id="path" placeholder="/Users/jmeno/Movies/nataceni  (složka = přidají se všechna videa v ní)">
+      <button type="submit">Přidat</button>
     </form>
     <div class="bar hidden" id="upload-bar"><div></div></div>
+    <div class="upload-status hidden" id="upload-status"></div>
     <div class="error hidden" id="source-error"></div>
     <div class="source hidden" id="source">
       <video id="preview" controls preload="metadata" playsinline></video>
       <div>
+        <div class="src-tools"><span id="src-count"></span><button type="button" id="clear-sources">Odebrat vše</button></div>
         <ul class="sources" id="sources"></ul>
         <div class="meta" id="source-meta"></div>
         <div class="mode hidden" id="mode">
@@ -294,6 +298,7 @@ function selectSource(i) {
 function renderSources() {
   $('#source').classList.toggle('hidden', !sources.length);
   $('#mode').classList.toggle('hidden', sources.length < 2);
+  $('#src-count').textContent = sources.length > 1 ? `${sources.length} videí · celkem ${tc(sources.reduce((a, s) => a + s.duration, 0))} · pořadí = pořadí v reelu` : '';
   const ul = $('#sources');
   ul.innerHTML = sources.map((s, i) => `<li class="${i === selected ? 'active' : ''}" data-i="${i}">
       <span class="n" title="${esc(s.name)}">${i + 1}. ${esc(s.name)}</span><span class="m">${tc(s.duration)}</span>
@@ -339,10 +344,42 @@ function uploadOne(file) {
   });
 }
 
+const VIDEO_RE = /\.(mp4|mov|m4v|mkv|webm|avi|mts|m2ts|3gp|mpg|mpeg|wmv)$/i;
+let uploading = false;
+
 async function uploadFiles(files) {
+  files = files.filter((f) => VIDEO_RE.test(f.name) || (f.type || '').startsWith('video/'));
+  if (!files.length) { showSourceError('Mezi vybranými soubory není žádné video.'); return; }
+  if (uploading) { showSourceError('Počkejte, až doběhne předchozí nahrávání.'); return; }
+  uploading = true;
   $('#source-error').classList.add('hidden');
-  for (const f of files) await uploadOne(f);
+  const st = $('#upload-status'); st.classList.remove('hidden');
+  for (let i = 0; i < files.length; i++) {
+    st.textContent = `Nahrávám ${i + 1}/${files.length}: ${files[i].name}`;
+    await uploadOne(files[i]);
+  }
+  st.textContent = `Nahráno ${files.length} ${files.length === 1 ? 'video' : files.length < 5 ? 'videa' : 'videí'}.`;
   $('#upload-bar').classList.add('hidden');
+  uploading = false;
+}
+
+async function filesFromDrop(dt) {
+  // folders dropped from Finder: walk their entries (one level deep is enough for a shoot folder)
+  const items = dt.items ? [...dt.items] : [];
+  const entries = items.map((it) => (it.webkitGetAsEntry ? it.webkitGetAsEntry() : null));
+  if (!entries.some((e) => e && e.isDirectory)) return [...dt.files];
+  const out = [];
+  const readDir = (dir) => new Promise((res) => { const r = dir.createReader(); const all = []; const step = () => r.readEntries((es) => { if (!es.length) return res(all); all.push(...es); step(); }); step(); });
+  const toFile = (fe) => new Promise((res) => fe.file(res, () => res(null)));
+  for (const e of entries) {
+    if (!e) continue;
+    if (e.isFile) { const f = await toFile(e); if (f) out.push(f); }
+    else if (e.isDirectory) {
+      const kids = (await readDir(e)).filter((k) => k.isFile).sort((a, b) => a.name.localeCompare(b.name));
+      for (const k of kids) { const f = await toFile(k); if (f) out.push(f); }
+    }
+  }
+  return out;
 }
 
 const drop = $('#drop');
@@ -350,13 +387,19 @@ drop.onclick = () => $('#file').click();
 $('#file').onchange = (e) => { if (e.target.files.length) uploadFiles([...e.target.files]); e.target.value = ''; };
 ['dragenter', 'dragover'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('over'); }));
 ['dragleave', 'drop'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('over'); }));
-drop.addEventListener('drop', (e) => { if (e.dataTransfer.files.length) uploadFiles([...e.dataTransfer.files]); });
+drop.addEventListener('drop', async (e) => { const files = await filesFromDrop(e.dataTransfer); if (files.length) uploadFiles(files); });
 $('#pathform').onsubmit = async (e) => {
   e.preventDefault();
   $('#source-error').classList.add('hidden');
-  try { addSource(await api('/api/sources/path', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: $('#path').value }) })); $('#path').value = ''; }
-  catch (err) { showSourceError(err.message); }
+  try {
+    const res = await api('/api/sources/path', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: $('#path').value }) });
+    res.sources.forEach(addSource);
+    $('#path').value = '';
+    const st = $('#upload-status'); st.classList.remove('hidden');
+    st.textContent = `Přidáno ${res.sources.length} z disku.` + (res.skipped.length ? ` Přeskočeno: ${res.skipped.join('; ')}` : '');
+  } catch (err) { showSourceError(err.message); }
 };
+$('#clear-sources').onclick = () => { sources = []; selected = -1; renderSources(); };
 $('#target').oninput = (e) => { $('#target-out').textContent = `${e.target.value} s`; };
 
 function collectParams() {

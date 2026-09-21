@@ -58,6 +58,7 @@ def test_index_and_capabilities(client):
 def test_bad_inputs(client):
     assert client.post("/api/sources/upload", data={}).status_code == 400
     assert client.post("/api/sources/path", json={"path": "/nope/missing.mp4"}).status_code == 404
+    assert client.post("/api/sources/path", json={"path": "   "}).status_code == 400
     assert client.post("/api/jobs", json={"source_id": "missing"}).status_code == 404
     assert client.get("/api/jobs/missing").status_code == 404
 
@@ -98,7 +99,7 @@ def test_upload_job_and_rerender(client, sample):
 def test_path_source(client, sample):
     r = client.post("/api/sources/path", json={"path": str(sample)})
     assert r.status_code == 201
-    body = r.get_json()
+    body = r.get_json()["sources"][0]
     assert body["uploaded"] is False and body["proxy"] == "none" and body["codec"] == "h264"
     assert client.get(f"/api/sources/{body['id']}").status_code == 200
     assert any(s["id"] == body["id"] for s in client.get("/api/sources").get_json())
@@ -112,7 +113,7 @@ def test_thumbnails_and_persistence(sample, tmp_path):
     app = create_app(work)
     app.testing = True
     c = app.test_client()
-    src = c.post("/api/sources/path", json={"path": str(sample)}).get_json()
+    src = c.post("/api/sources/path", json={"path": str(sample)}).get_json()["sources"][0]
     r = c.post("/api/jobs", json={"source_id": src["id"], "target": 8, "hook": False, **FAST})
     job = _wait(c, r.get_json()["id"])
     assert job["state"] == "done", job
@@ -142,7 +143,7 @@ def test_proxy_for_non_h264_source(tmp_path):
     app = create_app(tmp_path / "work")
     app.testing = True
     c = app.test_client()
-    body = c.post("/api/sources/path", json={"path": str(src)}).get_json()
+    body = c.post("/api/sources/path", json={"path": str(src)}).get_json()["sources"][0]
     assert body["codec"] == "mpeg4" and body["proxy"] == "pending"
     deadline = time.time() + 60
     while time.time() < deadline:
@@ -159,8 +160,8 @@ def test_proxy_for_non_h264_source(tmp_path):
 
 
 def test_multi_source_job(client, sample, tmp_path):
-    a = client.post("/api/sources/path", json={"path": str(sample)}).get_json()
-    b = client.post("/api/sources/path", json={"path": str(sample)}).get_json()
+    a = client.post("/api/sources/path", json={"path": str(sample)}).get_json()["sources"][0]
+    b = client.post("/api/sources/path", json={"path": str(sample)}).get_json()["sources"][0]
     r = client.post("/api/jobs", json={"source_ids": [a["id"], b["id"]], "target": 14, "min_quality": 0, **FAST})
     assert r.status_code == 202
     job = _wait(client, r.get_json()["id"])
@@ -171,3 +172,28 @@ def test_multi_source_job(client, sample, tmp_path):
     assert client.post("/api/jobs", json={"source_ids": []}).status_code == 400
     listed = client.get("/api/jobs").get_json()[0]
     assert " + " in listed["source_name"]
+
+
+def test_folder_import_and_many_sources(client, sample, tmp_path):
+    import shutil
+
+    folder = tmp_path / "shoot"
+    folder.mkdir()
+    for i in range(6):
+        shutil.copy(sample, folder / f"clip{i:02d}.mp4")
+    (folder / "notes.txt").write_text("not a video")
+    (folder / "broken.mp4").write_bytes(b"not really a video")
+    r = client.post("/api/sources/path", json={"path": str(folder)})
+    assert r.status_code == 201, r.get_json()
+    body = r.get_json()
+    assert [s["name"] for s in body["sources"]] == [f"clip{i:02d}.mp4" for i in range(6)]
+    assert any("broken.mp4" in x for x in body["skipped"])
+    # several lines = several paths / folders
+    r2 = client.post("/api/sources/path", json={"path": f"{sample}\n{folder / 'clip00.mp4'}"})
+    assert len(r2.get_json()["sources"]) == 2
+    ids = [s["id"] for s in body["sources"]]
+    r = client.post("/api/jobs", json={"source_ids": ids, "target": 20, "speech_mode": "ignore", "style": "action", **FAST})
+    job = _wait(client, r.get_json()["id"], timeout=300)
+    assert job["state"] == "done", job
+    used = {c["source"].split("/")[-1] for c in job["plan"]["clips"]}
+    assert len(used) >= 3, used  # the reel is spread across several of the videos
