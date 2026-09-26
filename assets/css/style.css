@@ -287,6 +287,11 @@ a{color:inherit}
 .exp-when{font-size:15px;font-weight:600;color:var(--ink-3);padding-top:4px}
 .exp h3{font-size:clamp(22px,2vw,28px);font-weight:700;letter-spacing:-.03em}
 .exp p{margin-top:6px;color:var(--ink-2);max-width:40em}
+.exp-with-logo{display:flex;align-items:center;gap:12px}
+.exp-logo{width:auto;height:1.25em}
+.client-row li.with-logo{display:inline-flex;align-items:center;gap:10px}
+.client-row li.with-logo img{width:auto;height:1em;filter:grayscale(1);opacity:.45;transition:filter .3s,opacity .3s}
+.client-row li.with-logo:hover img{filter:none;opacity:1}
 @media (max-width:700px){.exp li{grid-template-columns:minmax(0,1fr);padding:24px 0}}
 
 /* education */
