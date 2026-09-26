@@ -132,6 +132,83 @@
   window.addEventListener("resize", request);
   onFrame();
 
+  /* ---------- iMessage thread around the portrait ---------- */
+  var chat = $("#chat");
+  if (chat && !reduced) {
+    var threads = [
+      [
+        "Před zápasem mě svazuje nervozita.",
+        "Nervozita je energie. Naučíme se ji řídit.",
+        "Pod tlakem se mi třesou ruce.",
+        "Postavíme rutinu a dech mezi výměnami.",
+        "Bojím se, že zase prohraju.",
+        "Strach z porážky rozebereme krok po kroku."
+      ],
+      [
+        "Ztrácím motivaci trénovat.",
+        "Najdeme, co vás doopravdy žene.",
+        "Po chybě se už nechytím.",
+        "Postavíme sebevědomí, které vydrží i chybu.",
+        "Jak poznám, že to funguje?",
+        "Změříme to. Diagnostika a data, ne dojmy."
+      ]
+    ];
+    var chatVisible = true, timers = [], threadIdx = 0;
+    var later = function (fn, ms) { timers.push(setTimeout(fn, ms)); };
+    var makeBubble = function (i, html, typing) {
+      var el = document.createElement("div");
+      el.className = "b " + (i % 2 ? "out" : "in") + " pop" + (typing ? " typing" : "");
+      el.style.setProperty("--slot", i);
+      el.setAttribute("style", "--slot:" + i);
+      el.innerHTML = html;
+      return el;
+    };
+    var markOld = function () {
+      var all = $$(".b", chat);
+      all.forEach(function (b, k) { b.classList.toggle("old", k < all.length - 2); });
+    };
+    var play = function () {
+      timers.forEach(clearTimeout); timers = [];
+      chat.classList.remove("bye");
+      chat.innerHTML = "";
+      var msgs = threads[threadIdx % threads.length];
+      var t = 400;
+      msgs.forEach(function (text, i) {
+        var typingAt = t, showAt = t + (i % 2 ? 1100 : 800);
+        later(function () {
+          var ty = makeBubble(i, "<i></i><i></i><i></i>", true);
+          chat.appendChild(ty);
+          markOld();
+          later(function () {
+            var b = makeBubble(i, "<span></span>", false);
+            b.firstChild.textContent = text;
+            if (i === msgs.length - 1) {
+              var r = document.createElement("span");
+              r.className = "receipt";
+              r.textContent = "Doručeno";
+              b.appendChild(r);
+            }
+            chat.replaceChild(b, ty);
+            markOld();
+          }, showAt - typingAt);
+        }, typingAt);
+        t = showAt + 900;
+      });
+      later(function () { chat.classList.add("bye"); }, t + 3200);
+      later(function () {
+        threadIdx++;
+        if (chatVisible) play(); else chat.dataset.pending = "1";
+      }, t + 3800);
+    };
+    if (hasIO) {
+      new IntersectionObserver(function (en) {
+        chatVisible = en[0].isIntersecting;
+        if (chatVisible && chat.dataset.pending) { delete chat.dataset.pending; play(); }
+      }).observe(chat);
+    }
+    play();
+  }
+
   /* ---------- focus field: chaos of thoughts settles into a target ---------- */
   var fStage = $("#focus-stage"), fCanvas = $("#focus-canvas");
   var fVal = $("#fm-val"), fFill = $("#fm-fill");
