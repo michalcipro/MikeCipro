@@ -232,7 +232,7 @@ a{color:inherit}
   background:var(--bg-deep);border:1px solid var(--glass-border);
   box-shadow:0 2px 6px rgba(16,20,36,.06),0 50px 100px -40px color-mix(in srgb,var(--mind) 45%,rgba(16,20,36,.4));
 }
-.photo-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%}
+.photo-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 35%}
 .photo-frame::after{
   content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 0 0 1px rgba(255,255,255,.12);
@@ -278,7 +278,7 @@ a{color:inherit}
 .about-main .about-lead{font-size:clamp(18px,2vw,21px);line-height:1.5;color:var(--ink);font-weight:500}
 .about-side{display:grid;gap:16px;align-content:start}
 .portrait{
-  aspect-ratio:1/1;border-radius:var(--r-lg);display:grid;place-items:center;position:relative;overflow:hidden;
+  aspect-ratio:4/5;border-radius:var(--r-lg);display:grid;place-items:center;position:relative;overflow:hidden;
   background:
     radial-gradient(circle at 25% 20%,color-mix(in srgb,var(--code) 55%,transparent),transparent 55%),
     radial-gradient(circle at 80% 85%,color-mix(in srgb,var(--mentor) 65%,transparent),transparent 60%),
@@ -286,7 +286,7 @@ a{color:inherit}
   box-shadow:inset 0 1px 0 rgba(255,255,255,.4),var(--shadow);
 }
 .portrait span{font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.85)}
-.portrait img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 22%}
+.portrait img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 72%}
 .side-title{font:500 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-top:6px}
 .skills{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:0;padding:0}
 .skills li{padding:8px 13px;border-radius:999px;font-size:13.5px;font-weight:600;color:var(--ink-2);background:var(--glass-strong);border:1px solid var(--line)}
@@ -389,6 +389,7 @@ a{color:inherit}
 .press-media span{font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
 .press-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--ease)}
 .press:hover .press-media img{transform:scale(1.03)}
+.press-media img.focus-face{object-position:45% 28%}
 .press-body{display:grid;gap:10px;padding:22px 26px 28px}
 .press-src{font:500 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
 .press h3{font-size:clamp(19px,1.8vw,22px);font-weight:700;line-height:1.25;letter-spacing:-.02em}
