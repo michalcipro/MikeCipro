@@ -77,13 +77,27 @@
         <figure class="stage-photo">
           <img src="assets/img/michal-portrait.jpg" alt="Michal Cipro" width="1333" height="2000" fetchpriority="high">
         </figure>
-        <div class="chat" id="chat" aria-hidden="true">
-          <div class="b in" style="--slot:0"><span>Před zápasem mě svazuje nervozita.</span></div>
-          <div class="b out" style="--slot:1"><span>Nervozita je energie. Naučíme se ji řídit.</span></div>
-          <div class="b in" style="--slot:2"><span>Pod tlakem se mi třesou ruce.</span></div>
-          <div class="b out" style="--slot:3"><span>Postavíme rutinu a dech mezi výměnami.</span></div>
-          <div class="b in" style="--slot:4"><span>Bojím se, že zase prohraju.</span></div>
-          <div class="b out last" style="--slot:5"><span>Strach z porážky rozebereme krok po kroku.</span></div>
+        <div class="notif lg" id="notif" aria-hidden="true">
+          <span class="notif-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C6.5 3 2 6.8 2 11.5c0 2.6 1.4 4.9 3.6 6.5L5 21l3.8-1.9c1 .3 2.1.4 3.2.4 5.5 0 10-3.8 10-8.5S17.5 3 12 3Z"/></svg></span>
+          <span class="notif-body"><span class="notif-top"><strong>Zprávy</strong><em>teď</em></span><span class="notif-text" id="notif-text">Sportovec: Před zápasem mě svazuje nervozita.</span></span>
+        </div>
+        <div class="phone lg" id="phone">
+          <div class="phone-head">
+            <span class="ph-avatar" aria-hidden="true">S</span>
+            <span class="ph-name"><strong>Sportovec</strong><span>iMessage</span></span>
+          </div>
+          <div class="thread" id="thread" aria-live="off">
+            <div class="b in"><span>Před zápasem mě svazuje nervozita.</span></div>
+            <div class="b out"><span>Nervozita je energie. Naučíme se ji řídit, ne potlačovat.</span></div>
+          </div>
+          <div class="quick" id="quick" role="group" aria-label="Vyberte téma zprávy">
+            <button type="button" data-topic="0" class="on">Nervozita</button>
+            <button type="button" data-topic="1">Tlak</button>
+            <button type="button" data-topic="2">Strach z porážky</button>
+            <button type="button" data-topic="3">Motivace</button>
+            <button type="button" data-topic="4">Sebevědomí</button>
+            <button type="button" data-topic="5">Data</button>
+          </div>
         </div>
         <p class="sr-only">S čím sportovcům pomáhám: nervozita před zápasem, výkon pod tlakem, strach z porážky, motivace, sebevědomí a analýza dat.</p>
       </div>
