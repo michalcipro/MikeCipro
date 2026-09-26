@@ -12,6 +12,102 @@
   var year = $("#year");
   if (year) year.textContent = new Date().getFullYear();
 
+  /* ---------- intro loader ---------- */
+  var loader = $("#loader");
+  if (loader) {
+    if (root.classList.contains("no-loader") || reduced) {
+      loader.remove();
+    } else {
+      var num = $("#loader-num"), lt0 = performance.now();
+      var countUp = function (now) {
+        var k = Math.min(1, (now - lt0) / 1900);
+        var e = 1 - Math.pow(1 - k, 3);
+        if (num) num.textContent = String(Math.round(e * 100)).padStart(3, "0");
+        if (k < 1) requestAnimationFrame(countUp);
+      };
+      requestAnimationFrame(countUp);
+      setTimeout(function () { loader.remove(); }, 3300);
+    }
+  }
+
+  /* ---------- clock ---------- */
+  var clocks = $$("[data-clock]");
+  if (clocks.length) {
+    var tick = function () {
+      var t;
+      try { t = new Intl.DateTimeFormat("cs-CZ", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Prague" }).format(new Date()); }
+      catch (e) { t = ""; }
+      clocks.forEach(function (c) { c.textContent = t ? "Praha · " + t : "Praha"; });
+    };
+    tick();
+    setInterval(tick, 20000);
+  }
+
+  /* ---------- inertial smooth scroll (desktop) ---------- */
+  var smooth = null;
+  if (finePointer && !reduced) {
+    root.classList.add("smooth");
+    var sCur = window.scrollY, sTgt = window.scrollY, sRun = false;
+    var maxY = function () { return document.documentElement.scrollHeight - window.innerHeight; };
+    var sLoop = function () {
+      sCur += (sTgt - sCur) * 0.095;
+      if (Math.abs(sTgt - sCur) < 0.4) { sCur = sTgt; sRun = false; }
+      window.scrollTo(0, sCur);
+      if (sRun) requestAnimationFrame(sLoop);
+    };
+    var kick = function () { if (!sRun) { sRun = true; sCur = window.scrollY; requestAnimationFrame(sLoop); } };
+    window.addEventListener("wheel", function (e) {
+      if (e.ctrlKey || root.style.overflow === "hidden") return;
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+      e.preventDefault();
+      var d = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? window.innerHeight : 1);
+      sTgt = clamp(sTgt + d, 0, maxY());
+      kick();
+    }, { passive: false });
+    window.addEventListener("scroll", function () { if (!sRun) { sCur = sTgt = window.scrollY; } }, { passive: true });
+    smooth = function (y) { sTgt = clamp(y, 0, maxY()); kick(); };
+  }
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute("href").slice(1);
+    var el = id ? document.getElementById(id) : null;
+    if (!el) return;
+    e.preventDefault();
+    var y = id === "top" ? 0 : el.getBoundingClientRect().top + window.scrollY - 70;
+    if (smooth) smooth(y);
+    else window.scrollTo({ top: y, behavior: reduced ? "auto" : "smooth" });
+  });
+
+  /* ---------- custom cursor ---------- */
+  var cDot = $("#c-dot"), cRing = $("#c-ring"), cLabel = $("#c-label");
+  if (cDot && cRing && cLabel && finePointer && !reduced) {
+    root.classList.add("has-cursor");
+    cDot.hidden = false; cRing.hidden = false;
+    var mx = -100, my = -100, rx = -100, ry = -100, labelOn = false, lScale = 0;
+    window.addEventListener("pointermove", function (e) {
+      mx = e.clientX; my = e.clientY;
+      cDot.style.transform = "translate3d(" + mx + "px," + my + "px,0)";
+    }, { passive: true });
+    document.addEventListener("pointerover", function (e) {
+      var t = e.target.closest("a,button,[data-cursor]");
+      var label = t && t.getAttribute("data-cursor");
+      cRing.classList.toggle("is-hover", !!t && !label);
+      cRing.classList.toggle("is-label", !!label);
+      if (label) { cLabel.textContent = label; cLabel.hidden = false; }
+      labelOn = !!label;
+    });
+    document.addEventListener("pointerleave", function () { mx = my = -100; });
+    var cLoop = function () {
+      rx += (mx - rx) * 0.18; ry += (my - ry) * 0.18;
+      cRing.style.transform = "translate3d(" + rx.toFixed(1) + "px," + ry.toFixed(1) + "px,0)";
+      lScale += ((labelOn ? 1 : 0) - lScale) * 0.2;
+      cLabel.style.transform = "translate3d(" + rx.toFixed(1) + "px," + ry.toFixed(1) + "px,0) translate(-50%,-50%) scale(" + lScale.toFixed(3) + ")";
+      requestAnimationFrame(cLoop);
+    };
+    requestAnimationFrame(cLoop);
+  }
+
   /* ---------- aurora shader ---------- */
   var pointer = { x: 0.5, y: 0.5, sx: 0.5, sy: 0.5 };
   (function aurora() {
@@ -163,8 +259,40 @@
         if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
       });
     }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
-    $$(".rv, .rv-mask").forEach(function (el) { io.observe(el); });
+    $$(".rv, .rv-mask, .rv-words").forEach(function (el) { io.observe(el); });
+
+    var glyphs = "ABCDEFGHIJKLMNOPRSTUVXYZ0123456789/*+#";
+    var scramble = function (el) {
+      var final = el.getAttribute("data-text") || el.textContent;
+      el.setAttribute("data-text", final);
+      var st = performance.now(), dur = 650 + final.length * 12;
+      var step = function (now) {
+        var k = Math.min(1, (now - st) / dur), out = "";
+        for (var i = 0; i < final.length; i++) {
+          var ch = final[i];
+          out += (ch === " " || i < k * final.length) ? ch : glyphs[(Math.random() * glyphs.length) | 0];
+        }
+        el.textContent = out;
+        if (k < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    };
+    var sio = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { scramble(en.target); sio.unobserve(en.target); }
+      });
+    }, { threshold: 0.6 });
+    $$(".scramble, .exp-when, .step-no, .feature-src").forEach(function (el) { sio.observe(el); });
   }
+
+  /* ---------- word-by-word quote ---------- */
+  $$(".rv-words").forEach(function (el) {
+    if (!root.classList.contains("js-anim")) return;
+    var n = 0, parts = el.innerHTML.split(/(\s+)/);
+    el.innerHTML = parts.map(function (w) {
+      return /^\s+$/.test(w) || !w ? w : '<span class="w" style="--w:' + (n++) + '">' + w + "</span>";
+    }).join("");
+  });
 
   /* ---------- manifest words ---------- */
   var manifest = $("#manifest");
@@ -201,6 +329,8 @@
   var aboutImg = $("#about-photo img");
   var lastY = window.scrollY;
   var ticking = false;
+  var hero = $(".hero");
+  var velocity = 0, lastFrameY = window.scrollY;
 
   function onFrame() {
     ticking = false;
@@ -215,7 +345,12 @@
     }
     lastY = y;
 
+    velocity += ((y - lastFrameY) - velocity) * 0.2;
+    lastFrameY = y;
+
     if (reduced) return;
+
+    if (hero) hero.style.setProperty("--hx", clamp(y / (vh * 0.9), 0, 1).toFixed(4));
 
     if (words.length) {
       var mr = manifest.getBoundingClientRect();
@@ -316,6 +451,58 @@
       });
       el.addEventListener("pointerleave", function () { el.style.transform = ""; });
     });
+  }
+
+  /* ---------- velocity marquee ---------- */
+  var rows = $$(".mq");
+  var clientsSec = $("#spoluprace");
+  if (rows.length && clientsSec && !reduced) {
+    var mqState = rows.map(function (r) {
+      r.classList.add("mq-js");
+      return { el: r, tracks: $$(".mq-track", r), x: 0, dir: r.classList.contains("rev") ? 1 : -1 };
+    });
+    var mqRaf = 0, mqPrev = 0, mqVel = 0, mqLastY = window.scrollY;
+    var mqLoop = function (now) {
+      var dt = mqPrev ? Math.min(0.05, (now - mqPrev) / 1000) : 0.016;
+      mqPrev = now;
+      var dy = window.scrollY - mqLastY; mqLastY = window.scrollY;
+      mqVel += (dy / Math.max(dt, 0.001) - mqVel) * 0.12;
+      var boost = Math.min(Math.abs(mqVel) * 0.6, 1400);
+      mqState.forEach(function (m) {
+        var w = m.tracks[0].offsetWidth;
+        if (!w) return;
+        m.x += m.dir * (70 + boost) * dt;
+        if (m.x <= -w) m.x += w;
+        if (m.x > 0) m.x -= w;
+        m.tracks.forEach(function (tr) { tr.style.transform = "translate3d(" + m.x.toFixed(1) + "px,0,0)"; });
+        m.el.style.setProperty("--sk", clamp(-mqVel * 0.004, -10, 10).toFixed(2) + "deg");
+      });
+      mqRaf = requestAnimationFrame(mqLoop);
+    };
+    if (hasIO) {
+      new IntersectionObserver(function (en) {
+        if (en[0].isIntersecting) { if (!mqRaf) { mqPrev = 0; mqRaf = requestAnimationFrame(mqLoop); } }
+        else { cancelAnimationFrame(mqRaf); mqRaf = 0; }
+      }).observe(clientsSec);
+    }
+  }
+
+  /* ---------- wordmark weight follows the cursor ---------- */
+  var wordmark = $("#wordmark");
+  if (wordmark && finePointer && !reduced) {
+    var letters = $$(".wl", wordmark);
+    window.addEventListener("pointermove", function (e) {
+      var wr = wordmark.getBoundingClientRect();
+      if (wr.bottom < 0 || wr.top > window.innerHeight || e.clientY < wr.top - 250) {
+        return;
+      }
+      letters.forEach(function (l) {
+        var r = l.getBoundingClientRect();
+        var d = Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2));
+        var k = clamp(1 - d / 380, 0, 1);
+        l.style.setProperty("--fw", Math.round(800 - k * 600));
+      });
+    }, { passive: true });
   }
 
   /* ---------- box breathing guide ---------- */
