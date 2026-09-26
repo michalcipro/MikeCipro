@@ -108,32 +108,25 @@
         <h2 class="h-sec rv" id="services-title">Co dělám.</h2>
       </div>
       <div class="bento">
-        <article class="tile span2 rv" id="mentalni-koucink">
-          <p class="tile-kicker grad">Sportovci i byznys</p>
-          <h3 class="h-tile">Mentální koučink na míru.</h3>
-          <p class="body">Začínáme diagnostikou, podle ní navrhneme plán a pak pravidelně trénujeme zvládání stresu, soustředění a sebedůvěru.</p>
-          <div class="visual">
-            <div class="breath" id="breath" aria-hidden="true">
-              <svg viewBox="0 0 120 120">
-                <defs>
-                  <radialGradient id="breath-grad" cx="35%" cy="30%" r="75%">
-                    <stop offset="0" class="stop-a"/>
-                    <stop offset=".55" class="stop-b"/>
-                    <stop offset="1" class="stop-c"/>
-                  </radialGradient>
-                </defs>
-                <path class="track" d="M14 88V32a18 18 0 0 1 18-18h56a18 18 0 0 1 18 18v56a18 18 0 0 1-18 18H32a18 18 0 0 1-18-18Z"/>
-                <circle class="core" cx="60" cy="60" r="30"/>
-                <circle class="runner-glow" cx="14" cy="88" r="10"/>
-                <circle class="runner" cx="14" cy="88" r="4.5"/>
-              </svg>
-              <span class="breath-now"><span class="breath-word">Nádech</span><span class="breath-count">4</span></span>
-              <span class="breath-title">Zkuste si čtvercové dýchání 4-4-4-4</span>
+        <article class="tile tile-xl rv" id="mentalni-koucink">
+          <div class="xl-text">
+            <p class="tile-kicker grad">Sportovci i byznys</p>
+            <h3 class="h-tile">Mentální koučink na míru.</h3>
+            <p class="body">Začínáme diagnostikou, podle ní navrhneme plán a pak pravidelně trénujeme zvládání stresu, soustředění a sebedůvěru.</p>
+            <ul class="tags"><li>Diagnostika stresu</li><li>Práce s dechem</li><li>Soustředění</li><li>Sebedůvěra</li></ul>
+            <div class="focus-meter" aria-hidden="true">
+              <div class="fm-row"><span class="fm-label">Soustředění</span><span class="fm-val" id="fm-val">0 %</span></div>
+              <div class="fm-bar"><i id="fm-fill"></i></div>
+              <div class="fm-ends"><span>Hluk v hlavě</span><span>Klid a fokus</span></div>
             </div>
+          </div>
+          <div class="focus-stage" id="focus-stage" aria-hidden="true">
+            <canvas id="focus-canvas"></canvas>
+            <span class="focus-hint">Zkuste do toho vjet kurzorem</span>
           </div>
         </article>
 
-        <article class="tile rv" style="--d:.08s" id="mentoring">
+        <article class="tile tile-l rv" style="--d:.06s" id="mentoring">
           <p class="tile-kicker grad">Týmy a kluby</p>
           <h3 class="h-tile">Mentoring na celou sezónu.</h3>
           <p class="body">Týmová sezení i individuální podpora hráčů, s konkrétními kroky a pravidelnou zpětnou vazbou.</p>
@@ -158,10 +151,10 @@
           </div>
         </article>
 
-        <article class="tile court-tile rv" id="na-kurtu">
+        <article class="tile tile-m court-tile rv" style="--d:.12s" id="na-kurtu">
           <p class="tile-kicker" style="color:#6b7a2e">Kde to začalo</p>
           <h3 class="h-tile">Na kurtu.</h3>
-          <p class="body">Jako tenisový trenér jsem poznal, jak moc o výsledku rozhoduje hlava. Na kurtu dodnes občas vypomáhám.</p>
+          <p class="body">Jako tenisový trenér jsem poznal, jak moc o výsledku rozhoduje hlava.</p>
           <div class="visual">
             <svg class="court" viewBox="-8 -8 253.7 125.7" aria-hidden="true">
               <rect class="ln" x="0" y="0" width="237.7" height="109.7" rx="1"/>
@@ -173,17 +166,15 @@
           <span class="art-label">Kurt 23,77 × 10,97 m</span>
         </article>
 
-        <article class="tile dark span2 rv" style="--d:.08s" id="vibecoding">
+        <article class="tile tile-s dark rv" style="--d:.18s" id="vibecoding">
           <p class="tile-kicker grad">Hobby</p>
           <h3 class="h-tile">Vibecoding.</h3>
-          <p class="body">Po večerech stavím nástroje, aplikace a weby s pomocí AI. Rychle, intuitivně a pro radost. Tenhle web je jedním z nich.</p>
+          <p class="body">Po večerech stavím věci s AI. Včetně tohohle webu.</p>
           <div class="visual">
             <div class="term" aria-hidden="true">
               <div class="term-bar"><i></i><i></i><i></i></div>
-<pre><span class="pr">~ $</span> vibe "osobní web"
-<span class="dim">→ čtu zadání…</span>
-<span class="ok">✓</span> design hotový
-<span class="ok">✓</span> michalcipro.com<span class="caret"></span></pre>
+<pre><span class="pr">$</span> vibe web
+<span class="ok">✓</span> hotovo<span class="caret"></span></pre>
             </div>
           </div>
         </article>
