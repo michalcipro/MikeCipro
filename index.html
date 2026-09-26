@@ -12,13 +12,14 @@
 <meta property="og:title" content="Michal Cipro | Výkon začíná v hlavě">
 <meta property="og:description" content="Mentální příprava pro sportovce, týmy i lidi z byznysu.">
 <meta property="og:image" content="https://michalcipro.com/assets/img/michal-portrait.jpg">
-<meta name="theme-color" content="#06070b">
+<meta name="theme-color" content="#f5f5f7">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Manrope:wght@200..800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap">
 <link rel="preload" as="image" href="assets/img/michal-portrait.jpg">
 <link rel="stylesheet" href="assets/css/style.css">
+<script>(function(d){if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&"IntersectionObserver"in window)d.classList.add("js");})(document.documentElement);</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -31,29 +32,13 @@
   "knowsAbout": ["Mentální koučink", "Mentální příprava sportovců", "Mentoring", "Tenis", "Vibecoding"]
 }
 </script>
-<script>(function(d){var r=matchMedia("(prefers-reduced-motion: reduce)").matches,s=null;if(!r&&"IntersectionObserver"in window)d.classList.add("js-anim");try{s=sessionStorage.getItem("mc-intro");sessionStorage.setItem("mc-intro","1");}catch(e){}d.classList.add(r||s?"no-loader":"has-loader");})(document.documentElement);</script>
 <script src="assets/js/main.js" defer></script>
 </head>
 <body>
 <!-- BODY:START -->
-<div class="loader" id="loader" aria-hidden="true">
-  <div class="loader-orb"></div>
-  <p class="loader-word"><span class="lw lw-in">Nádech</span><span class="lw lw-out">Výdech</span></p>
-  <p class="loader-name">Michal Cipro</p>
-  <p class="loader-count"><span id="loader-num">000</span></p>
-</div>
-<span class="c-ring" id="c-ring" aria-hidden="true" hidden></span>
-<span class="c-dot" id="c-dot" aria-hidden="true" hidden></span>
-<span class="c-label" id="c-label" aria-hidden="true" hidden></span>
-<canvas class="aurora" id="aurora" aria-hidden="true"></canvas>
-<div class="aurora-fallback" id="aurora-fallback" aria-hidden="true" hidden></div>
-<div class="vignette" aria-hidden="true"></div>
-<div class="cursor-glow" id="cursor-glow" aria-hidden="true" hidden></div>
-<div class="grain" aria-hidden="true"></div>
-
-<header class="site-nav" id="site-nav">
-  <nav class="nav-pill glass" aria-label="Hlavní navigace">
-    <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>Michal Cipro</a>
+<header class="nav-wrap">
+  <nav class="nav lg" id="nav" aria-label="Hlavní navigace">
+    <a class="brand" href="#top"><span class="brand-dot" aria-hidden="true"></span>Michal Cipro</a>
     <ul class="nav-links">
       <li><a href="#o-mne">O mně</a></li>
       <li><a href="#co-delam">Co dělám</a></li>
@@ -63,217 +48,195 @@
     </ul>
     <a class="nav-cta" href="#kontakt">Kontakt</a>
     <button class="menu-btn" id="menu-btn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="mobile-menu"><span></span><span></span></button>
-    <span class="nav-progress" id="nav-progress" aria-hidden="true"></span>
   </nav>
 </header>
-<div class="mobile-menu" id="mobile-menu" hidden>
-  <a href="#o-mne" style="--i:0">O mně</a>
-  <a href="#co-delam" style="--i:1">Co dělám</a>
-  <a href="#metoda" style="--i:2">Metoda</a>
-  <a href="#zkusenosti" style="--i:3">Zkušenosti</a>
-  <a href="#media" style="--i:4">Média</a>
-  <a href="#kontakt" style="--i:5">Kontakt</a>
-</div>
+<nav class="mobile-menu lg" id="mobile-menu" aria-label="Menu" hidden>
+  <a href="#o-mne">O mně</a>
+  <a href="#co-delam">Co dělám</a>
+  <a href="#metoda">Metoda</a>
+  <a href="#zkusenosti">Zkušenosti</a>
+  <a href="#media">Média</a>
+  <a href="#kontakt">Kontakt</a>
+</nav>
 
 <main id="top">
 
-  <section class="hero wrap" aria-labelledby="hero-title">
-    <div class="hero-grid">
-      <div class="hero-copy">
-        <p class="hero-kicker fade-up" style="--d:.05s"><span class="pulse" aria-hidden="true"></span>Michal Cipro · Mentální kouč · Winning Minds</p>
-        <h1 class="hero-title" id="hero-title" aria-label="Výkon začíná v hlavě.">
-          <span class="line" aria-hidden="true"><span><span class="ch" style="--c:0">V</span><span class="ch" style="--c:1">ý</span><span class="ch" style="--c:2">k</span><span class="ch" style="--c:3">o</span><span class="ch" style="--c:4">n</span></span></span>
-          <span class="line" aria-hidden="true"><span><span class="ch" style="--c:5">z</span><span class="ch" style="--c:6">a</span><span class="ch" style="--c:7">č</span><span class="ch" style="--c:8">í</span><span class="ch" style="--c:9">n</span><span class="ch" style="--c:10">á</span></span></span>
-          <span class="line" aria-hidden="true"><span><span class="ch" style="--c:11">v</span> <em class="ch" style="--c:13">hlavě.</em></span></span>
-        </h1>
-        <p class="hero-lead fade-up" style="--d:.55s">Pomáhám sportovcům, týmům i lidem z byznysu podávat výkon ve chvíli, kdy na tom nejvíc záleží. Mentální trénink spojuji s poznatky moderní neurovědy a se vším, co mě naučily roky na tenisovém kurtu.</p>
-        <div class="hero-ctas fade-up" style="--d:.7s">
-          <a class="btn btn-primary magnetic" href="#kontakt">Domluvit konzultaci
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
-          <a class="btn btn-ghost magnetic" href="#metoda">Jak pracuji</a>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-text">
+      <p class="eyebrow grad rv">Mentální kouč · Winning Minds</p>
+      <h1 class="h-hero rv" style="--d:.08s" id="hero-title">Výkon začíná<br>v&nbsp;hlavě.</h1>
+      <p class="sub rv" style="--d:.16s">Pomáhám sportovcům, týmům i lidem z byznysu podávat výkon ve chvíli, kdy na tom nejvíc záleží.</p>
+      <div class="ctas rv" style="--d:.24s">
+        <a class="btn btn-blue" href="#kontakt">Domluvit konzultaci</a>
+        <a class="link-more" href="#metoda">Jak pracuji <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></a>
+      </div>
+    </div>
+    <div class="stage-wrap">
+      <div class="stage rv" style="--d:.3s" id="stage">
+        <div class="mesh" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <figure class="stage-photo">
+          <img src="assets/img/michal-portrait.jpg" alt="Michal Cipro" width="1333" height="2000" fetchpriority="high">
+        </figure>
+        <div class="chip lg bob c1" data-depth="26">
+          <span class="chip-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg></span>Diagnostika stresu
+        </div>
+        <div class="chip lg bob c2" data-depth="-18">
+          <span class="chip-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 9h11a3 3 0 1 0-3-3M4 15h14a3 3 0 1 1-3 3"/></svg></span>Práce s dechem
+        </div>
+        <div class="chip lg bob c3" data-depth="-24">
+          <span class="chip-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></span>Soustředění
+        </div>
+        <div class="chip lg bob c4" data-depth="20">
+          <span class="chip-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.6-7 10-7 10Z"/></svg></span>Klid pod tlakem
+        </div>
+        <div class="stage-card lg">
+          <strong>Winning Minds</strong>
+          <span>Mentální příprava pro vrcholové sportovce, týmy i byznys.</span>
         </div>
       </div>
-
-      <figure class="hero-portrait" id="hero-portrait">
-        <div class="portrait-frame" id="portrait-frame" data-cursor="Jasnost">
-          <img class="p-base" src="assets/img/michal-portrait.jpg" alt="" aria-hidden="true" width="1333" height="2000">
-          <img class="p-color" src="assets/img/michal-portrait.jpg" alt="Michal Cipro" width="1333" height="2000" fetchpriority="high">
-          <span class="lens-ring" aria-hidden="true"></span>
-        </div>
-        <figcaption class="portrait-tag glass">
-          <span class="tag-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/></svg></span>
-          <span class="tag-text"><strong>Michal Cipro</strong><span>Klid pod tlakem</span></span>
-        </figcaption>
-        <div class="orbit" aria-hidden="true">
-          <svg viewBox="0 0 120 120">
-            <defs><path id="orbit-path" d="M60 60m-46 0a46 46 0 1 1 92 0a46 46 0 1 1-92 0"/></defs>
-            <text><textPath href="#orbit-path">Mentální síla · Klid pod tlakem · Výkon ·</textPath></text>
-          </svg>
-          <span class="orbit-core"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M5.7 5.6c3 3.2 3 9.6 0 12.8M18.3 5.6c-3 3.2-3 9.6 0 12.8"/></svg></span>
-        </div>
-      </figure>
-    </div>
-
-    <div class="hero-foot fade-up" style="--d:1s">
-      <a class="scroll-cue" href="#o-mne" style="text-decoration:none"><i aria-hidden="true"></i>Scrolluj dál</a>
-      <div class="hero-tags"><span>Vrcholoví sportovci</span><span>Týmy a kluby</span><span>Byznys</span><span class="clock" data-clock>Praha</span></div>
     </div>
   </section>
 
   <section class="manifest wrap" id="o-mne" aria-label="O mně">
-    <p class="label rv scramble">O mně</p>
-    <p class="manifest-text" id="manifest">Začínal jsem jako tenisový trenér. Znovu a znovu jsem viděl, že o výsledku často nerozhoduje technika, ale <em>hlava.</em> Dnes vedu Winning Minds a pomáhám lidem zůstat klidní ve chvíli, kdy na tom nejvíc záleží.</p>
+    <p class="eyebrow grad rv">O mně</p>
+    <p class="manifest-text" id="manifest">Začínal jsem jako tenisový trenér. Znovu a znovu jsem viděl, že o výsledku často nerozhoduje technika, ale <span class="g">hlava.</span> Dnes vedu Winning Minds a pomáhám lidem zůstat klidní ve chvíli, kdy na tom nejvíc záleží.</p>
   </section>
 
-  <section class="about wrap" aria-labelledby="about-title">
-    <figure class="about-photo rv-mask" id="about-photo">
-      <img src="assets/img/michal-rozhovor.jpg" alt="Michal Cipro mluví na panelové diskusi" loading="lazy" width="1334" height="2000">
-      <figcaption class="glass">Panel Worklife Balance</figcaption>
-    </figure>
-    <div class="about-body">
-      <h2 id="about-title" class="rv">Na pomezí hlavy, kurtu a <em class="grad-text">kódu.</em></h2>
-      <p class="rv" style="--d:.1s">Mentální přípravu jsem studoval doma i v zahraničí. Ve Winning Minds s partnerem Milanem Večeřou připravujeme vrcholové sportovce, týmy, kluby i jednotlivce. Tradiční koučink doplňujeme o diagnostiku stresu, práci s dechem a neurovizuální trénink, takže se neřídíme jen pocitem, ale i daty.</p>
-      <p class="rv" style="--d:.2s">Rád hraju golf a po večerech stavím věci s AI. Tenhle web vznikl přesně tak.</p>
-      <ul class="skills rv" style="--d:.3s" aria-label="Dovednosti">
-        <li>Mentální odolnost</li>
-        <li>Zvládání tlaku</li>
-        <li>Diagnostika stresu</li>
-        <li>Práce s dechem</li>
-        <li>Neurovizuální trénink</li>
-        <li>Soustředění</li>
-        <li>Tenisový trénink</li>
-        <li>Prototypování s AI</li>
-      </ul>
-    </div>
-  </section>
-
-  <section class="section wrap" id="co-delam" aria-labelledby="services-title">
-    <div class="sec-head">
-      <p class="label rv scramble">Co dělám</p>
-      <h2 class="sec-title rv" id="services-title">Čtyři oblasti, jedna <em class="grad-text">hlava.</em></h2>
-      <p class="sec-lead rv">Každá čerpá z těch ostatních. Mentální trénink drží formu na kurtu, kurt učí disciplíně a kód dává hlavě prostor vypnout.</p>
-    </div>
-
-    <div class="stack" id="stack">
-      <article class="stack-card" id="mentalni-koucink" style="--i:0;--c:var(--blue)">
-        <div class="sc-text">
-          <p class="sc-kicker"><i aria-hidden="true"></i>Sportovci i byznys</p>
-          <h3>Mentální koučink</h3>
-          <p>Mentální příprava na míru. Začínáme diagnostikou, podle ní navrhneme plán a pak pravidelně trénujeme zvládání stresu, soustředění a sebedůvěru. Pro sportovce, manažery i každého, kdo chce podávat výkon bez vyhoření.</p>
-          <ul class="tags"><li>Diagnostika stresu</li><li>Práce s dechem</li><li>Soustředění</li><li>Sebedůvěra</li></ul>
-        </div>
-        <div class="sc-visual">
-          <div class="breath" id="breath" aria-hidden="true">
-            <svg viewBox="0 0 120 120">
-              <defs>
-                <radialGradient id="breath-grad" cx="35%" cy="30%" r="75%">
-                  <stop offset="0" class="stop-cyan"/>
-                  <stop offset=".55" class="stop-blue"/>
-                  <stop offset="1" class="stop-violet"/>
-                </radialGradient>
-              </defs>
-              <path class="track" d="M14 88V32a18 18 0 0 1 18-18h56a18 18 0 0 1 18 18v56a18 18 0 0 1-18 18H32a18 18 0 0 1-18-18Z"/>
-              <circle class="core" cx="60" cy="60" r="30"/>
-              <circle class="runner-glow" cx="14" cy="88" r="10"/>
-              <circle class="runner" cx="14" cy="88" r="4.5"/>
-            </svg>
-            <span class="breath-title">Čtvercové dýchání · 4-4-4-4</span>
-            <span class="breath-now"><span class="breath-word">Nádech</span><span class="breath-count">4</span></span>
+  <section class="section gray" id="co-delam" aria-labelledby="services-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="h-sec rv" id="services-title">Co dělám.</h2>
+      </div>
+      <div class="bento">
+        <article class="tile span2 rv" id="mentalni-koucink">
+          <p class="tile-kicker grad">Sportovci i byznys</p>
+          <h3 class="h-tile">Mentální koučink na míru.</h3>
+          <p class="body">Začínáme diagnostikou, podle ní navrhneme plán a pak pravidelně trénujeme zvládání stresu, soustředění a sebedůvěru.</p>
+          <div class="visual">
+            <div class="breath" id="breath" aria-hidden="true">
+              <svg viewBox="0 0 120 120">
+                <defs>
+                  <radialGradient id="breath-grad" cx="35%" cy="30%" r="75%">
+                    <stop offset="0" class="stop-a"/>
+                    <stop offset=".55" class="stop-b"/>
+                    <stop offset="1" class="stop-c"/>
+                  </radialGradient>
+                </defs>
+                <path class="track" d="M14 88V32a18 18 0 0 1 18-18h56a18 18 0 0 1 18 18v56a18 18 0 0 1-18 18H32a18 18 0 0 1-18-18Z"/>
+                <circle class="core" cx="60" cy="60" r="30"/>
+                <circle class="runner-glow" cx="14" cy="88" r="10"/>
+                <circle class="runner" cx="14" cy="88" r="4.5"/>
+              </svg>
+              <span class="breath-now"><span class="breath-word">Nádech</span><span class="breath-count">4</span></span>
+              <span class="breath-title">Zkuste si čtvercové dýchání 4-4-4-4</span>
+            </div>
           </div>
-        </div>
-      </article>
+        </article>
 
-      <article class="stack-card" id="mentoring" style="--i:1;--c:var(--violet)">
-        <div class="sc-text">
-          <p class="sc-kicker"><i aria-hidden="true"></i>Týmy a kluby</p>
-          <h3>Mentoring</h3>
-          <p>Dlouhodobě provázím týmy, kluby i jednotlivce. Od týmových sezení po individuální podporu hráčů v průběhu celé sezóny, s konkrétními kroky a pravidelnou zpětnou vazbou.</p>
-          <ul class="tags"><li>Týmová sezení</li><li>Individuální podpora</li><li>Celá sezóna</li></ul>
-        </div>
-        <div class="sc-visual">
-          <svg class="path-art" id="path-art" viewBox="0 0 320 110" aria-hidden="true">
-            <defs>
-              <linearGradient id="path-grad" x1="0" x2="1" y1="0" y2="0">
-                <stop offset="0" class="stop-cyan"/>
-                <stop offset=".5" class="stop-blue"/>
-                <stop offset="1" class="stop-violet"/>
-              </linearGradient>
-            </defs>
-            <path class="path-bg" d="M14 80C80 80 96 26 160 34S250 72 306 20"/>
-            <path class="path-fg" pathLength="1" d="M14 80C80 80 96 26 160 34S250 72 306 20"/>
-            <circle class="node" cx="14" cy="80" r="5"/>
-            <circle class="node" cx="160" cy="34" r="5"/>
-            <circle class="node node-goal" cx="306" cy="20" r="6"/>
-            <text x="4" y="104">Teď</text>
-            <text x="144" y="60">Směr</text>
-            <text x="290" y="46">Cíl</text>
-          </svg>
-        </div>
-      </article>
+        <article class="tile rv" style="--d:.08s" id="mentoring">
+          <p class="tile-kicker grad">Týmy a kluby</p>
+          <h3 class="h-tile">Mentoring na celou sezónu.</h3>
+          <p class="body">Týmová sezení i individuální podpora hráčů, s konkrétními kroky a pravidelnou zpětnou vazbou.</p>
+          <div class="visual">
+            <svg class="path-art" id="path-art" viewBox="0 0 320 110" aria-hidden="true">
+              <defs>
+                <linearGradient id="path-grad" x1="0" x2="1" y1="0" y2="0">
+                  <stop offset="0" class="stop-a"/>
+                  <stop offset=".5" class="stop-b"/>
+                  <stop offset="1" class="stop-c"/>
+                </linearGradient>
+              </defs>
+              <path class="path-bg" d="M14 80C80 80 96 26 160 34S250 72 306 20"/>
+              <path class="path-fg" pathLength="1" d="M14 80C80 80 96 26 160 34S250 72 306 20"/>
+              <circle class="node" cx="14" cy="80" r="5"/>
+              <circle class="node" cx="160" cy="34" r="5"/>
+              <circle class="node node-goal" cx="306" cy="20" r="6"/>
+              <text x="4" y="104">Teď</text>
+              <text x="146" y="60">Směr</text>
+              <text x="294" y="46">Cíl</text>
+            </svg>
+          </div>
+        </article>
 
-      <article class="stack-card" id="na-kurtu" style="--i:2;--c:var(--optic)">
-        <div class="sc-text">
-          <p class="sc-kicker"><i aria-hidden="true"></i>Kde to začalo</p>
-          <h3>Na kurtu</h3>
-          <p>Jako tenisový trenér jsem poznal, jak moc o výsledku rozhoduje hlava. Na kurtu dodnes občas vypomáhám a technika i psychika hráče u mě jdou ruku v ruce.</p>
-          <ul class="tags"><li>Technika</li><li>Rutiny mezi výměnami</li><li>Zápasová psychika</li></ul>
-        </div>
-        <div class="sc-visual">
-          <svg class="court" viewBox="-8 -8 253.7 125.7" aria-hidden="true">
-            <rect class="ln" x="0" y="0" width="237.7" height="109.7" rx="1"/>
-            <path class="ln" d="M0 13.7H237.7M0 96H237.7M54.85 13.7V96M182.85 13.7V96M54.85 54.85H182.85M0 54.85H4M233.7 54.85H237.7"/>
-            <path class="net" d="M118.85 -5V114.7"/>
-            <g class="ball"><circle class="ball-glow" r="9"/><circle class="ball-core" r="4.2"/></g>
-          </svg>
-          <span class="art-label">Kurt · 23,77 × 10,97 m</span>
-        </div>
-      </article>
+        <article class="tile court-tile rv" id="na-kurtu">
+          <p class="tile-kicker" style="color:#6b7a2e">Kde to začalo</p>
+          <h3 class="h-tile">Na kurtu.</h3>
+          <p class="body">Jako tenisový trenér jsem poznal, jak moc o výsledku rozhoduje hlava. Na kurtu dodnes občas vypomáhám.</p>
+          <div class="visual">
+            <svg class="court" viewBox="-8 -8 253.7 125.7" aria-hidden="true">
+              <rect class="ln" x="0" y="0" width="237.7" height="109.7" rx="1"/>
+              <path class="ln" d="M0 13.7H237.7M0 96H237.7M54.85 13.7V96M182.85 13.7V96M54.85 54.85H182.85M0 54.85H4M233.7 54.85H237.7"/>
+              <path class="net" d="M118.85 -5V114.7"/>
+              <g class="ball"><circle class="ball-glow" r="9"/><circle class="ball-core" r="4.2"/></g>
+            </svg>
+          </div>
+          <span class="art-label">Kurt 23,77 × 10,97 m</span>
+        </article>
 
-      <article class="stack-card" id="vibecoding" style="--i:3;--c:var(--cyan)">
-        <div class="sc-text">
-          <p class="sc-kicker"><i aria-hidden="true"></i>Hobby</p>
-          <h3>Vibecoding</h3>
-          <p>Po večerech stavím nástroje, aplikace a weby s pomocí AI. Rychle, intuitivně a pro radost. Tenhle web je jedním z nich.</p>
-          <ul class="tags"><li>AI nástroje</li><li>Prototypy</li><li>Weby</li></ul>
-        </div>
-        <div class="sc-visual">
-          <div class="term" aria-hidden="true">
-            <div class="term-bar"><i></i><i></i><i></i></div>
+        <article class="tile dark span2 rv" style="--d:.08s" id="vibecoding">
+          <p class="tile-kicker grad">Hobby</p>
+          <h3 class="h-tile">Vibecoding.</h3>
+          <p class="body">Po večerech stavím nástroje, aplikace a weby s pomocí AI. Rychle, intuitivně a pro radost. Tenhle web je jedním z nich.</p>
+          <div class="visual">
+            <div class="term" aria-hidden="true">
+              <div class="term-bar"><i></i><i></i><i></i></div>
 <pre><span class="pr">~ $</span> vibe "osobní web"
 <span class="dim">→ čtu zadání…</span>
 <span class="ok">✓</span> design hotový
-<span class="ok">✓</span> animace hotové
 <span class="ok">✓</span> michalcipro.com<span class="caret"></span></pre>
+            </div>
           </div>
-        </div>
-      </article>
+        </article>
+      </div>
     </div>
   </section>
 
-  <section class="section wrap" id="metoda" aria-labelledby="method-title">
-    <div class="sec-head">
-      <p class="label rv scramble">Metoda</p>
-      <h2 class="sec-title rv" id="method-title">Méně dojmů, víc <em class="grad-text">dat.</em></h2>
-      <p class="sec-lead rv">S Milanem Večeřou jsme dali mentálnímu tréninku strukturu. Každá spolupráce prochází třemi fázemi.</p>
+  <section class="section wrap" aria-labelledby="about-title">
+    <div class="about">
+      <figure class="about-photo rv" id="about-photo">
+        <img src="assets/img/michal-rozhovor.jpg" alt="Michal Cipro mluví na panelové diskusi" loading="lazy" width="1334" height="2000">
+      </figure>
+      <div class="about-body">
+        <p class="eyebrow grad rv">Příběh</p>
+        <h2 class="h-sec rv" id="about-title">Na pomezí hlavy, kurtu a&nbsp;kódu.</h2>
+        <p class="body rv">Mentální přípravu jsem studoval doma i v zahraničí. Ve <strong>Winning Minds</strong> s partnerem Milanem Večeřou připravujeme vrcholové sportovce, týmy, kluby i jednotlivce. Tradiční koučink doplňujeme o diagnostiku stresu, práci s dechem a neurovizuální trénink, takže se neřídíme jen pocitem, ale i daty.</p>
+        <p class="body rv">Rád hraju golf a po večerech stavím věci s AI. Tenhle web vznikl přesně tak.</p>
+        <ul class="skills rv" aria-label="Dovednosti">
+          <li>Mentální odolnost</li>
+          <li>Zvládání tlaku</li>
+          <li>Diagnostika stresu</li>
+          <li>Práce s dechem</li>
+          <li>Neurovizuální trénink</li>
+          <li>Soustředění</li>
+          <li>Tenisový trénink</li>
+          <li>Prototypování s AI</li>
+        </ul>
+      </div>
     </div>
-    <div class="steps-wrap" id="steps-wrap" style="position:relative">
-      <span class="steps-line" aria-hidden="true"></span>
-      <ol class="steps" id="steps">
+  </section>
+
+  <section class="section gray" id="metoda" aria-labelledby="method-title">
+    <div class="wrap">
+      <div class="sec-head center">
+        <p class="eyebrow grad rv">Metoda</p>
+        <h2 class="h-sec rv" id="method-title">Méně dojmů. Víc dat.</h2>
+        <p class="sub rv">S Milanem Večeřou jsme dali mentálnímu tréninku strukturu. Každá spolupráce prochází třemi fázemi.</p>
+      </div>
+      <ol class="steps">
         <li class="step rv">
-          <span class="step-no">01</span>
+          <span class="step-no grad">01</span>
           <h3>Diagnostika</h3>
-          <p>Zjistíme, jak reagujete na stres a kde vám utíká energie i soustředění. Víme, od čeho se odrazit.</p>
+          <p class="body">Zjistíme, jak reagujete na stres a kde vám utíká energie i soustředění. Víme, od čeho se odrazit.</p>
         </li>
-        <li class="step rv" style="--d:.1s">
-          <span class="step-no">02</span>
+        <li class="step rv" style="--d:.08s">
+          <span class="step-no grad">02</span>
           <h3>Plán na míru</h3>
-          <p>Podle výsledků navrhneme trénink přesně pro vás: práci s dechem, soustředěním, sebedůvěrou i rutinami před výkonem.</p>
+          <p class="body">Podle výsledků navrhneme trénink přesně pro vás: práci s dechem, soustředěním, sebedůvěrou i rutinami před výkonem.</p>
         </li>
-        <li class="step rv" style="--d:.2s">
-          <span class="step-no">03</span>
+        <li class="step rv" style="--d:.16s">
+          <span class="step-no grad">03</span>
           <h3>Pravidelný trénink</h3>
-          <p>Trénujeme průběžně a pokrok znovu vyhodnocujeme. Mentální forma se buduje stejně jako ta fyzická.</p>
+          <p class="body">Trénujeme průběžně a pokrok znovu vyhodnocujeme. Mentální forma se buduje stejně jako ta fyzická.</p>
         </li>
       </ol>
     </div>
@@ -281,95 +244,95 @@
 
   <section class="section wrap" id="zkusenosti" aria-labelledby="exp-title">
     <div class="sec-head">
-      <p class="label rv scramble">Zkušenosti</p>
-      <h2 class="sec-title rv" id="exp-title">Od kurtu k <em class="grad-text">vrcholu.</em></h2>
+      <p class="eyebrow grad rv">Zkušenosti</p>
+      <h2 class="h-sec rv" id="exp-title">Od kurtu k vrcholu.</h2>
     </div>
     <ol class="exp">
-      <li class="rv" style="--c:var(--blue)"><span class="exp-when">Současnost</span><h3>Winning Minds</h3><p>Vedu společnost, která s Milanem Večeřou zajišťuje mentální přípravu pro vrcholové sportovce, týmy, kluby i jednotlivce.</p></li>
-      <li class="rv" style="--c:var(--violet)"><span class="exp-when">Volejbal</span><h3>Volejbal Kladno</h3><p>Mentální příprava týmu v boji o medaile. Pracujeme na výkonu jednotlivců i na psychické hygieně celého kádru.</p></li>
-      <li class="rv" style="--c:var(--cyan)"><span class="exp-when">MMA</span><h3>Patrik Kincl · Oktagon</h3><p>Mentální příprava před zápasem na Oktagonu 81 v pražské O2 areně.</p></li>
-      <li class="rv" style="--c:var(--optic)"><span class="exp-when">Začátky</span><h3>Tenisový trenér</h3><p>Na kurtu jsem viděl, jak moc o výsledku rozhoduje hlava. Odtud vedla cesta k mentální přípravě.</p></li>
-      <li class="rv" style="--c:var(--ink-3)"><span class="exp-when">Základy</span><h3>Studium doma i v zahraničí</h3><p>Mentální trénink, koučink a moderní neurověda, na kterých stavím svou práci.</p></li>
+      <li class="rv"><span class="exp-when">Současnost</span><div><h3>Winning Minds</h3><p>Vedu společnost, která s Milanem Večeřou zajišťuje mentální přípravu pro vrcholové sportovce, týmy, kluby i jednotlivce.</p></div></li>
+      <li class="rv"><span class="exp-when">Volejbal</span><div><h3>Volejbal Kladno</h3><p>Mentální příprava týmu v boji o medaile. Pracujeme na výkonu jednotlivců i na psychické hygieně celého kádru.</p></div></li>
+      <li class="rv"><span class="exp-when">MMA</span><div><h3>Patrik Kincl · Oktagon</h3><p>Mentální příprava před zápasem na Oktagonu 81 v pražské O2 areně.</p></div></li>
+      <li class="rv"><span class="exp-when">Začátky</span><div><h3>Tenisový trenér</h3><p>Na kurtu jsem viděl, jak moc o výsledku rozhoduje hlava. Odtud vedla cesta k mentální přípravě.</p></div></li>
+      <li class="rv"><span class="exp-when">Základy</span><div><h3>Studium doma i v zahraničí</h3><p>Mentální trénink, koučink a moderní neurověda, na kterých stavím svou práci.</p></div></li>
     </ol>
   </section>
 
-  <section class="quote-sec wrap" aria-label="Citát">
-    <figure class="big-quote">
-      <span class="qm" aria-hidden="true">“</span>
-      <blockquote class="rv-words" id="big-quote">Je dobře, že kluci spadli z&nbsp;obláčku rychle dolů.</blockquote>
-      <figcaption class="rv"><span class="scramble">Michal Cipro o volejbalistech Kladna</span></figcaption>
-    </figure>
+  <section class="quote-sec" aria-label="Citát">
+    <div class="wrap">
+      <span class="qm rv" aria-hidden="true">“</span>
+      <blockquote class="big-quote rv" style="--d:.08s">Je dobře, že kluci spadli z&nbsp;obláčku rychle dolů.</blockquote>
+      <p class="quote-cap rv" style="--d:.16s">Michal Cipro o volejbalistech Kladna · <a href="https://kladno.volejbal.cz/je-dobre-ze-kluci-spadli-z-oblacku-rychle-dolu-je-si-jisty-michal-cipro/" target="_blank" rel="noopener">Celý rozhovor</a></p>
+    </div>
   </section>
 
   <section class="section wrap" id="media" aria-labelledby="media-title">
     <div class="sec-head">
-      <p class="label rv scramble">Média a vystoupení</p>
-      <h2 class="sec-title rv" id="media-title">Kde o hlavě <em class="grad-text">mluvím.</em></h2>
+      <p class="eyebrow grad rv">Média a vystoupení</p>
+      <h2 class="h-sec rv" id="media-title">Kde o hlavě mluvím.</h2>
     </div>
-    <article class="feature glass rv">
+    <article class="feature rv">
       <div class="feature-media">
         <img src="assets/img/panel-worklife.jpg" alt="Michal Cipro na panelové diskusi Worklife Balance" loading="lazy" width="1458" height="972">
       </div>
       <div class="feature-body">
-        <p class="feature-src">Panelová diskuse</p>
+        <p class="feature-kicker">Panelová diskuse</p>
         <h3>Worklife Balance: jak optimalizovat výkon v práci a životě bez vyhoření</h3>
-        <p>Diskuse s Denisou Hrubešovou (Forendors) a Michalem Ptáčkem (CzechCrunch) o tom, jak podávat výkon dlouhodobě a nevyhořet.</p>
+        <p class="body">Diskuse s Denisou Hrubešovou (Forendors) a Michalem Ptáčkem (CzechCrunch) o tom, jak podávat výkon dlouhodobě a nevyhořet.</p>
       </div>
     </article>
-    <ul class="press-list">
-      <li class="rv"><a href="https://isport.blesk.cz/clanek/ostatni-mma-oktagon/470322/mentalni-koucove-o-kinclovi-trashtalku-se-smeje-perfekcionismus-ho-posouva-i-brzdi.html" target="_blank" rel="noopener" data-cursor="Číst"><span class="pl-src">iSport.cz</span><span class="pl-title">Mentální koučové o Kinclovi: Trashtalku se směje. Perfekcionismus ho posouvá i brzdí</span><span class="pl-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></li>
-      <li class="rv"><a href="https://www.fights.cz/ceska-scena/neduvera-a-pohled-masoveho-vraha-mentalni-kouci-promluvili-o-spolupraci-s-patrikem-kinclem-621006" target="_blank" rel="noopener" data-cursor="Číst"><span class="pl-src">Fights.cz</span><span class="pl-title">Mentální kouči promluvili o spolupráci s Patrikem Kinclem</span><span class="pl-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></li>
-      <li class="rv"><a href="https://kladno.volejbal.cz/je-dobre-ze-kluci-spadli-z-oblacku-rychle-dolu-je-si-jisty-michal-cipro/" target="_blank" rel="noopener" data-cursor="Číst"><span class="pl-src">Volejbal Kladno</span><span class="pl-title">Je dobře, že kluci spadli z obláčku rychle dolů, je si jistý Michal Cipro</span><span class="pl-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></li>
-      <li class="rv"><a href="https://www.youtube.com/watch?v=q6AOFVUXtO0" target="_blank" rel="noopener" data-cursor="Číst"><span class="pl-src">YouTube</span><span class="pl-title">Winning Minds: Michal Cipro a Milan Večeřa</span><span class="pl-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></li>
+    <ul class="press">
+      <li class="rv"><a href="https://isport.blesk.cz/clanek/ostatni-mma-oktagon/470322/mentalni-koucove-o-kinclovi-trashtalku-se-smeje-perfekcionismus-ho-posouva-i-brzdi.html" target="_blank" rel="noopener"><span class="press-src">iSport.cz</span><span class="press-title">Mentální koučové o Kinclovi: Trashtalku se směje. Perfekcionismus ho posouvá i brzdí</span><span class="press-go">Číst <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span></a></li>
+      <li class="rv"><a href="https://www.fights.cz/ceska-scena/neduvera-a-pohled-masoveho-vraha-mentalni-kouci-promluvili-o-spolupraci-s-patrikem-kinclem-621006" target="_blank" rel="noopener"><span class="press-src">Fights.cz</span><span class="press-title">Mentální kouči promluvili o spolupráci s Patrikem Kinclem</span><span class="press-go">Číst <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span></a></li>
+      <li class="rv"><a href="https://kladno.volejbal.cz/je-dobre-ze-kluci-spadli-z-oblacku-rychle-dolu-je-si-jisty-michal-cipro/" target="_blank" rel="noopener"><span class="press-src">Volejbal Kladno</span><span class="press-title">Je dobře, že kluci spadli z obláčku rychle dolů, je si jistý Michal Cipro</span><span class="press-go">Číst <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span></a></li>
+      <li class="rv"><a href="https://www.youtube.com/watch?v=q6AOFVUXtO0" target="_blank" rel="noopener"><span class="press-src">YouTube</span><span class="press-title">Winning Minds: Michal Cipro a Milan Večeřa</span><span class="press-go">Přehrát <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span></a></li>
     </ul>
   </section>
 
-  <section class="clients" id="spoluprace" aria-labelledby="clients-title">
+  <section class="clients gray" id="spoluprace" aria-labelledby="clients-title">
     <div class="wrap">
-      <div class="sec-head">
-        <p class="label rv scramble">Spolupráce</p>
-        <h2 class="sr-only" id="clients-title">S kým pracuji: Winning Minds, Volejbal Kladno, Patrik Kincl, vrcholoví sportovci, týmy a kluby, firmy a manažeři, tenisoví hráči</h2>
-      </div>
-    </div>
-    <div class="mq" aria-hidden="true">
-      <div class="mq-track"><span class="mq-item">Winning Minds<svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c.6 6.4 5.6 11.4 12 12-6.4.6-11.4 5.6-12 12-.6-6.4-5.6-11.4-12-12C6.4 11.4 11.4 6.4 12 0Z"/></svg></span><span class="mq-item">Volejbal Kladno<svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c.6 6.4 5.6 11.4 12 12-6.4.6-11.4 5.6-12 12-.6-6.4-5.6-11.4-12-12C6.4 11.4 11.4 6.4 12 0Z"/></svg></span><span class="mq-item">Patrik Kincl · Oktagon<svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c.6 6.4 5.6 11.4 12 12-6.4.6-11.4 5.6-12 12-.6-6.4-5.6-11.4-12-12C6.4 11.4 11.4 6.4 12 0Z"/></svg></span></div>
-      <div class="mq-track"><span class="mq-item">Winning Minds<svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c.6 6.4 5.6 11.4 12 12-6.4.6-11.4 5.6-12 12-.6-6.4-5.6-11.4-12-12C6.4 11.4 11.4 6.4 12 0Z"/></svg></span><span class="mq-item">Volejbal Kladno<svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c.6 6.4 5.6 11.4 12 12-6.4.6-11.4 5.6-12 12-.6-6.4-5.6-11.4-12-12C6.4 11.4 11.4 6.4 12 0Z"/></svg></span><span class="mq-item">Patrik Kincl · Oktagon<svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c.6 6.4 5.6 11.4 12 12-6.4.6-11.4 5.6-12 12-.6-6.4-5.6-11.4-12-12C6.4 11.4 11.4 6.4 12 0Z"/></svg></span></div>
-    </div>
-    <div class="mq rev" aria-hidden="true">
-      <div class="mq-track"><span class="mq-item">Vrcholoví sportovci<svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c.6 6.4 5.6 11.4 12 12-6.4.6-11.4 5.6-12 12-.6-6.4-5.6-11.4-12-12C6.4 11.4 11.4 6.4 12 0Z"/></svg></span><span class="mq-item">Týmy a kluby<svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c.6 6.4 5.6 11.4 12 12-6.4.6-11.4 5.6-12 12-.6-6.4-5.6-11.4-12-12C6.4 11.4 11.4 6.4 12 0Z"/></svg></span><span class="mq-item">Firmy a manažeři<svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c.6 6.4 5.6 11.4 12 12-6.4.6-11.4 5.6-12 12-.6-6.4-5.6-11.4-12-12C6.4 11.4 11.4 6.4 12 0Z"/></svg></span><span class="mq-item">Tenisoví hráči<svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c.6 6.4 5.6 11.4 12 12-6.4.6-11.4 5.6-12 12-.6-6.4-5.6-11.4-12-12C6.4 11.4 11.4 6.4 12 0Z"/></svg></span></div>
-      <div class="mq-track"><span class="mq-item">Vrcholoví sportovci<svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c.6 6.4 5.6 11.4 12 12-6.4.6-11.4 5.6-12 12-.6-6.4-5.6-11.4-12-12C6.4 11.4 11.4 6.4 12 0Z"/></svg></span><span class="mq-item">Týmy a kluby<svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c.6 6.4 5.6 11.4 12 12-6.4.6-11.4 5.6-12 12-.6-6.4-5.6-11.4-12-12C6.4 11.4 11.4 6.4 12 0Z"/></svg></span><span class="mq-item">Firmy a manažeři<svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c.6 6.4 5.6 11.4 12 12-6.4.6-11.4 5.6-12 12-.6-6.4-5.6-11.4-12-12C6.4 11.4 11.4 6.4 12 0Z"/></svg></span><span class="mq-item">Tenisoví hráči<svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c.6 6.4 5.6 11.4 12 12-6.4.6-11.4 5.6-12 12-.6-6.4-5.6-11.4-12-12C6.4 11.4 11.4 6.4 12 0Z"/></svg></span></div>
+      <h2 class="eyebrow rv" id="clients-title">S kým pracuji</h2>
+      <ul class="client-row rv">
+        <li>Winning Minds</li>
+        <li>Volejbal Kladno</li>
+        <li>Patrik Kincl</li>
+        <li>Oktagon MMA</li>
+        <li>Vrcholoví sportovci</li>
+        <li>Firmy a manažeři</li>
+        <li>Tenisoví hráči</li>
+      </ul>
     </div>
   </section>
 
-  <section class="contact wrap" id="kontakt" aria-labelledby="contact-title">
-    <div class="contact-orb" aria-hidden="true"></div>
-    <p class="label rv scramble">Kontakt</p>
-    <h2 class="contact-title rv" id="contact-title">Pojďme <em>na to.</em></h2>
-    <p class="contact-lead rv">Napište mi pár vět o tom, co právě řešíte. Ozvu se a domluvíme si úvodní konzultaci.</p>
-    <div class="contact-actions rv">
-      <a class="btn btn-primary btn-xl magnetic" href="mailto:michal@michalcipro.com" data-cursor="Napsat">Napsat e-mail
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-      </a>
-      <div class="email-field">
-        <span id="email-text">michal@michalcipro.com</span>
-        <button class="copy" id="copy-email" type="button" aria-label="Kopírovat e-mail">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>
-          <span class="copy-label">Kopírovat</span>
-        </button>
+  <section class="section wrap" id="kontakt" aria-labelledby="contact-title">
+    <div class="contact-card rv">
+      <div class="mesh" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="contact-inner">
+        <h2 class="h-sec" id="contact-title">Pojďme na to.</h2>
+        <p class="sub">Napište mi pár vět o tom, co právě řešíte. Ozvu se a domluvíme si úvodní konzultaci.</p>
+        <div class="contact-actions">
+          <a class="btn btn-blue" href="mailto:michal@michalcipro.com">Napsat e-mail</a>
+          <div class="email-field lg">
+            <span id="email-text">michal@michalcipro.com</span>
+            <button class="copy" id="copy-email" type="button" aria-label="Kopírovat e-mail">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>
+              <span class="copy-label">Kopírovat</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
 </main>
 
-<footer class="site-footer wrap">
-  <div class="footer-row">
-    <span>© <span id="year">2026</span> Michal Cipro</span>
-    <span>Mentální koučink · Mentoring · Tenis · Vibecoding</span>
-    <span class="clock" data-clock>Praha</span>
-    <a href="#top">Nahoru ↑</a>
+<footer class="site-footer">
+  <div class="wrap">
+    <p class="footer-note">Mentální koučink, mentoring, tenis a vibecoding. Web vznikl s pomocí AI.</p>
+    <div class="footer-row">
+      <span>Copyright © <span id="year">2026</span> Michal Cipro. Všechna práva vyhrazena.</span>
+      <span class="clock" data-clock>Praha</span>
+      <a href="#top">Zpět nahoru</a>
+    </div>
   </div>
-  <p class="wordmark" id="wordmark" aria-hidden="true"><span class="wl">M</span><span class="wl">i</span><span class="wl">c</span><span class="wl">h</span><span class="wl">a</span><span class="wl">l</span> <span class="wl">C</span><span class="wl">i</span><span class="wl">p</span><span class="wl">r</span><span class="wl">o</span></p>
 </footer>
 <!-- BODY:END -->
 </body>
