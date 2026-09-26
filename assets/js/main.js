@@ -81,31 +81,6 @@
     specs.forEach(function (el) { sweep.observe(el); });
   }
 
-  // Hero orbs drift toward the pointer
-  var orbs = Array.prototype.slice.call(document.querySelectorAll(".orb-wrap"));
-  if (!reduced && orbs.length && window.matchMedia("(pointer: fine)").matches) {
-    var tx = 0, ty = 0, cx = 0, cy = 0, running = false;
-    var step = function () {
-      cx += (tx - cx) * 0.06;
-      cy += (ty - cy) * 0.06;
-      orbs.forEach(function (o) {
-        var d = parseFloat(o.dataset.depth) || 20;
-        o.style.setProperty("--px", (cx * d).toFixed(2) + "px");
-        o.style.setProperty("--py", (cy * d).toFixed(2) + "px");
-      });
-      if (Math.abs(tx - cx) > 0.001 || Math.abs(ty - cy) > 0.001) {
-        requestAnimationFrame(step);
-      } else {
-        running = false;
-      }
-    };
-    window.addEventListener("pointermove", function (e) {
-      tx = e.clientX / window.innerWidth - 0.5;
-      ty = e.clientY / window.innerHeight - 0.5;
-      if (!running) { running = true; requestAnimationFrame(step); }
-    }, { passive: true });
-  }
-
   // Box breathing guide: 4 s inhale, hold, exhale, hold
   var breath = document.querySelector(".breath");
   if (breath && !reduced) {

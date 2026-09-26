@@ -42,7 +42,7 @@
 
 <header class="site-nav">
   <nav class="nav-pill glass" aria-label="Hlavní navigace">
-    <a class="brand" href="#top"><span class="mark" aria-hidden="true">MC</span><span class="brand-name">Michal Cipro</span></a>
+    <a class="brand" href="#top">Michal Cipro</a>
     <ul class="nav-links">
       <li><a href="#o-mne">O mně</a></li>
       <li><a href="#co-delam">Co dělám</a></li>
@@ -72,25 +72,36 @@
 <main class="wrap" id="top">
 
   <section class="hero" aria-labelledby="hero-title">
-    <div class="orb-wrap orb-a" data-depth="22" aria-hidden="true"><div class="orb"></div></div>
-    <div class="orb-wrap orb-b" data-depth="-30" aria-hidden="true"><div class="orb orb-ball"></div></div>
-    <div class="hero-inner">
-      <p class="hello glass fx" style="--d:0s"><span class="mark" aria-hidden="true">MC</span>Mentální kouč a mentor</p>
-      <h1 id="hero-title" class="fx" style="--d:.1s">Michal <span class="liquid-text">Cipro</span></h1>
-      <p class="lead fx" style="--d:.24s">Pomáhám lidem najít klid v hlavě a jistotu ve výkonu. Koučuji, mentoruji, občas vypomáhám na tenisovém kurtu a po večerech stavím věci s AI.</p>
-      <div class="cta-row fx" style="--d:.38s">
+    <div class="hero-text">
+      <p class="hero-eyebrow fx" style="--d:0s"><span class="status-dot" aria-hidden="true"></span>Mentální kouč a mentor</p>
+      <h1 id="hero-title" class="fx" style="--d:.08s">Michal<br>Cipro</h1>
+      <p class="lead fx" style="--d:.2s">Pomáhám lidem najít klid v hlavě a jistotu ve výkonu. Koučuji, mentoruji, občas vypomáhám na tenisovém kurtu a po večerech stavím věci s AI.</p>
+      <div class="cta-row fx" style="--d:.32s">
         <a class="btn btn-primary" href="#kontakt">Domluvit konzultaci
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
         <a class="btn btn-glass glass" href="#co-delam">Co dělám</a>
       </div>
-      <ul class="chips fx" style="--d:.52s">
-        <li><a class="chip glass" href="#mentalni-koucink"><span class="dot" style="--c:var(--mind)"></span>Mentální koučink</a></li>
-        <li><a class="chip glass" href="#mentoring"><span class="dot" style="--c:var(--mentor)"></span>Mentoring</a></li>
-        <li><a class="chip glass" href="#na-kurtu"><span class="dot" style="--c:var(--court)"></span>Tenis</a></li>
-        <li><a class="chip glass" href="#vibecoding"><span class="dot" style="--c:var(--code)"></span>Vibecoding</a></li>
+      <ul class="hero-roles fx" style="--d:.44s">
+        <li><a href="#mentalni-koucink">Mentální koučink</a></li>
+        <li><a href="#mentoring">Mentoring</a></li>
+        <li><a href="#na-kurtu">Tenis</a></li>
+        <li><a href="#vibecoding">Vibecoding</a></li>
       </ul>
     </div>
+    <figure class="hero-photo fx" style="--d:.16s">
+      <div class="photo-frame">
+        <div class="photo-placeholder" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 21c.8-4.2 3.8-6.5 7.5-6.5s6.7 2.3 7.5 6.5"/></svg>
+          <span>Portrét</span>
+        </div>
+        <img src="assets/img/michal-portrait.jpg" alt="Michal Cipro" width="1333" height="2000" fetchpriority="high" onerror="this.remove()">
+      </div>
+      <figcaption class="photo-card glass">
+        <span class="quote">„Výkon začíná v hlavě.“</span>
+        <span class="quote-by">Michal Cipro</span>
+      </figcaption>
+    </figure>
   </section>
 
   <section class="section" id="o-mne" aria-labelledby="about-title">
@@ -102,7 +113,10 @@
         <p>Věřím v jednoduché nástroje, poctivou práci a rozhovory, po kterých je jasnější, co dělat dál. Když zrovna nekoučuji, bývám na kurtu nebo u počítače, kde s pomocí AI stavím aplikace a weby. Tenhle web vznikl přesně tak.</p>
       </div>
       <div class="about-side">
-        <div class="portrait" role="img" aria-label="Místo pro portrét Michala Cipra"><span aria-hidden="true">MC</span></div>
+        <div class="portrait">
+          <span aria-hidden="true">Rozhovor</span>
+          <img src="assets/img/michal-rozhovor.jpg" alt="Michal Cipro během rozhovoru" loading="lazy" onerror="this.remove()">
+        </div>
         <p class="side-title">Dovednosti</p>
         <ul class="skills">
           <li>Mentální odolnost</li>
@@ -237,7 +251,7 @@
       <li class="t-row">
         <span class="t-when">Současnost</span>
         <div class="t-body" style="--c:var(--mind)">
-          <h3>Mentální kouč a mentor</h3>
+          <h3>Mentální kouč · Winning Minds</h3>
           <p>Individuální koučink a dlouhodobý mentoring pro lidi, kteří chtějí růst a podávat výkon bez vyhoření.</p>
         </div>
       </li>
@@ -274,31 +288,32 @@
 
   <section class="section" id="clanky" aria-labelledby="press-title">
     <div class="sec-head">
-      <div class="eyebrow-row"><p class="eyebrow">Články</p><span class="sample">Ukázkový obsah</span></div>
-      <h2 id="press-title">Píší a mluví o mně</h2>
-      <p>Rozhovory, podcasty a texty, ve kterých sdílím, jak přemýšlím o výkonu a o hlavě.</p>
+      <p class="eyebrow">Média a vystoupení</p>
+      <h2 id="press-title">Kde o výkonu a hlavě mluvím</h2>
+      <p>Panelové diskuse, rozhovory a podcasty o tom, jak podávat výkon v práci i v životě bez vyhoření.</p>
     </div>
     <div class="press-grid">
       <article class="press glass spec">
-        <div class="press-src">Podcast
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg>
+        <div class="press-media">
+          <span aria-hidden="true">Panel</span>
+          <img src="assets/img/panel-worklife.jpg" alt="Michal Cipro na panelové diskusi Worklife Balance" loading="lazy" onerror="this.remove()">
         </div>
-        <h3>Jak pracovat s hlavou pod tlakem</h3>
-        <p>Rozhovor o tom, proč výkon začíná v hlavě a jak s tím pracovat v praxi.</p>
+        <div class="press-body">
+          <div class="press-src">Panelová diskuse</div>
+          <h3>Worklife Balance: jak optimalizovat výkon v práci a životě bez vyhoření</h3>
+          <p>Diskuse s Denisou Hrubešovou (Forendors) a Michalem Ptáčkem (CzechCrunch).</p>
+        </div>
       </article>
       <article class="press glass spec">
-        <div class="press-src">Rozhovor
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>
+        <div class="press-media">
+          <span aria-hidden="true">Rozhovor</span>
+          <img src="assets/img/rozhovor-hackni-zivot.jpg" alt="Michal Cipro v rozhovoru pro Hackni život" loading="lazy" onerror="this.remove()">
         </div>
-        <h3>Od kurtu ke koučinku</h3>
-        <p>O cestě od sportu k práci s lidmi a o tom, co mají společného.</p>
-      </article>
-      <article class="press glass spec">
-        <div class="press-src">Blog
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg>
+        <div class="press-body">
+          <div class="press-src">Rozhovor · Hackni život</div>
+          <h3>Mentální síla a výkon bez vyhoření</h3>
+          <p>Rozhovor o tom, proč výkon začíná v hlavě a jak s ní pracovat v praxi.</p>
         </div>
-        <h3>Vibecoding: jak stavím věci s AI</h3>
-        <p>Proč mě baví tvořit software bez klasického programování a co už jsem postavil.</p>
       </article>
     </div>
   </section>
