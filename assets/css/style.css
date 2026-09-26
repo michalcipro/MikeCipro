@@ -395,6 +395,16 @@ a{color:inherit}
 .press h3{font-size:clamp(19px,1.8vw,22px);font-weight:700;line-height:1.25;letter-spacing:-.02em}
 .press p{font-size:14.5px;color:var(--ink-2)}
 
+.press-list{list-style:none;margin:16px 0 0;padding:8px;border-radius:var(--r-xl)}
+.press-list li + li{border-top:1px solid var(--line)}
+.press-list a{display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:6px 24px;align-items:center;padding:18px 20px;border-radius:18px;text-decoration:none;color:var(--ink);transition:background .25s}
+.press-list a:hover{background:var(--glass-strong)}
+.pl-src{font:500 11px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.pl-title{font-size:16px;font-weight:600;line-height:1.4;letter-spacing:-.01em}
+.pl-arrow{color:var(--ink-3);transition:transform .35s var(--ease),color .25s}
+.press-list a:hover .pl-arrow{transform:translate(2px,-2px);color:var(--ink)}
+@media (max-width:620px){.press-list a{grid-template-columns:minmax(0,1fr) auto;padding:16px 14px}.pl-src{grid-column:1 / -1}}
+
 /* ---------- collaborations ---------- */
 .marquee{overflow:hidden;padding-block:6px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
 .marquee-track{display:flex;gap:12px;width:max-content;animation:marquee 38s linear infinite}
