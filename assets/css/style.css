@@ -171,12 +171,18 @@ a{color:inherit}
 @media (max-width:760px){
   .stage{aspect-ratio:4/5;border-radius:26px}
   .stage-photo{top:6%;width:80%;aspect-ratio:auto}
-  .chat{top:auto;left:12px;right:12px;bottom:14px;display:flex;flex-direction:column;gap:8px}
-  .b{position:relative;top:auto!important;left:auto;right:auto;max-width:82%;font-size:14.5px}
+  .chat{top:auto;left:0;right:0;bottom:0;display:flex;flex-direction:column;justify-content:flex-end;gap:7px;
+    padding:56px 14px 16px;min-height:46%;
+    background:linear-gradient(180deg,rgba(10,14,30,0),rgba(10,14,30,.28) 45%,rgba(10,14,30,.5));
+    -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 22%);mask-image:linear-gradient(180deg,transparent 0,#000 22%)}
+  .b{position:relative;top:auto!important;left:auto;right:auto;max-width:80%;padding:9px 14px 10px;border-radius:19px;font-size:14.5px;line-height:1.28;
+    box-shadow:0 8px 20px -10px rgba(0,0,0,.45);transition:opacity .35s ease,transform .35s ease}
+  .b.in,.b.out{left:auto;right:auto}
   .b.in{align-self:flex-start;margin-left:6px}
   .b.out{align-self:flex-end;margin-right:6px}
-  .b.old{display:none}
-  .receipt{display:none}
+  .b.leaving{opacity:0;transform:translateY(-8px) scale(.96)}
+  .b.pop{animation-duration:.42s}
+  .b .receipt{display:none}
 }
 
 /* ---------- reveal ---------- */
@@ -222,10 +228,9 @@ a{color:inherit}
 @media (max-width:860px){.tile-xl{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:640px){.bento{grid-template-columns:minmax(0,1fr)}.tile-l,.tile-m,.tile-s{grid-column:1 / -1}.tile{min-height:0}}
 
-.focus-stage{position:relative;min-height:380px;border-radius:24px;overflow:hidden;background:radial-gradient(90% 90% at 50% 50%,#f7f8fc,#eef0f6)}
+.focus-stage{position:relative;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;min-height:380px;border-radius:24px;overflow:hidden;background:radial-gradient(90% 90% at 50% 50%,#f7f8fc,#eef0f6)}
 .focus-stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .focus-hint{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.8);font-size:12.5px;font-weight:600;color:var(--ink-3);white-space:nowrap;pointer-events:none}
-@media (hover:none){.focus-hint{display:none}}
 .focus-meter{margin-top:auto;display:grid;gap:10px;padding-top:12px}
 .fm-row{display:flex;justify-content:space-between;align-items:baseline}
 .fm-label{font-size:15px;font-weight:600;color:var(--ink)}

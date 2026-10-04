@@ -154,6 +154,7 @@
       ]
     ];
     var chatVisible = true, timers = [], threadIdx = 0;
+    var compact = window.matchMedia("(max-width: 760px)");
     var later = function (fn, ms) { timers.push(setTimeout(fn, ms)); };
     var makeBubble = function (i, html, typing) {
       var el = document.createElement("div");
@@ -164,17 +165,22 @@
       return el;
     };
     var markOld = function () {
-      var all = $$(".b", chat);
-      all.forEach(function (b, k) { b.classList.toggle("old", k < all.length - 2); });
+      if (!compact.matches) return;
+      var all = $$(".b:not(.leaving)", chat);
+      all.slice(0, Math.max(0, all.length - 3)).forEach(function (b) {
+        b.classList.add("leaving");
+        setTimeout(function () { if (b.parentNode) b.parentNode.removeChild(b); }, 380);
+      });
     };
     var play = function () {
       timers.forEach(clearTimeout); timers = [];
       chat.classList.remove("bye");
       chat.innerHTML = "";
       var msgs = threads[threadIdx % threads.length];
-      var t = 400;
+      var fast = compact.matches;
+      var t = fast ? 250 : 400;
       msgs.forEach(function (text, i) {
-        var typingAt = t, showAt = t + (i % 2 ? 1100 : 800);
+        var typingAt = t, showAt = t + (fast ? (i % 2 ? 750 : 450) : (i % 2 ? 1100 : 800));
         later(function () {
           var ty = makeBubble(i, "<i></i><i></i><i></i>", true);
           chat.appendChild(ty);
@@ -192,13 +198,13 @@
             markOld();
           }, showAt - typingAt);
         }, typingAt);
-        t = showAt + 900;
+        t = showAt + (fast ? 1100 : 900);
       });
-      later(function () { chat.classList.add("bye"); }, t + 3200);
+      later(function () { chat.classList.add("bye"); }, t + (fast ? 2200 : 3200));
       later(function () {
         threadIdx++;
         if (chatVisible) play(); else chat.dataset.pending = "1";
-      }, t + 3800);
+      }, t + (fast ? 2700 : 3800));
     };
     if (hasIO) {
       new IntersectionObserver(function (en) {
@@ -215,7 +221,7 @@
   if (fStage && fCanvas && fCanvas.getContext) {
     var ctx = fCanvas.getContext("2d");
     var W = 0, H = 0, parts = [], order = reduced ? 1 : 0, orderTarget = reduced ? 1 : 0;
-    var mouse = { x: -9999, y: -9999, on: false };
+    var mouse = { x: -9999, y: -9999, on: false, touch: false, burst: 0 };
     var palette = [[22, 184, 217], [10, 132, 255], [124, 92, 255], [194, 100, 255], [255, 111, 174]];
     var rings = [[1, 0.44], [0.7, 0.3], [0.4, 0.18], [0.1, 0.08]];
     var mix = function (a, b, k) { return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k]; };
@@ -279,10 +285,11 @@
         var k = ease(clamp((order - p.delay * 0.35) / 0.65, 0, 1));
         var px = p.x + (tx - p.x) * k + p.dx;
         var py = p.y + (ty - p.y) * k + p.dy;
-        if (mouse.on) {
+        if (mouse.on || now < mouse.burst) {
+          var reach = (mouse.touch ? 90 : 95) + (now < mouse.burst ? 35 : 0);
           var mdx = px - mouse.x, mdy = py - mouse.y, d2 = mdx * mdx + mdy * mdy;
-          if (d2 < 9000) {
-            var d = Math.sqrt(d2) || 1, f = (95 - d) * 0.35;
+          if (d2 < reach * reach) {
+            var d = Math.sqrt(d2) || 1, f = (reach - d) * (now < mouse.burst ? 0.45 : 0.32);
             p.dx += (mdx / d) * f; p.dy += (mdy / d) * f;
           }
         }
@@ -308,11 +315,32 @@
     updateOrder();
     window.addEventListener("scroll", updateOrder, { passive: true });
     window.addEventListener("resize", function () { build(); updateOrder(); });
-    fStage.addEventListener("pointermove", function (e) {
+    var aim = function (x, y, touch) {
       var r = fStage.getBoundingClientRect();
-      mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; mouse.on = true;
+      mouse.x = x - r.left; mouse.y = y - r.top; mouse.on = true; mouse.touch = touch;
+    };
+    fStage.addEventListener("pointermove", function (e) {
+      if (e.pointerType === "mouse" || e.pointerType === "pen") aim(e.clientX, e.clientY, false);
     });
-    fStage.addEventListener("pointerleave", function () { mouse.on = false; });
+    fStage.addEventListener("pointerdown", function (e) {
+      if (e.pointerType === "mouse") { aim(e.clientX, e.clientY, false); mouse.burst = performance.now() + 450; }
+    });
+    fStage.addEventListener("pointerleave", function (e) { if (e.pointerType === "mouse") mouse.on = false; });
+    var touchRelease = 0;
+    var onTouch = function (e) {
+      var tch = e.touches[0];
+      if (!tch) return;
+      clearTimeout(touchRelease);
+      aim(tch.clientX, tch.clientY, true);
+      if (e.type === "touchstart") mouse.burst = performance.now() + 450;
+    };
+    fStage.addEventListener("touchstart", onTouch, { passive: true });
+    fStage.addEventListener("touchmove", onTouch, { passive: true });
+    var touchEnd = function () { touchRelease = setTimeout(function () { mouse.on = false; }, 120); };
+    fStage.addEventListener("touchend", touchEnd, { passive: true });
+    fStage.addEventListener("touchcancel", touchEnd, { passive: true });
+    var hint = $(".focus-hint", fStage);
+    if (hint && window.matchMedia("(hover: none)").matches) hint.textContent = "Dotkněte se a táhněte prstem";
     if (reduced) {
       requestAnimationFrame(draw);
     } else if (hasIO) {
