@@ -92,6 +92,15 @@ a{color:inherit}
 .menu-btn[aria-expanded="true"] span:first-child{transform:translateY(3px) rotate(45deg)}
 .menu-btn[aria-expanded="true"] span:last-child{transform:translateY(-3px) rotate(-45deg)}
 @media (max-width:880px){.nav-links{display:none}.menu-btn{display:grid}}
+/* language switch: nav pill (desktop), menu row (mobile), footer link */
+.nav-lang{margin-left:6px;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--ink-2);text-decoration:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);transition:background .25s,color .25s,box-shadow .25s}
+.nav-lang:hover{color:var(--ink);background:rgba(255,255,255,.7)}
+.nav.on-dark .nav-lang{color:rgba(245,245,247,.8);box-shadow:inset 0 0 0 1px rgba(255,255,255,.28)}
+.nav.on-dark .nav-lang:hover{color:#fff;background:rgba(255,255,255,.14)}
+@media (max-width:880px){.nav-lang{display:none}}
+.mobile-menu .menu-lang{display:flex;align-items:center;gap:10px;margin-top:6px;padding:16px 18px 10px;border-top:1px solid rgba(0,0,0,.08);border-radius:0;font-size:17px;letter-spacing:-.01em;color:var(--ink-2)}
+.mobile-menu .menu-lang:hover{background:none;color:var(--ink)}
+.menu-lang svg{width:20px;height:20px;color:#7c5cff}
 /* over dark sections ([data-nav-dark]) the pill turns into dark glass */
 .nav{transition:background .45s var(--ease),box-shadow .45s var(--ease)}
 .nav::before,.nav::after{transition:opacity .45s var(--ease)}
@@ -124,6 +133,8 @@ a{color:inherit}
 .hero-text{display:grid;justify-items:center;gap:18px;max-width:900px;margin-inline:auto;padding-inline:var(--pad)}
 .hero .h-hero{margin-top:4px}
 .hero .sub{max-width:30em}
+html[lang="en"] .hero-text{max-width:1060px}
+.nobr{white-space:nowrap}
 .ctas{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:14px 28px;margin-top:14px}
 
 .stage-wrap{padding:clamp(48px,6vw,80px) var(--pad) clamp(80px,10vw,140px)}
@@ -228,7 +239,7 @@ a{color:inherit}
 .manifest{padding-block:clamp(100px,13vw,190px);text-align:center}
 .manifest .eyebrow{margin-bottom:28px}
 .manifest-text{max-width:22em;margin-inline:auto;font-size:clamp(30px,4.2vw,56px);font-weight:700;line-height:1.14;letter-spacing:-.035em;color:var(--ink)}
-.js .manifest-text .w{color:#d2d2d7;transition:color .35s linear}
+.js .manifest-text .w{color:#d2d2d7;transition:color .35s linear;white-space:nowrap}
 .js .manifest-text .w.on{color:var(--ink)}
 .js .manifest-text .g .w.on{color:var(--violet)}
 
@@ -428,6 +439,10 @@ a{color:inherit}
 .foot-meta p{margin:0}
 .foot-clock{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--ink-2);font-variant-numeric:tabular-nums}
 .foot-clock svg{width:14px;height:14px;color:#0a84ff}
+.foot-sub{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px}
+.foot-lang{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--ink-2);text-decoration:none;transition:color .25s}
+.foot-lang:hover{color:var(--ink)}
+.foot-lang svg{width:14px;height:14px;color:#7c5cff}
 .to-top{display:grid;place-items:center;flex:none;width:44px;height:44px;border-radius:50%;color:var(--ink);transition:translate .45s var(--ease)}
 .to-top svg{position:relative;z-index:2;width:18px;height:18px}
 .to-top:hover{translate:0 -3px}
