@@ -405,11 +405,37 @@ a{color:inherit}
 @media (max-width:480px){.copy .copy-label{display:none}.copy{padding:0 12px}.email-field{font-size:15px;padding-left:16px}}
 
 /* footer */
-.site-footer{background:var(--gray);padding-block:22px calc(22px + env(safe-area-inset-bottom,0px));font-size:12px;letter-spacing:-.01em;color:var(--ink-3)}
-.footer-row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;padding-top:16px;border-top:1px solid var(--line)}
-.footer-row a{text-decoration:none;color:var(--ink-2)}
-.footer-row a:hover{text-decoration:underline}
-.footer-note{padding-bottom:14px;line-height:1.5}
+/* footer: brand, contact chips, quick nav, meta row with live Prague time and back-to-top */
+.site-footer{position:relative;overflow:hidden;background:var(--gray);padding:clamp(52px,6vw,76px) 0 calc(26px + env(safe-area-inset-bottom,0px));color:var(--ink-2)}
+.site-footer::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(38% 60% at 8% 0%,rgba(10,132,255,.09),transparent 70%),radial-gradient(34% 55% at 92% 8%,rgba(124,92,255,.09),transparent 70%)}
+.site-footer .wrap{position:relative}
+.foot-top{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:36px 56px;align-items:start}
+.foot-logo{display:inline-flex;align-items:center;gap:10px;font-size:21px;font-weight:700;letter-spacing:-.03em;color:var(--ink);text-decoration:none}
+.foot-logo .brand-dot{width:28px;height:28px}
+.foot-note{margin-top:12px;max-width:26em;font-size:15px;line-height:1.5;color:var(--ink-2)}
+.foot-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.foot-chip{display:inline-flex;align-items:center;gap:10px;max-width:100%;min-height:46px;padding:0 18px 0 6px;border-radius:999px;font-size:15px;font-weight:600;letter-spacing:-.015em;color:var(--ink);text-decoration:none;transition:translate .45s var(--ease)}
+.foot-chip:hover{translate:0 -2px}
+.foot-chip > span{position:relative;z-index:2;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.foot-ic{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;flex:none;color:#fff}
+.foot-ic svg{width:17px;height:17px}
+.foot-ic-mail{background:linear-gradient(135deg,#16b8d9,#0a84ff 50%,#7c5cff);box-shadow:inset 0 1px 1px rgba(255,255,255,.55),0 6px 14px -6px rgba(60,70,200,.55)}
+.foot-nav{display:grid;grid-template-columns:repeat(2,minmax(0,max-content));gap:2px 40px;justify-self:end}
+.foot-nav a{padding:7px 0;font-size:15px;font-weight:500;color:var(--ink-2);text-decoration:none;transition:color .25s}
+.foot-nav a:hover{color:var(--ink)}
+.foot-bottom{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:44px;padding-top:20px;border-top:1px solid rgba(0,0,0,.08)}
+.foot-meta{display:grid;gap:6px;font-size:13px;color:var(--ink-3)}
+.foot-meta p{margin:0}
+.foot-clock{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.foot-clock svg{width:14px;height:14px;color:#0a84ff}
+.to-top{display:grid;place-items:center;flex:none;width:44px;height:44px;border-radius:50%;color:var(--ink);transition:translate .45s var(--ease)}
+.to-top svg{position:relative;z-index:2;width:18px;height:18px}
+.to-top:hover{translate:0 -3px}
+@media (max-width:760px){
+  .foot-top{grid-template-columns:minmax(0,1fr);gap:28px}
+  .foot-nav{justify-self:stretch;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 12px;padding-top:20px;border-top:1px solid rgba(0,0,0,.08)}
+  .foot-bottom{margin-top:28px}
+}
 .clock{font-variant-numeric:tabular-nums}
 
 /* ---------- reduced motion ---------- */
