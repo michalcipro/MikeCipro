@@ -317,25 +317,30 @@ a{color:inherit}
 /* timeline: gradient rail, nodes and soft cards; the current role pulses */
 .exp{position:relative;list-style:none;margin:0;padding:0 0 0 40px;display:grid;gap:14px}
 .exp::before{content:"";position:absolute;left:10px;top:43px;bottom:0;width:2px;border-radius:2px;background:linear-gradient(180deg,#0a84ff,#7c5cff 60%,rgba(194,100,255,0))}
-.exp li{position:relative;display:grid;grid-template-columns:210px minmax(0,1fr);gap:10px 36px;align-items:start;padding:28px 32px 30px;border-radius:26px;background:linear-gradient(180deg,#fbfbfd,#f3f4f7);box-shadow:inset 0 1px 0 #fff,0 0 0 1px rgba(0,0,0,.035);transition:translate .6s var(--ease),box-shadow .6s var(--ease)}
-.exp li:hover{translate:0 -3px;box-shadow:inset 0 1px 0 #fff,0 0 0 1px rgba(0,0,0,.035),0 26px 50px -34px rgba(20,30,70,.45)}
-.exp li::before{content:"";position:absolute;left:-36px;top:36px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:inset 0 0 0 3px #0a84ff,0 0 0 5px rgba(10,132,255,.12)}
-.exp li.exp-now::before{background:linear-gradient(135deg,#0a84ff,#7c5cff);box-shadow:0 0 0 3px #fff,0 0 0 5px rgba(10,132,255,.3)}
-.exp li.exp-now::after{content:"";position:absolute;left:-36px;top:36px;width:14px;height:14px;border-radius:50%;animation:exp-pulse 2.4s var(--ease) infinite}
+.exp>li{position:relative;display:grid;grid-template-columns:210px minmax(0,1fr);gap:10px 36px;align-items:start;padding:28px 32px 30px;border-radius:26px;background:linear-gradient(180deg,#fbfbfd,#f3f4f7);box-shadow:inset 0 1px 0 #fff,0 0 0 1px rgba(0,0,0,.035);transition:translate .6s var(--ease),box-shadow .6s var(--ease)}
+.exp>li:hover{translate:0 -3px;box-shadow:inset 0 1px 0 #fff,0 0 0 1px rgba(0,0,0,.035),0 26px 50px -34px rgba(20,30,70,.45)}
+.exp>li::before{content:"";position:absolute;left:-36px;top:36px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:inset 0 0 0 3px #0a84ff,0 0 0 5px rgba(10,132,255,.12)}
+.exp>li.exp-now::before{background:linear-gradient(135deg,#0a84ff,#7c5cff);box-shadow:0 0 0 3px #fff,0 0 0 5px rgba(10,132,255,.3)}
+.exp>li.exp-now::after{content:"";position:absolute;left:-36px;top:36px;width:14px;height:14px;border-radius:50%;animation:exp-pulse 2.4s var(--ease) infinite}
 @keyframes exp-pulse{0%{box-shadow:0 0 0 0 rgba(10,132,255,.45)}80%,100%{box-shadow:0 0 0 14px rgba(10,132,255,0)}}
 .exp-when{justify-self:start;display:inline-flex;align-items:center;min-height:30px;padding:6px 13px;border-radius:999px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.06),0 2px 6px -3px rgba(20,30,70,.18);font-size:13.5px;font-weight:600;letter-spacing:-.01em;color:var(--ink-2);white-space:nowrap}
 .exp-now .exp-when{background:linear-gradient(135deg,#0a84ff,#7c5cff);color:#fff;box-shadow:inset 0 1px 1px rgba(255,255,255,.4),0 6px 14px -6px rgba(60,70,200,.55)}
 .exp h3{font-size:clamp(22px,2vw,28px);font-weight:700;letter-spacing:-.03em}
 .exp p{margin-top:8px;color:var(--ink-2);max-width:40em}
-.exp-with-logo{display:flex;align-items:center;gap:12px}
-.exp-logo{width:auto;height:1.25em}
+.exp .exp-clients-label{margin-top:20px;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.exp-clients{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:10px 0 0;padding:0}
+.exp-clients li{display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px 8px;padding:8px 14px;border-radius:14px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.06),0 2px 6px -3px rgba(20,30,70,.16);font-size:14px;line-height:1.3}
+.exp-clients b{font-weight:600;color:var(--ink)}
+.exp-clients span{color:var(--ink-3)}
+.exp-clients img{width:auto;height:16px}
 @media (max-width:700px){
   .exp{padding-left:28px;gap:12px}
   .exp::before{left:6px;top:35px}
-  .exp li{grid-template-columns:minmax(0,1fr);gap:12px;padding:20px 20px 22px;border-radius:22px}
-  .exp li::before,.exp li.exp-now::after{left:-27px;top:29px;width:12px;height:12px}
+  .exp>li{grid-template-columns:minmax(0,1fr);gap:12px;padding:20px 20px 22px;border-radius:22px}
+  .exp>li::before,.exp>li.exp-now::after{left:-27px;top:29px;width:12px;height:12px}
+  .exp-clients{display:grid}
 }
-@media (prefers-reduced-motion:reduce){.exp li.exp-now::after{animation:none}}
+@media (prefers-reduced-motion:reduce){.exp>li.exp-now::after{animation:none}}
 
 /* education */
 .edu{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;list-style:none;margin:0;padding:0}
