@@ -35,6 +35,25 @@
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") setMenu(false); });
   }
 
+  /* ---------- nav turns into dark glass over dark sections ---------- */
+  var navEl = $("#nav"), darkSecs = $$("[data-nav-dark]");
+  if (navEl && darkSecs.length) {
+    var navTick = false;
+    var navTheme = function () {
+      navTick = false;
+      var nr = navEl.getBoundingClientRect(), y = nr.top + nr.height / 2, dark = false;
+      for (var i = 0; i < darkSecs.length; i++) {
+        var r = darkSecs[i].getBoundingClientRect();
+        if (r.top <= y && r.bottom >= y) { dark = true; break; }
+      }
+      navEl.classList.toggle("on-dark", dark);
+    };
+    var navReq = function () { if (!navTick) { navTick = true; requestAnimationFrame(navTheme); } };
+    window.addEventListener("scroll", navReq, { passive: true });
+    window.addEventListener("resize", navReq);
+    navTheme();
+  }
+
   /* ---------- scrollspy ---------- */
   var links = $$(".nav-links a");
   if (hasIO && links.length) {
