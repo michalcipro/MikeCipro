@@ -138,17 +138,29 @@ a{color:inherit}
 /* iMessage-style thread around the portrait */
 .chat{position:absolute;inset:0;z-index:2;pointer-events:none}
 .b{
-  position:absolute;max-width:min(30%,360px);padding:11px 16px 12px;border-radius:22px;
+  --r:22px;--rt:18px;
+  position:absolute;max-width:min(30%,360px);padding:11px 16px 12px;
   font-size:clamp(14px,1.25vw,17px);font-weight:500;line-height:1.3;letter-spacing:-.015em;
-  box-shadow:0 12px 28px -12px rgba(20,30,70,.28),0 1px 2px rgba(20,30,70,.06);
+  filter:drop-shadow(0 8px 12px rgba(20,30,70,.14));
   text-align:left;
 }
-.b::after{content:"";position:absolute;bottom:0;width:17px;height:21px;background:var(--bf)}
-.b.in{--bf:#fff;background:#fff;color:var(--ink);left:12.5%;border-bottom-left-radius:22px}
-.b.out{--bf:#0a7cff;background:linear-gradient(180deg,#2b95ff,#0a7cff);color:#fff;right:12.5%}
-.b.in::after{left:-6px;clip-path:path("M17 0 V21 H0 C6 20 10 16 11 9 Z")}
-.b.out::after{right:-6px;clip-path:path("M0 0 V21 H17 C11 20 7 16 6 9 Z")}
-.b span{position:relative;z-index:1}
+/* Bubble + tail read as one shape, like iMessage:
+   - body (::before) and tail (::after) are both cut with clip-path, so their edges share the same
+     sub-pixel position (a plain background would be pixel-snapped and leave a half-pixel step);
+   - the tail covers the body's corner on its side (--rt), leaves the side edge tangentially, sweeps
+     out to the tip and curls back into the bottom edge;
+   - the blue gradient is anchored to the bottom in px, so body and tail match at every height;
+   - the shadow is a drop-shadow filter, so it follows body and tail together. */
+.b::before,.b::after{content:"";position:absolute;background:var(--bf);background-repeat:no-repeat}
+.b::before{inset:-1px;background-position:0 -1px}
+.b::after{bottom:0;width:24.75px;height:20.25px}
+.b.in{--bf:#fff;color:var(--ink);left:12.5%}
+.b.out{--bf:linear-gradient(0deg,#0a7cff,#2b95ff 64px);color:#fff;right:12.5%}
+.b.in::before{clip-path:inset(1px round var(--r) var(--r) var(--r) var(--rt))}
+.b.out::before{clip-path:inset(1px round var(--r) var(--r) var(--rt) var(--r))}
+.b.in::after{left:-6.75px;clip-path:path("M 6.75 0 C 6.75 9 5.62 16.43 0 20.25 C 2.93 19.57 5.29 17.55 7.88 17.55 C 11.81 17.55 15.75 20.25 24.75 20.25 L 24.75 0 Z")}
+.b.out::after{right:-6.75px;clip-path:path("M 18 0 C 18 9 19.12 16.43 24.75 20.25 C 21.82 19.57 19.46 17.55 16.88 17.55 C 12.94 17.55 9 20.25 0 20.25 L 0 0 Z")}
+.b span,.b.typing i{position:relative;z-index:1}
 .b[style*="--slot:0"]{top:8%}
 .b[style*="--slot:1"]{top:21%}
 .b[style*="--slot:2"]{top:37%}
@@ -175,11 +187,14 @@ a{color:inherit}
     padding:56px 14px 16px;min-height:46%;
     background:linear-gradient(180deg,rgba(10,14,30,0),rgba(10,14,30,.28) 45%,rgba(10,14,30,.5));
     -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 22%);mask-image:linear-gradient(180deg,transparent 0,#000 22%)}
-  .b{position:relative;top:auto!important;left:auto;right:auto;max-width:80%;padding:9px 14px 10px;border-radius:19px;font-size:14.5px;line-height:1.28;
-    box-shadow:0 8px 20px -10px rgba(0,0,0,.45);transition:opacity .35s ease,transform .35s ease}
+  .b{--r:19px;--rt:16px;position:relative;top:auto!important;left:auto;right:auto;max-width:80%;padding:9px 14px 10px;font-size:14.5px;line-height:1.28;
+    filter:drop-shadow(0 5px 9px rgba(0,0,0,.24));transition:opacity .35s ease,transform .35s ease}
   .b.in,.b.out{left:auto;right:auto}
   .b.in{align-self:flex-start;margin-left:6px}
   .b.out{align-self:flex-end;margin-right:6px}
+  .b::after{width:22px;height:18px}
+  .b.in::after{left:-6px;clip-path:path("M 6 0 C 6 8 5 14.6 0 18 C 2.6 17.4 4.7 15.6 7 15.6 C 10.5 15.6 14 18 22 18 L 22 0 Z")}
+  .b.out::after{right:-6px;clip-path:path("M 16 0 C 16 8 17 14.6 22 18 C 19.4 17.4 17.3 15.6 15 15.6 C 11.5 15.6 8 18 0 18 L 0 0 Z")}
   .b.leaving{opacity:0;transform:translateY(-8px) scale(.96)}
   .b.pop{animation-duration:.42s}
   .b .receipt{display:none}
