@@ -102,6 +102,13 @@
     navTheme();
   }
 
+  /* ---------- analytics: in-page links are tracked without holding up the scroll ---------- */
+  document.addEventListener("click", function (e) {
+    var el = e.target && e.target.closest ? e.target.closest("[data-track]") : null;
+    if (!el || !window.umami || typeof window.umami.track !== "function") return;
+    try { window.umami.track(el.getAttribute("data-track")); } catch (err) {}
+  });
+
   /* ---------- scrollspy ---------- */
   var links = $$(".nav-links a");
   if (hasIO && links.length) {
